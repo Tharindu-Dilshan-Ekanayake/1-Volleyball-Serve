@@ -75,7 +75,7 @@ export function startGameTicker() {
       atPlate: inRollZone(p.x, p.z, 1.5),
       // At the Ball Shop's counter (its panel opens).
       ballShop: nearBallShop(p.x, p.z),
-      // On the Sword Counter's dais (it sells your next sword).
+      // On the Ball Counter's dais (it sells your next ball).
       swordCounter: atSwordCounter(p.x, p.z),
       egg: egg ? egg.eggId : null,
       portal: portalAt(p.x, p.z)?.id ?? null,

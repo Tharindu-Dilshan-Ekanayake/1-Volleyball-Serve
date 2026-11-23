@@ -27,7 +27,7 @@ const DUPLICATE_LOGIN = 4100
 const POD = process.env.POD_NAME || `local-${process.pid}`
 
 /** What other players may be told someone is doing. */
-/** What a player can be seen doing: 'run' training on a dummy, 'pull' winding up a throw, 'swing' a click slash. */
+/** What a player can be seen doing: 'run' training on a court, 'pull' winding up a serve, 'swing' a click spike. */
 const ANIMS = ['idle', 'walk', 'run', 'jump', 'pull', 'swing']
 /** A Boxity emote, replicated through `anim` as 'emote:<its 24-hex id>'. */
 const EMOTE_ANIM = /^emote:[a-f0-9]{24}$/
@@ -153,7 +153,7 @@ export class GameRoom extends Room {
         return ok
       },
       onRoll: (result) => {
-        // Everyone else watches the sword fly down its own line of the field. Excluded by session id, not by the
+        // Everyone else watches the ball fly down its own line of the field. Excluded by session id, not by the
         // client object from the join: after a reconnect that object is stale, and the
         // roller would get their own roll back as a second tire.
         const self = this.clients.find((c) => c.sessionId === client.sessionId)

@@ -34,19 +34,19 @@ export function handleServerEvent(type, payload) {
         sfx.rebirth()
         burst({ ...atPlayer(), count: 60, speed: 9 })
       } else if (game.profileLoaded && payload.profile.ownedTires.length > before.ownedTires.length) {
-        // A new sword: a shower of confetti and its name up in lights.
+        // A new ball: a shower of confetti and its name up in lights.
         sfx.buy()
         sfx.wins()
         burst({ ...atPlayer(2.5), count: 60, palette: 'confetti', speed: 9 })
         const tire = TIRES.find((t) => t.id === payload.profile.equippedTire)
-        if (tire) game.showToast(`NEW SWORD: ${tire.name}!${tutorialDone(before, payload.profile) ? ' Tutorial complete - have fun!' : ''}`)
+        if (tire) game.showToast(`NEW BALL: ${tire.name}!${tutorialDone(before, payload.profile) ? ' Tutorial complete - have fun!' : ''}`)
       } else if (game.profileLoaded && (payload.profile.ownedBalls?.length || 0) > (before.ownedBalls?.length || 0)) {
-        // A new enchantment: the same, in its colours.
+        // A new aura: the same, in its colours.
         sfx.buy()
         sfx.wins()
         burst({ ...atPlayer(2.5), count: 60, palette: 'gold', speed: 9 })
         const ball = BALLS.find((b) => b.id === payload.profile.equippedBall)
-        if (ball) game.showToast(`NEW ENCHANT: ${ball.name}!${tutorialDone(before, payload.profile) ? ' Tutorial complete - have fun!' : ''}`)
+        if (ball) game.showToast(`NEW AURA: ${ball.name}!${tutorialDone(before, payload.profile) ? ' Tutorial complete - have fun!' : ''}`)
       }
       break
     }
@@ -80,7 +80,7 @@ export function handleServerEvent(type, payload) {
     case 'streak':
       // Played past midnight: the streak's next day starts now.
       sfx.wins()
-      game.showToast(`DAY ${payload.days} STREAK! x${payload.multiplier.toFixed(1)} Wins on every throw`)
+      game.showToast(`DAY ${payload.days} STREAK! x${payload.multiplier.toFixed(1)} Wins on every serve`)
       break
 
     case 'pack':
@@ -108,7 +108,7 @@ export function handleServerEvent(type, payload) {
       break
 
     case 'star': {
-      // Dragonfire Peaks' Secret Star, found: a shower of gold and the news.
+      // Christmas Village's Secret Star, found: a shower of gold and the news.
       sfx.wins()
       sfx.levelUp()
       burst({ ...atPlayer(2), count: 70, palette: 'gold', speed: 10 })
@@ -125,7 +125,7 @@ export function handleServerEvent(type, payload) {
       const world = WORLDS[payload.world]
       game.showToast(
         payload.world === 1
-          ? `WELCOME TO ${world.name.toUpperCase()}! x${world.wins} Wins on every throw!${payload.first ? ' A Secret Star is hidden here...' : ''}`
+          ? `WELCOME TO ${world.name.toUpperCase()}! x${world.wins} Wins on every serve!${payload.first ? ' A Secret Star is hidden here...' : ''}`
           : `Back in ${world.name}!`,
       )
       break

@@ -359,7 +359,7 @@ export async function loadProfile(id, name, owner) {
 
 /**
  * Saves a profile if `owner` still owns it. Resolves false when it was dropped (owned
- * by a newer session) or failed; never throws, so a save can't break a leave.
+ * by a newer session) or failed; never serves, so a save can't break a leave.
  */
 export async function saveProfile(profile, owner) {
   profile.lastSeen = Date.now()

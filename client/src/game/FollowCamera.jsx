@@ -30,23 +30,23 @@ const LOOK_SMOOTHING = 14
 const _desired = new Vector3()
 const _target = new Vector3()
 const _batTarget = new Vector3()
-/** How far the view has swung round to the throw view (0-1), and into the wind-up, eased. */
+/** How far the view has swung round to the serve view (0-1), and into the wind-up, eased. */
 let batView = 0
 let slowView = 0
 /**
- * Up on the throw stage you can still look around like anywhere else: the first drag or zoom
+ * Up on the serve stage you can still look around like anywhere else: the first drag or zoom
  * there hands the camera back to your own orbit (`userLook`), and it stays yours until you
- * step off. (Winding up and the throw itself always use the throw view, then it gives the
+ * step off. (Winding up and the serve itself always use the serve view, then it gives the
  * view back.) Plain module state, read every frame.
  */
 let userLook = false
 let lookView = 0
 /**
- * The throw view: low behind you and over your right shoulder, looking up the long valley
- * road your sword is about to fly down - you in the lower third, the road, its first gates
+ * The serve view: low behind you and over your right shoulder, looking up the long valley
+ * road your ball is about to fly down - you in the lower third, the road, its first gates
  * and the sky ahead filling the rest, clear of the HUD. On a narrow screen held upright it
  * sits a little further back so all of you fits. It breathes a little while you wait
- * (`drift`); as you wind up it pushes in and drops a touch (`slow`), into the throw.
+ * (`drift`); as you wind up it pushes in and drops a touch (`slow`), into the serve.
  */
 const BAT_VIEW = {
   /** What it looks at, from where you stand on the stage (x: on a wide screen; narrowX upright). */
@@ -164,10 +164,10 @@ export function FollowCamera() {
     }
     const delta = Math.min(rawDelta, 0.05)
     const p = runtime.player.position
-    // Up on the throw stage: swing round to the throw view (BAT_VIEW).
+    // Up on the serve stage: swing round to the serve view (BAT_VIEW).
     const pulling = isPulling()
     if (!pulling) userLook = false
-    // Free look on the stage, except while winding up / throwing (the throw view frames it).
+    // Free look on the stage, except while winding up / serving (the serve view frames it).
     const winding = launch.stage === 'charge' || launch.released
     const wantLook = userLook && !winding ? 1 : 0
     lookView += (wantLook - lookView) * (1 - Math.exp(-6 * delta))

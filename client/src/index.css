@@ -9,6 +9,11 @@
    * and floored so touch targets stay usable on phones.
    */
   --px: clamp(0.3px, min(100vw / 1920, 100vh / 1080), 1.4px);
+  /* Popups (ui/panels/Panel.jsx) draw a size smaller than the HUD: everything in them shrinks together. */
+  --panel-scale: 0.68;
+  /* Room kept clear down each side for the portal's side ads (wide screens only: see below). */
+  --ad-side: 0px;
+  --panel-px: calc(var(--px) * var(--panel-scale));
 }
 
 /*
@@ -51,10 +56,18 @@
   bottom: 100px;
 }
 
+/* Wide screens: the portal shows a 300 px ad down each side (Boxity screen ads), so popups keep clear of them. */
+@media (min-width: 1280px) and (orientation: landscape) {
+  :root {
+    --ad-side: 310px;
+  }
+}
+
 @media (orientation: portrait) {
   :root {
     /* Upright: sized to the width, as if the screen were 1000 reference px wide. */
     --px: clamp(0.3px, min(100vw / 1000, 100vh / 1900), 1.4px);
+    --panel-px: calc(var(--px) * var(--panel-scale));
   }
   .hud-topcenter {
     top: calc(var(--px) * 96);

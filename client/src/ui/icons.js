@@ -157,36 +157,34 @@ const heart = svg(
 )
 
 /**
- * A sword (the game's `bat` icon, kept for the template's callers): a broad steel blade
- * with a bright edge and a fuller, a gold crossguard, a blue wrapped grip and a gem
- * pommel, tilted for action, with speed streaks behind it.
+ * A volleyball (the game's `bat` icon, kept for the template's callers): a white ball with
+ * blue and gold panels swirling out from its middle, a shine, and speed streaks behind it.
  */
-const SWORD_BLADE = 'M50 6 L59 18 L59 66 L41 66 L41 18 Z'
+const VB_PANEL = 'M50 50 Q66 46 80 60 L84 84 Q60 66 50 50 Z'
 const bat = svg(
-  `<g transform="rotate(38 50 50)">
-    <path d="${SWORD_BLADE}" fill="none" stroke="${OUT}" stroke-width="10" stroke-linejoin="round"/>
-    <path d="${SWORD_BLADE}" fill="url(#bt-s)"/>
-    <path d="M50 10 L50 64" stroke="#8fa2bf" stroke-width="3.5" stroke-linecap="round"/>
-    <path d="M45 20 L45 62" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity=".9"/>
-    <rect x="30" y="64" width="40" height="9" rx="4" fill="url(#bt-g)" stroke="${OUT}" stroke-width="5"/>
-    <rect x="45" y="72" width="10" height="15" rx="3" fill="#2f5fd0" stroke="${OUT}" stroke-width="4.5"/>
-    <path d="M45.5 76.5h9M45.5 81h9" stroke="#8fb8ff" stroke-width="2"/>
-    <circle cx="50" cy="91" r="5.5" fill="#ff3b5c" stroke="${OUT}" stroke-width="4"/>
-    <circle cx="48.5" cy="89.5" r="1.6" fill="#fff"/>
+  `<path d="M8 62l16-3M5 48l15 2M12 76l13-7" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <path d="M8 62l16-3M5 48l15 2M12 76l13-7" stroke="${OUT}" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+  <circle cx="56" cy="50" r="38" fill="#ffffff" stroke="${OUT}" stroke-width="7"/>
+  <clipPath id="vb-c"><circle cx="56" cy="50" r="35"/></clipPath>
+  <g clip-path="url(#vb-c)" transform="translate(6 0)">
+    <path d="${VB_PANEL}" fill="url(#vb-y)" transform="rotate(0 50 50)"/>
+    <path d="${VB_PANEL}" fill="url(#vb-b)" transform="rotate(120 50 50)"/>
+    <path d="${VB_PANEL}" fill="url(#vb-y)" transform="rotate(240 50 50)"/>
+    <path d="M50 50 Q66 46 80 60 L96 72" fill="none" stroke="${OUT}" stroke-width="3.5" transform="rotate(0 50 50)"/>
+    <path d="M50 50 Q66 46 80 60 L96 72" fill="none" stroke="${OUT}" stroke-width="3.5" transform="rotate(120 50 50)"/>
+    <path d="M50 50 Q66 46 80 60 L96 72" fill="none" stroke="${OUT}" stroke-width="3.5" transform="rotate(240 50 50)"/>
   </g>
-  <path d="M10 66l14-4M6 54l13 1M14 78l11-8" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
-  <path d="M10 66l14-4M6 54l13 1M14 78l11-8" stroke="${OUT}" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>`,
-  vgrad('bt-s', [
-    [0, '#ffffff'],
-    [0.5, '#d6e2f2'],
-    [1, '#9aaac2'],
-  ]) + vgrad('bt-g', GOLD),
+  <path d="M34 30c4-6 10-10 17-11" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".9"/>`,
+  vgrad('vb-y', GOLD) +
+    vgrad('vb-b', [
+      [0, '#7fc4ff'],
+      [1, '#2f5fd0'],
+    ]),
 )
 
 /**
- * An enchantment orb (the game's `ball` icon, kept for the template's callers): a glowing
- * violet orb swirling with light, a bright core and sparkles round it, in the thick ink
- * outline.
+ * An aura orb (the game's `ball` icon, kept for the template's callers): a glowing violet
+ * orb swirling with light, a bright core and sparkles round it, in the thick ink outline.
  */
 const ball = svg(
   `<circle cx="50" cy="52" r="38" fill="url(#bl-g)" stroke="${OUT}" stroke-width="6"/>
@@ -346,7 +344,7 @@ export const ICON_SVGS = {
   settings,
   heart,
   bat,
-  // The template's name for the item you upgrade: everything that asks for it gets the bat.
+  // The template's name for the item you upgrade: everything that asks for it gets the volleyball.
   tire: bat,
   ball,
   potionWins,
@@ -364,8 +362,8 @@ export const EGG_COLORS = {
   sunset: ['#ffc07a', '#ff6a3d', '#ffe2b8'],
   unicorn: ['#f6eaff', '#d3b4ff', '#ffd1f0'],
   volcano: ['#5a3a30', '#2a1814', '#ff6a14'],
-  // Lava Land's Lava Egg (id 'beach'): molten orange shell with glowing yellow spots.
-  beach: ['#ffb03a', '#d8320c', '#fff06a'],
+  // Christmas Village's Gift Egg (id 'beach'): red wrapping, a green ribbon, white dots.
+  beach: ['#ff4a5a', '#c8102e', '#ffffff'],
 }
 
 const urlCache = new Map()

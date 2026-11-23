@@ -7,11 +7,11 @@ import { zoneIndexAt } from '@shared/logic'
 import { getQuality } from '../../store/quality'
 import { createBoxInstances, disposeBlocks } from '../blocks'
 import { sharedMaterials, STYLE } from '../materials'
-import { zones } from '../worldLook'
+import { activeWorld, zones } from '../worldLook'
 import { roll } from './rollControl'
 
 /**
- * Something in the air of every stage while your sword flies over it: pollen over the
+ * Something in the air of every stage while your ball flies over it: pollen over the
  * meadows, autumn leaves in the maple woods, sand on the desert wind, sea spray on the
  * shore, fireflies in the jungle, snowflakes in the frozen passes, blossom petals in the
  * cherry groves, sparkles over candy, crystal and neon, embers rising off the volcanoes,
@@ -83,9 +83,17 @@ const _s = new Vector3()
 const _axis = new Vector3()
 
 /** A fresh spot for particle `i` somewhere in the box ahead of the camera at `cam`. */
-function respawn(pt, cam, anywhere) {
+function respawn(pt, cam, anywhere, around = false) {
+  if (around) {
+    // In the lobby the camera looks every way: a box all round it, new flakes from the top.
+    pt.pos.set(cam.x + (Math.random() - 0.5) * LOBBY_SPAN, cam.y + (anywhere ? (Math.random() - 0.5) : 0.5) * SPAN_Y, cam.z + (Math.random() - 0.5) * LOBBY_SPAN)
+    return
+  }
   pt.pos.set(cam.x + (Math.random() - 0.5) * SPAN_X, cam.y + (Math.random() - 0.5) * SPAN_Y, cam.z - (anywhere ? Math.random() : 0.15 + Math.random() * 0.85) * AHEAD)
 }
+
+/** The lobby's snow box (Christmas Village): this wide each way round the camera. */
+const LOBBY_SPAN = 40
 
 export function Weather() {
   const ref = useRef(null)
@@ -102,7 +110,10 @@ export function Weather() {
     const pts = ref.current
     if (!pts) return
     const st = state.current
-    const kindId = roll.active && getQuality().particles ? BY_THEME[zones()[zoneIndexAt(Math.max(0, roll.meter))].theme] : null
+    // Christmas Village: snow falling all the time, in the lobby and down the court.
+    const snowy = activeWorld() === 1
+    const around = snowy && !roll.active
+    const kindId = !getQuality().particles ? null : snowy ? 'snow' : roll.active ? BY_THEME[zones()[zoneIndexAt(Math.max(0, roll.meter))].theme] : null
     if (!kindId) {
       pts.count = 0
       st.kind = null
@@ -111,12 +122,13 @@ export function Weather() {
     const kind = KINDS[kindId]
     const cam = frame.camera.position
     // A new stage's air: recolour the pool and spread it out round the camera.
-    if (st.kind !== kindId) {
+    if (st.kind !== kindId || st.around !== around) {
       st.kind = kindId
+      st.around = around
       const colors = KIND_COLORS[kindId]
       for (let i = 0; i < COUNT; i += 1) {
         const pt = st.points[i]
-        respawn(pt, cam, true)
+        respawn(pt, cam, true, around)
         pt.axis.set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize()
         pts.setColorAt(i, colors[i % colors.length])
       }
@@ -131,8 +143,8 @@ export function Weather() {
       p.y += (kind.vel[1] + Math.cos(t * 1.1 + pt.phase) * kind.sway * 0.5) * delta
       p.z += kind.vel[2] * delta
       // Out of the box (left behind, or drifted off): back in, ahead.
-      if (p.z > cam.z + BEHIND || p.z < cam.z - AHEAD || Math.abs(p.x - cam.x) > SPAN_X / 2 || Math.abs(p.y - cam.y) > SPAN_Y / 2) {
-        respawn(pt, cam, false)
+      if (around ? Math.abs(p.x - cam.x) > LOBBY_SPAN / 2 || Math.abs(p.z - cam.z) > LOBBY_SPAN / 2 || Math.abs(p.y - cam.y) > SPAN_Y / 2 : p.z > cam.z + BEHIND || p.z < cam.z - AHEAD || Math.abs(p.x - cam.x) > SPAN_X / 2 || Math.abs(p.y - cam.y) > SPAN_Y / 2) {
+        respawn(pt, cam, false, around)
       }
       const twinkle = kind.twinkle ? 0.55 + 0.45 * Math.sin(t * 6 + pt.phase * 3) : 1
       _q.setFromAxisAngle(_axis.copy(pt.axis), t * kind.spin + pt.phase)

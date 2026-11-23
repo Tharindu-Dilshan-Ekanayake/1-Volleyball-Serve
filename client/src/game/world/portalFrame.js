@@ -10,7 +10,7 @@ export const PORTAL_CENTER_Y = PORTALS[0].radius + 0.6
  * on every fourth block), the slab under it, and its swirl's colours (linear RGB).
  */
 export const PORTAL_THEMES = {
-  // Dragonfire Peaks: a ring of basalt and glowing magma, a swirl of fire.
+  // Christmas Village: a ring of basalt and glowing magma, a swirl of fire.
   world2: {
     ring: ['#2a1e22', '#3a2a2e', '#ff6a1e'],
     base: '#1e161a',

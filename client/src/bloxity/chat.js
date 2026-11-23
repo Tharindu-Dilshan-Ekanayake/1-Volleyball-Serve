@@ -27,7 +27,7 @@ const byName = new Map()
 /** Your own bubble: { text, until } or null. */
 let local = null
 
-/** Handles one `chat.onMessage` message. Never throws. */
+/** Handles one `chat.onMessage` message. Never serves. */
 export function handleChatMessage(sdk, m) {
   if (!m || typeof m !== 'object') return
   const text = String(safeCall(sdk?.chat?.bubbleText?.bind(sdk.chat), m) ?? (m.isGif ? 'sent a GIF' : m.text ?? '')).trim()

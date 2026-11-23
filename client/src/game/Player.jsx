@@ -15,8 +15,8 @@ import PlayerAvatar from './PlayerAvatar'
 import { RUN_CADENCE } from './kick'
 import { actions } from '../net/actions'
 import { cancelPull, grab, heldFor, isPulling, launch, pressThrow, releaseThrow, slowAt, standAt, updatePull } from './launch'
-import { BODY } from './playerPose'
-import { swordLength } from './swords'
+import { BODY, SERVE_S } from './playerPose'
+import { ballLength } from './volleyballs'
 import { roll } from './roll/rollControl'
 import { runtime } from './runtime'
 import useKeyboard from './useKeyboard'
@@ -30,8 +30,8 @@ const GRAVITY = 32
 const JUMP_SPEED = 10.5
 /** Ledges up to this high are walked straight onto (the showroom's back stage). */
 const STEP_UP = 1.05
-/** How long the throw's pose plays (seconds) while waiting for the authority's answer. */
-const THROW_POSE_S = 0.95
+/** How long the serve's pose plays (seconds) while waiting for the authority's answer. */
+const THROW_POSE_S = SERVE_S
 /** Each pad's training spot and the way you face there (shared/world), made once: nothing per frame. */
 const TRAIN_SPOTS = Array.from({ length: PAD_COUNT }, (_, i) => cageBatterSpot(i))
 /** On the stage's top (not just beside it at its foot). */
@@ -88,13 +88,13 @@ function pushOut(pos, rect) {
  * rectangular walls, which a circle-vs-rect push-out handles exactly. That saves the
  * ~2 MB Rapier WASM download and keeps the active rigid body count at zero.
  *
- * Walk onto a throw spot in the THROW ZONE and you step up to throw (launch.js): facing
- * down the valley, your sword on your shoulder. HOLD THROW - the button, Space / E, or
- * press and hold on the game - to wind up, and let go to throw (RollButton shows the
- * meter); the throw plays here. The flight itself is the sword's, not yours (roll/): you
+ * Walk onto a serve spot in the SERVE ZONE and you step up to serve (launch.js): facing
+ * down the court, your ball on your shoulder. HOLD SERVE - the button, Space / E, or
+ * press and hold on the game - to wind up, and let go to serve (RollButton shows the
+ * meter); the serve plays here. The flight itself is the ball's, not yours (roll/): you
  * stay on your spot, watching it go, then celebrate. Push the stick to step off. At a
- * training dummy you step onto its training spot and slash it again and again. Walking
- * about, your sword rides across your back.
+ * training court you step onto its training spot and spike it again and again. Walking
+ * about, your ball rides across your back.
  *
  * Reads and writes `runtime.player`; never touches React state per frame.
  *
@@ -106,14 +106,14 @@ export function Player({ onAvatarReady }) {
   const keys = useKeyboard()
   const velocity = useRef(new Vector3())
   const vy = useRef(0)
-  /** The jump input last frame: on a throw spot, holding it winds up a throw. */
+  /** The jump input last frame: on a serve spot, holding it winds up a serve. */
   const jumpHeld = useRef(false)
-  /** Space pressed on a throw spot (so letting go of it throws). */
+  /** Space pressed on a serve spot (so letting go of it serves). */
   const jumpWound = useRef(false)
 
-  // A press on the 3D view (not on the HUD, which sits above it): on a throw spot, press
-  // and hold to wind up a throw, let go to throw; anywhere else a quick click or tap (not
-  // a drag to turn the camera) is a click slash (clickSwing.js) for Power.
+  // A press on the 3D view (not on the HUD, which sits above it): on a serve spot, press
+  // and hold to wind up a serve, let go to serve; anywhere else a quick click or tap (not
+  // a drag to turn the camera) is a click spike (clickSwing.js) for Power.
   const gl = useThree((s) => s.gl)
   useEffect(() => {
     const el = gl.domElement
@@ -186,8 +186,8 @@ export function Player({ onAvatarReady }) {
     const group = groupRef.current
     const visual = visualRef.current
 
-    // --- The throw stage: up on it, winding up, off it ----------------------------
-    // Anywhere on the stage's top you're up to throw; walk along it to pick your line.
+    // --- The serve stage: up on it, winding up, off it ----------------------------
+    // Anywhere on the stage's top you're up to serve; walk along it to pick your line.
     const onStage = inRollZone(pos.x, pos.z) && player.grounded && pos.y >= ON_STAGE_Y
     if (!roll.active && !isPulling() && onStage && !player.frozen && !game.panel) {
       grab(false, now)
@@ -196,7 +196,7 @@ export function Player({ onAvatarReady }) {
     // Walked off it (or moved off it some other way: a correction, a portal).
     if (!roll.active && isPulling() && !launch.released && !onStage) cancelPull()
     const atBat = !roll.active && isPulling()
-    // Winding up or throwing: planted, facing down the valley.
+    // Winding up or serving: planted, facing down the court.
     const winding = atBat && (launch.stage === 'charge' || launch.released)
     if (atBat) standAt(pos.x, pos.y, pos.z)
 
@@ -213,9 +213,9 @@ export function Player({ onAvatarReady }) {
     let inputLength = Math.min(1, _input.length())
 
     if (atBat) {
-      // Auto Throw follows its toggle, even mid-turn.
+      // Auto Serve follows its toggle, even mid-turn.
       launch.auto = false
-      // The meter, a throw the authority never answered, Auto Throw's release.
+      // The meter, a serve the authority never answered, Auto Serve's release.
       if (updatePull(now) === 'auto') {
         sfx.throwRelease(1)
         actions.roll()
@@ -241,7 +241,7 @@ export function Player({ onAvatarReady }) {
     } else {
       _move.set(0, 0, 0)
     }
-    // A click slash plants you for a moment while you cut.
+    // A click spike plants you for a moment while you cut.
     const clicking = sinceClick(now) < CLICK_PLANT_S
     const planted = winding || launch.stage === 'charge' || roll.active || clicking
 
@@ -256,7 +256,7 @@ export function Player({ onAvatarReady }) {
     pos.x += velocity.current.x * delta
     pos.z += velocity.current.z * delta
 
-    // At a dummy, standing still: ease onto its training spot to slash it.
+    // At a court, standing still: ease onto its training spot to spike it.
     const pad = padAt(pos.x, pos.z)
     const speedNow = Math.hypot(velocity.current.x, velocity.current.z)
     const training = pad >= 0 && player.grounded && speedNow < 0.5 && !still && !planted && isPadUnlocked(profile, pad)
@@ -284,7 +284,7 @@ export function Player({ onAvatarReady }) {
     const jumpInput = k.jump || joy.jump
     const pressed = jumpInput && !jumpHeld.current
     jumpHeld.current = jumpInput
-    // On the throw stage, the jump button (Space) winds up a throw instead: hold, let go.
+    // On the serve stage, the jump button (Space) winds up a serve instead: hold, let go.
     if (pressed && atBat && isPulling()) pressThrow(now)
     if (!jumpInput && launch.stage === 'charge' && jumpWound.current) releaseThrow(now)
     jumpWound.current = jumpInput && atBat ? jumpWound.current || pressed : false
@@ -315,12 +315,12 @@ export function Player({ onAvatarReady }) {
     else if (batting) player.yaw = BATTER_YAW
     else if (speed > 0.3) player.yaw = Math.atan2(velocity.current.x, velocity.current.z)
 
-    // --- The sword: ready on your shoulder, winding up, throwing, watching it fly ---
+    // --- The ball: ready on your shoulder, winding up, serving, watching it fly ---
     motion.bat = undefined
     motion.cheer = 0
     motion.coil = 0
     motion.strain = 0
-    motion.swordLen = swordLength(profile.equippedTire)
+    motion.swordLen = ballLength(profile.equippedTire)
     const sinceSwing = (now - launch.swungAt) / 1000
     if (roll.active) {
       motion.bat = 'after'
@@ -330,13 +330,13 @@ export function Player({ onAvatarReady }) {
       motion.bat = 'throw'
       motion.swingT = sinceSwing
     } else if (atBat && (launch.stage === 'charge' || speed < 0.3)) {
-      // Ready on the stage, sword on your shoulder - winding up as THROW is held, straining
+      // Ready on the stage, ball on your shoulder - winding up as SERVE is held, straining
       // once the meter is full. (Walking along the stage, it rides on your back.)
       motion.bat = 'ready'
       motion.coil = slowAt(now)
       motion.strain = Math.min(1, Math.max(0, (heldFor(now) - CHARGE_TIME) / 0.6))
     } else if (!training && sinceClick(now) < CLICK_POSE_S) {
-      // A click slash: one cut through the air in front of you.
+      // A click spike: one cut through the air in front of you.
       motion.bat = 'slash'
       motion.swingT = sinceClick(now)
     }
@@ -361,14 +361,14 @@ export function Player({ onAvatarReady }) {
 
     // --- Publish motion ---------------------------------------------------------
     player.speed = speed
-    // What other players see: 'pull' is winding up a throw on the stage (the template's
-    // name), 'run' slashing a dummy, 'swing' a click slash.
+    // What other players see: 'pull' is winding up a serve on the stage (the template's
+    // name), 'run' spiking a court, 'swing' a click spike.
     player.anim = !player.grounded ? 'jump' : batting ? 'pull' : training ? 'run' : motion.bat === 'slash' ? 'swing' : speed > 0.5 ? 'walk' : 'idle'
 
     motion.speed = speed
     motion.grounded = player.grounded
     motion.vy = vy.current
-    // At a dummy: a slash every TRAIN_INTERVAL (playerPose, `run`).
+    // At a court: a spike every TRAIN_INTERVAL (playerPose, `run`).
     motion.run = training ? 1 : 0
     motion.stride += delta * (training ? RUN_CADENCE : 5 + 6 * Math.min(1, speed / WALK_SPEED))
     runtime.player.cagePhase = training ? motion.stride : -1

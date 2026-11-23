@@ -17,10 +17,10 @@ const ARRIVED = 3.5
 
 /** Ground point each tutorial step leads to. */
 const TARGETS = {
-  // Up onto the throw stage: anywhere on it will do, so it counts once you're on it.
+  // Up onto the serve stage: anywhere on it will do, so it counts once you're on it.
   roll: { x: 0, z: THROW_STAGE.maxZ - 3, reach: 2.6 },
   pad0: { ...cageBatterSpot(0), reach: PAD_RADIUS - 0.8 },
-  // Onto the Sword Counter at the foot of the Sword Wall: it sells your next sword.
+  // Onto the Ball Counter at the foot of the Ball Wall: it sells your next ball.
   tires: { x: SWORD_COUNTER.x, z: SWORD_COUNTER.z, reach: SWORD_COUNTER.half - 0.6 },
   balls: { x: BALL_SHOP.x, z: BALL_SHOP.z, reach: BALL_SHOP.radius - 0.6 },
   // The first egg, from its side on the avenue (where you come from), within its reach.
@@ -106,7 +106,7 @@ export function TutorialArrows() {
     for (let d = 1.6 + offset; d < dist - 1 && count < MAX_CHEVRONS; d += SPACING) {
       const x = player.x + ux * d
       const z = player.z + uz * d
-      // Over the pads' mats and the sword shop's stages, not under them, and well clear of
+      // Over the pads' mats and the ball shop's stages, not under them, and well clear of
       // everything lying on the floor (decals 0.03 up, the stage's deck painting 0.03 over it).
       _p.set(x, groundHeightAt(x, z) + 0.15, z)
       // Fade in near the player, shrink near the goal - in plan only, so their height

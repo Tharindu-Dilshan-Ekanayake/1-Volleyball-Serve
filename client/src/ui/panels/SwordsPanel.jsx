@@ -16,14 +16,14 @@ import { GRADIENTS, u } from '../hud/style'
 import Panel from './Panel'
 
 /**
- * The SWORD SHOP: every sword in balance TIRES (the template's tires) - its portrait (the
- * real 3D model: swordIcons.js), name, rarity, Power, the Legend swords' Wins bonus, its
+ * The BALL SHOP: every ball in balance TIRES (the template's tires) - its portrait (the
+ * real 3D model: swordIcons.js), name, rarity, Power, the Legend balls' Wins bonus, its
  * trail and its price - bought one after another (shared/logic.js buyTire sells only the
- * next) and equipped from here. Opened by stepping onto the Sword Counter at the foot of
- * the Sword Wall (SwordCounterOpener), or from the counter's prompt.
+ * next) and equipped from here. Opened by stepping onto the Ball Counter at the foot of
+ * the Ball Wall (SwordCounterOpener), or from the counter's prompt.
  *
  * Buying is checked by the server against standing on the counter (shared/session.js
- * atCounter), so off it the Buy button says where to go; equipping a sword you own works
+ * atCounter), so off it the Buy button says where to go; equipping a ball you own works
  * from anywhere.
  */
 
@@ -44,10 +44,10 @@ const CSS = `
 /* Phones: the HUD's reference pixel is tiny there (a 390 px tall screen makes 22 px text 8
    px), so the shop - a lot of small text and buttons - gets a bigger one of its own. */
 @media (orientation: landscape) and (max-height: 600px) {
-  .sp-root { --px: clamp(0.3px, min(100vw / 1250, 100vh / 760), 1.4px); }
+  .sp-root { --px: calc(clamp(0.3px, min(100vw / 1250, 100vh / 760), 1.4px) * var(--panel-scale)); }
 }
 @media (orientation: portrait) and (max-width: 700px) {
-  .sp-root { --px: clamp(0.3px, 100vw / 760, 1.4px); }
+  .sp-root { --px: calc(clamp(0.3px, 100vw / 760, 1.4px) * var(--panel-scale)); }
 }
 `
 
@@ -73,7 +73,7 @@ const TRAIL_WORDS = {
   wind: 'Wind',
 }
 
-/** "Petals", "Rainbow Stars"...: sword `id`'s trail in words. */
+/** "Petals", "Rainbow Stars"...: ball `id`'s trail in words. */
 function trailWords(id) {
   const t = swordTrailStyle(id)
   const words = TRAIL_WORDS[t.fx] || 'Glow'
@@ -110,7 +110,7 @@ function Chip({ icon, text, fill, size = 20 }) {
   )
 }
 
-/** Where the Legend swords' portraits twinkle (percent of the square, and a delay). */
+/** Where the Legend balls' portraits twinkle (percent of the square, and a delay). */
 const TWINKLES = [
   [12, 18, 0],
   [80, 30, 0.5],
@@ -120,7 +120,7 @@ const TWINKLES = [
 
 /**
  * A portrait on a glowing disc in its rarity's colour; the rarest get slowly turning rays,
- * the Legend swords twinkles too. `size` in reference pixels.
+ * the Legend balls twinkles too. `size` in reference pixels.
  */
 function Portrait({ tire, size, dim = false, float = false }) {
   const color = RARITIES[tire.rarity]?.color ?? '#ffffff'
@@ -170,7 +170,7 @@ function Words({ size, stroke = 6, children }) {
 }
 
 /**
- * The action for sword `index` in state `state`, as a big button (`size` its text): Equipped,
+ * The action for ball `index` in state `state`, as a big button (`size` its text): Equipped,
  * Equip, Buy (the next one along: green when you can afford it, red when you can't, grey
  * off the counter) or a locked note.
  */
@@ -233,13 +233,13 @@ function Action({ index, state, wins, atCounter, size = 30, height = 64 }) {
   )
 }
 
-/** The selected sword, big: portrait, name, rarity, numbers, trail, and what you can do with it. */
+/** The selected ball, big: portrait, name, rarity, numbers, trail, and what you can do with it. */
 function Detail({ index, state, wins, atCounter, collected }) {
   const tire = TIRES[index]
   const color = RARITIES[tire.rarity]?.color ?? '#ffffff'
   const bonus = winsBonus(tire)
   const [headline, headlineColor] =
-    state === 'equipped' ? ['EQUIPPED', '#7dff4a'] : state === 'owned' ? ['OWNED', '#8fe0ff'] : state === 'buy' ? ['NEXT SWORD', '#ffe066'] : ['LOCKED', '#ff8a7a']
+    state === 'equipped' ? ['EQUIPPED', '#7dff4a'] : state === 'owned' ? ['OWNED', '#8fe0ff'] : state === 'buy' ? ['NEXT BALL', '#ffe066'] : ['LOCKED', '#ff8a7a']
   return (
     <div
       className="relative flex flex-wrap items-center justify-center overflow-hidden"
@@ -271,7 +271,7 @@ function Detail({ index, state, wins, atCounter, collected }) {
         </span>
         <span style={{ fontSize: u(18) }}>
           <StrokeText stroke={u(4)} fill="#c9d3ff">
-            Sword {index + 1} of {TIRES.length} · Collected {collected}/{TIRES.length}
+            Ball {index + 1} of {TIRES.length} · Collected {collected}/{TIRES.length}
           </StrokeText>
         </span>
         <div className="w-full" style={{ maxWidth: u(420), paddingTop: u(4) }}>
@@ -282,7 +282,7 @@ function Detail({ index, state, wins, atCounter, collected }) {
   )
 }
 
-/** One sword's card in the grid: tap it to see it big above; its own button acts straight away. */
+/** One ball's card in the grid: tap it to see it big above; its own button acts straight away. */
 function SwordCard({ index, state, wins, atCounter, selected, popped, onSelect }) {
   const tire = TIRES[index]
   const color = RARITIES[tire.rarity]?.color ?? '#ffffff'
@@ -330,7 +330,7 @@ function SwordCard({ index, state, wins, atCounter, selected, popped, onSelect }
 const GRID = { gridTemplateColumns: `repeat(auto-fill, minmax(${u(182)}, 1fr))`, gap: u(12) }
 
 export function SwordsPanel() {
-  // As strings: the profile is a fresh object after every update (a slash, a throw...).
+  // As strings: the profile is a fresh object after every update (a spike, a serve...).
   const ownedKey = useGame((s) => s.profile.ownedTires.join(','))
   const equipped = useGame((s) => s.profile.equippedTire)
   const wins = useGame((s) => s.profile.wins)
@@ -340,11 +340,11 @@ export function SwordsPanel() {
   const nextIndex = TIRES.findIndex((t) => !owned.includes(t.id))
   const equippedIndex = Math.max(0, TIRES.findIndex((t) => t.id === equipped))
 
-  /** The sword shown big: one you tapped, or (null) the next one to buy - which moves on as you buy. */
+  /** The ball shown big: one you tapped, or (null) the next one to buy - which moves on as you buy. */
   const [picked, setPicked] = useState(null)
   const shown = picked ?? (nextIndex >= 0 ? nextIndex : equippedIndex)
 
-  // A sword just bought: its card pops, and if it was the one shown, the next one shows.
+  // A ball just bought: its card pops, and if it was the one shown, the next one shows.
   const [popped, setPopped] = useState(null)
   const count = useRef(owned.length)
   useEffect(() => {
@@ -366,14 +366,14 @@ export function SwordsPanel() {
     // display: contents - no box of its own, but the panel inside inherits its --px.
     <div className="sp-root" style={{ display: 'contents' }}>
       <style>{CSS}</style>
-      <Panel title="SWORD SHOP" icon="tire" width={1180}>
+      <Panel title="BALL SHOP" icon="tire" width={1180}>
         <div className="flex flex-col" style={{ gap: u(14) }}>
           <Detail index={shown} state={standState(profile, shown)} wins={wins} atCounter={atCounter} collected={owned.length} />
           <p className="m-0 text-center" style={{ fontSize: u(22) }}>
             <StrokeText stroke={u(5)} style={{ whiteSpace: 'normal' }}>
               {atCounter
-                ? 'Buy them one after another - every sword hits harder, and the Legend swords pay extra Wins on every throw!'
-                : 'Stand on the SWORD COUNTER to buy swords. You can equip any sword you own from anywhere.'}
+                ? 'Buy them one after another - every ball serves harder, and the Legend balls pay extra Wins on every serve!'
+                : 'Stand on the BALL COUNTER to buy volleyballs. You can equip any ball you own from anywhere.'}
             </StrokeText>
           </p>
           <div className="grid" style={GRID}>

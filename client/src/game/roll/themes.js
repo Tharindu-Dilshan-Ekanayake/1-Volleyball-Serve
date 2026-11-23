@@ -1,6 +1,6 @@
 /**
- * Each stage theme's colours (each stage names one in its `theme`): the sky the sword flies
- * under (Lane.jsx blends the sky and fog to it as the sword gets there), the HUD's name
+ * Each stage theme's colours (each stage names one in its `theme`): the sky the ball flies
+ * under (Lane.jsx blends the sky and fog to it as the ball gets there), the HUD's name
  * gradient, and the floor/gate tints the landing spray, the stage-start line, the lanterns'
  * glow and the gate arches' gems borrow.
  *
@@ -13,22 +13,22 @@
  * The sunny day sky most stages fly under (a few late ones keep a sky of their own:
  * volcano glow, neon night, the Moon, the aurora, space); `horizon` tints it per stage.
  */
-const DAY_SKY = { top: '#2f80ea', horizon: '#c6e6ff', sun: '#ffffff', glow: 0.35, clouds: 0.85 }
+const DAY_SKY = { top: '#3d4aa0', horizon: '#ffc090', sun: '#ffcf7a', glow: 0.95, clouds: 0.7, stars: 0.05 }
 const DAY_TINTS = {
-  grassy: '#c6e6ff',
-  autumn: '#d8ecff',
-  desert: '#ffe9c4',
-  beach: '#d6f2ff',
-  jungle: '#cff0e0',
-  frozen: '#e8f2ff',
-  cherry: '#ffe2f0',
-  candy: '#ffe4f6',
-  mushroom: '#eadcff',
-  swamp: '#d8f0d0',
-  crystal: '#e0e4ff',
-  ocean: '#c8f0ff',
-  sky: '#dff2ff',
-  rainbow: '#f4e8ff',
+  grassy: '#ffbe8e',
+  autumn: '#ffb080',
+  desert: '#ffbc78',
+  beach: '#ffb898',
+  jungle: '#f6c294',
+  frozen: '#f4cbe0',
+  cherry: '#ffbcd0',
+  candy: '#ffc4e0',
+  mushroom: '#ecbde6',
+  swamp: '#eec496',
+  crystal: '#e4c4f0',
+  ocean: '#ffc0a8',
+  sky: '#ffd4bc',
+  rainbow: '#ffcce6',
 }
 
 export const ZONE_THEMES = {
@@ -155,8 +155,8 @@ export const ZONE_THEMES = {
 }
 
 /**
- * How each stage theme dresses the valley road (Lane.jsx):
- *   road / roadStyle   the cobbles of the royal road, two shades (alternate 5 m rows), in
+ * How each stage theme dresses the court (Lane.jsx):
+ *   road / roadStyle   the court's surface, two shades (alternate 5 m rows), in
  *                      a materials STYLE name (STUDS cobbles, CHECKER slabs, ROAD asphalt,
  *                      RAINBOW, GALAXY...)
  *   kerb / kerbStyle   the kerb stones along both edges (GLOW for glowing kerbs; SMOOTH
@@ -165,64 +165,64 @@ export const ZONE_THEMES = {
  *                      [main, trim]
  *   flowers            the two colours of the flower beds beside the road
  *   turf               the ground either side of the road out to the hills, light and dark
- *                      (Impact.jsx borrows them for the clods a landing throws up)
+ *                      (Impact.jsx borrows them for the clods a landing serves up)
  *   field / style      the ground beyond (materials STYLE name)
  *   colors             kept from the template (unused by the road)
  *   hill               the ridges down both sides (World 1): their look (`style`), their
  *                      rock in two shades (`dirt`) and what grows on them (`decor`, in
  *                      `leaves` on a `trunk`) - the same decor, smaller, grows by the road.
- * In Dragonfire Peaks (the lava venue) Lane.jsx darkens all of it towards basalt, turns
+ * In Christmas Village (the lava venue) Lane.jsx darkens all of it towards basalt, turns
  * the kerbs into glowing lava channels in the stage's gate colour and swaps the lanterns
  * for braziers.
  */
-// Most stages: the sunny day sky, tinted at the horizon.
+// Most stages: the sunset sky, tinted at the horizon.
 for (const [id, horizon] of Object.entries(DAY_TINTS)) {
   if (ZONE_THEMES[id]) ZONE_THEMES[id].sky = { ...DAY_SKY, horizon }
 }
 
 export const STAGE_LOOKS = {
   grassy: {
-    road: ['#b9ada0', '#ada194'], roadStyle: 'STUDS', kerb: ['#ece2d0', '#dacebb'], stone: ['#cac3b7', '#8f877c'], flowers: ['#ff6fa8', '#ffe24a'],
-    field: '#3aa834', style: 'STUDS', turf: ['#3cbf3c', '#46cc44'], colors: ['#5a6787', '#776c8c', '#ffd27a'],
-    hill: { style: 'HILL', dirt: ['#8d6036', '#7d5530'], decor: 'tree', leaves: '#3fb84a', trunk: '#7a4f2a' },
+    road: ['#ec9a52', '#e08e48'], roadStyle: 'SMOOTH', kerb: ['#ffffff', '#eef2f6'], stone: ['#cac3b7', '#8f877c'], flowers: ['#ff6fa8', '#ffe24a'],
+    field: '#ecd29c', style: 'STUDS', turf: ['#f0d6a0', '#e8cc94'], colors: ['#5a6787', '#776c8c', '#ffd27a'],
+    hill: { style: 'HILL', dirt: ['#d9b878', '#c9a868'], decor: 'tree', leaves: '#3fb84a', trunk: '#7a4f2a' },
   },
   autumn: {
-    road: ['#b49c84', '#a89078'], roadStyle: 'STUDS', kerb: ['#ecdac0', '#dac6a8'], stone: ['#c8b496', '#8a7458'], flowers: ['#ffb12a', '#e8452c'],
+    road: ['#d9824a', '#cc7842'], roadStyle: 'SMOOTH', kerb: ['#ffffff', '#eef2f6'], stone: ['#c8b496', '#8a7458'], flowers: ['#ffb12a', '#e8452c'],
     field: '#7a8a3a', style: 'STUDS', turf: ['#9cb83e', '#a6c246'], colors: ['#6f7f9f', '#8a8fa8', '#ffe8b0'],
     hill: { style: 'HILL', dirt: ['#a0602a', '#8a5426'], decor: 'tree', leaves: '#ff8a1e', trunk: '#6a4020' },
   },
   desert: {
-    road: ['#e8c88e', '#dcbb80'], roadStyle: 'CHECKER', kerb: ['#f6e2b4', '#e8d29e'], stone: ['#e8b878', '#b07e48'], flowers: ['#ff5a8a', '#ffd21f'],
+    road: ['#f0d49a', '#e6c98c'], roadStyle: 'SMOOTH', kerb: ['#ffffff', '#eef2f6'], stone: ['#e8b878', '#b07e48'], flowers: ['#ff5a8a', '#ffd21f'],
     field: '#d8b06a', style: 'STUDS', turf: ['#dcb46a', '#e4be74'], colors: ['#c08a5a', '#a8784e', '#ffe0a0'],
     hill: { style: 'MESA', dirt: ['#e8a868', '#d89458'], decor: 'cactus', leaves: '#3f9a3a', trunk: '#3f9a3a' },
   },
   beach: {
-    road: ['#f2e2bc', '#e8d6aa'], roadStyle: 'CHECKER', kerb: ['#ffffff', '#e8f4ff'], stone: ['#fff4dc', '#d8c49a'], flowers: ['#ff7ab8', '#ffb12a'],
+    road: ['#f6e2b0', '#ecd6a0'], roadStyle: 'SMOOTH', kerb: ['#ffffff', '#eef2f6'], stone: ['#fff4dc', '#d8c49a'], flowers: ['#ff7ab8', '#ffb12a'],
     field: '#2fa8d8', style: 'WATER', turf: ['#f0d9a0', '#f6e2ae'], colors: ['#8a6aa8', '#c47a9a', '#ffd0e0'],
     hill: { style: 'MESA', dirt: ['#f0d9a0', '#e6c88a'], decor: 'palm', leaves: '#2fae4a', trunk: '#9a6a3a' },
   },
   jungle: {
-    road: ['#8e8e72', '#828266'], roadStyle: 'STUDS', kerb: ['#a2b088', '#92a078'], stone: ['#9aa48a', '#5f6a4f'], flowers: ['#ff4fa0', '#ffd21f'],
+    road: ['#4fa45a', '#479a51'], roadStyle: 'SMOOTH', kerb: ['#ffffff', '#eef2f6'], stone: ['#9aa48a', '#5f6a4f'], flowers: ['#ff4fa0', '#ffd21f'],
     field: '#2f6a2a', style: 'STUDS', turf: ['#1f9a3a', '#25a642'], colors: ['#3f6a6f', '#557a6a', '#e6ffb0'],
     hill: { style: 'HILL', dirt: ['#5a4a2a', '#4a3c22'], decor: 'palm', leaves: '#1f8a2a', trunk: '#6a4a2a' },
   },
   frozen: {
-    road: ['#cfe2f4', '#c2d8ee'], roadStyle: 'STUDS', kerb: ['#ffffff', '#e6f2ff'], stone: ['#dcecff', '#8fb0d8'], flowers: ['#7fd2ff', '#ffffff'],
+    road: ['#bfe0ff', '#b2d6fa'], roadStyle: 'SMOOTH', kerb: ['#ffffff', '#eef2f6'], stone: ['#dcecff', '#8fb0d8'], flowers: ['#7fd2ff', '#ffffff'],
     field: '#eef6ff', style: 'STUDS', turf: ['#eaf4ff', '#dcecfa'], colors: ['#8a9ac0', '#a8b4d0', '#fff0f6'],
     hill: { style: 'MESA', dirt: ['#a8c4e6', '#94b4dc'], decor: 'pine', leaves: '#2f7a5a', trunk: '#5a4030' },
   },
   cherry: {
-    road: ['#dcc8c4', '#d0bab6'], roadStyle: 'STUDS', kerb: ['#fff0f4', '#f4dce4'], stone: ['#ecdcd8', '#a48a88'], flowers: ['#ff9cc8', '#ffffff'],
+    road: ['#ffb0cc', '#f6a2c0'], roadStyle: 'SMOOTH', kerb: ['#ffffff', '#eef2f6'], stone: ['#ecdcd8', '#a48a88'], flowers: ['#ff9cc8', '#ffffff'],
     field: '#5aa060', style: 'STUDS', turf: ['#6fd068', '#78da70'], colors: ['#5a4a8a', '#7a5a9a', '#ffc0d8'],
     hill: { style: 'HILL', dirt: ['#9a6a5a', '#8a5a4a'], decor: 'tree', leaves: '#ff9cc8', trunk: '#5a3a3a' },
   },
   candy: {
-    road: ['#ffe0f0', '#ffd0e8'], roadStyle: 'CHECKER', kerb: ['#ffffff', '#ff9cd6'], stone: ['#ffb8dc', '#c86aa8'], flowers: ['#5fd6ff', '#ffe45c'],
+    road: ['#ffd0e8', '#ffc2e0'], roadStyle: 'SMOOTH', kerb: ['#ffffff', '#ff9cd6'], stone: ['#ffb8dc', '#c86aa8'], flowers: ['#5fd6ff', '#ffe45c'],
     field: '#f0c0e0', style: 'STUDS', turf: ['#ffb8dc', '#ffc4e2'], colors: ['#a07ac8', '#d08ab8', '#ffffff'],
     hill: { style: 'MESA', dirt: ['#ff9cc8', '#c8a0ff'], decor: 'lollipop', leaves: '#ff5fa8', trunk: '#ffffff' },
   },
   mushroom: {
-    road: ['#a898c0', '#9c8cb4'], roadStyle: 'STUDS', kerb: ['#e8dcff', '#d6c8f2'], stone: ['#b8a8d8', '#6a5a8a'], flowers: ['#ff5fd2', '#7fffd0'],
+    road: ['#b49ae0', '#a88ed4'], roadStyle: 'SMOOTH', kerb: ['#ffffff', '#eef2f6'], stone: ['#b8a8d8', '#6a5a8a'], flowers: ['#ff5fd2', '#7fffd0'],
     field: '#3c5a46', style: 'STUDS', turf: ['#3fb8a0', '#46c2a8'], colors: ['#4a3a8a', '#6a4a9a', '#ffd0ff'],
     hill: { style: 'HILL', dirt: ['#6a4a8a', '#5a3a7a'], decor: 'mushroom', leaves: '#ff3b5a', trunk: '#fff4e0' },
   },
@@ -232,7 +232,7 @@ export const STAGE_LOOKS = {
     hill: { style: 'LAVA', dirt: ['#ff5a14', '#ff6a1e'], decor: 'spike', leaves: '#ff6a1e', trunk: '#1a1220' },
   },
   swamp: {
-    road: ['#7e7e5e', '#727254'], roadStyle: 'STUDS', kerb: ['#8e8e6a', '#7e7e5c'], stone: ['#7f8a6a', '#4a5240'], flowers: ['#c8ff5a', '#ffe45c'],
+    road: ['#7a9a5a', '#709050'], roadStyle: 'SMOOTH', kerb: ['#ffffff', '#eef2f6'], stone: ['#7f8a6a', '#4a5240'], flowers: ['#c8ff5a', '#ffe45c'],
     field: '#3a5a46', style: 'WATER', turf: ['#5a8a3a', '#619240'], colors: ['#3a5048', '#4a5f4f', '#f0ffb0'],
     hill: { style: 'HILL', dirt: ['#4a5a3a', '#3a4a2e'], decor: 'tree', leaves: '#6a8a2a', trunk: '#3a3020' },
   },
@@ -242,7 +242,7 @@ export const STAGE_LOOKS = {
     hill: { style: 'PLATE', dirt: ['#5a3ae0', '#4a2cc8'], decor: 'crystal', leaves: '#c08bff', trunk: '#7fe8ff' },
   },
   ocean: {
-    road: ['#ece0c4', '#e0d4b6'], roadStyle: 'STUDS', kerb: ['#ffffff', '#bff4ff'], stone: ['#e0f4ff', '#5fa8d0'], flowers: ['#ff7a8a', '#ffd21f'],
+    road: ['#3fa8d8', '#389ecf'], roadStyle: 'SMOOTH', kerb: ['#ffffff', '#eef2f6'], stone: ['#e0f4ff', '#5fa8d0'], flowers: ['#ff7a8a', '#ffd21f'],
     field: '#2fa0c8', style: 'WATER', turf: ['#3fc6c0', '#46d0c8'], colors: ['#2a5a8a', '#3a6f9a', '#e0fbff'],
     hill: { style: 'WATER', dirt: ['#2f8fd0', '#1f7ac0'], decor: 'coral', leaves: '#ff7a8a', trunk: '#ffb36a' },
   },
@@ -262,7 +262,7 @@ export const STAGE_LOOKS = {
     hill: { style: 'RAINBOW', dirt: ['#ffffff', '#ffffff'], decor: 'lollipop', leaves: '#ffd21f', trunk: '#ffffff' },
   },
   moon: {
-    road: ['#a8acb8', '#9ca0ac'], roadStyle: 'STUDS', kerb: ['#d0d4de', '#c0c4ce'], stone: ['#b8bcc8', '#6a6f7c'], flowers: ['#7fb8ff', '#ffffff'],
+    road: ['#a8acb8', '#9ca0ac'], roadStyle: 'SMOOTH', kerb: ['#ffffff', '#eef2f6'], stone: ['#b8bcc8', '#6a6f7c'], flowers: ['#7fb8ff', '#ffffff'],
     field: '#8a8f9c', style: 'STUDS', turf: ['#8a90a0', '#9298a8'], colors: ['#3a3f50', '#4a4f60', '#7fb8ff'],
     hill: { style: 'STUDS', dirt: ['#8a8f9c', '#7a7f8c'], decor: 'rock', leaves: '#6a6f7c', trunk: '#5a5f6c' },
   },

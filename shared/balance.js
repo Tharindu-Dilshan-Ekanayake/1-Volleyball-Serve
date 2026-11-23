@@ -1,44 +1,44 @@
 /**
  * Every tunable number in the game. Rules live in logic.js; this file is only data,
  * so balancing never means touching code. `scripts/balance-sim.mjs` plays the game
- * with these numbers and prints the pacing (time to each rebirth, sword and stage).
+ * with these numbers and prints the pacing (time to each rebirth, ball and stage).
  *
  * Shared by client (display) and server (authority): both always agree on costs and
  * multipliers because they read the same table.
  *
- * The loop (Sword Toss Legends): slash the training dummies for Power -> step onto a throw
- * spot in the THROW ZONE, hold THROW to wind up and let go at the top of the meter -> your
- * sword spins down the long valley road (more Power throws it further, and every metre it
- * flies pays) and sticks in the ground -> Wins -> bigger swords, enchantments, eggs and
- * dummies -> rebirth at max level for a bigger Power multiplier and a higher cap -> throw
- * further still -> Dragonfire Peaks (World 2).
+ * The loop (Volley Serve Legends): spike balls at the training courts for Serve Power ->
+ * step up to the SERVE LINE, hold SERVE to load up and let go at the top of the meter ->
+ * your jump serve blasts the volleyball down the endless court (more Power serves it
+ * further, and every metre it flies pays), it bounces and rolls to a stop -> Wins ->
+ * better volleyballs, auras, eggs and courts -> rebirth at max level for a bigger Power
+ * multiplier and a higher cap -> serve further still -> Christmas Village (World 2).
  *
  * Inside the code the template's names stay (so saves and the server never change):
- * `health` is POWER, a `tire` is a SWORD, a `ball` is an ENCHANTMENT, a `pad` is a training
- * dummy, a `roll` is a throw and a `zone` is a stage of the road. Only what players see was
- * renamed. How each sword looks is client/src/game/swords.js, each enchantment
+ * `health` is POWER, a `tire` is a VOLLEYBALL, a `ball` is an AURA, a `pad` is a training
+ * court, a `roll` is a serve and a `zone` is a stage of the court. Only what players see
+ * was renamed. How each volleyball looks is client/src/game/volleyballs.js, each aura
  * client/src/game/enchants.js.
  */
 
 // --- Health and levels --------------------------------------------------------------
 
-/** Seconds between gains slashing a training dummy: one slash, one gain. */
+/** Seconds between gains spiking at a training court: one spike, one gain. */
 export const TRAIN_INTERVAL = 0.6
-/** Seconds between the "+N" gains you earn while your sword flies. */
+/** Seconds between the "+N" gains you earn while your ball flies. */
 export const ROLL_TICK = 1
 /**
- * Clicking (or tapping) anywhere outside the THROW ZONE and the dummies makes you slash
- * the air with your sword: one gain each, at most one every CLICK_INTERVAL seconds. The
- * same gain as the Straw Dummy - but you have to keep clicking, and better dummies
- * multiply theirs. (Walking earns nothing.)
+ * Clicking (or tapping) anywhere off the SERVE LINE and the courts makes you toss and spike
+ * a ball: one gain each, at most one every CLICK_INTERVAL seconds. The same gain as the
+ * Rookie Court - but you have to keep clicking, and better courts multiply theirs.
+ * (Walking earns nothing.)
  */
 export const CLICK_INTERVAL = 0.5
 
 /**
  * Your level comes from your Health: reaching level L takes healthForLevel(L) Health.
  * Each level needs LEVEL_GROWTH_EARLY times the last at first, easing towards
- * LEVEL_GROWTH_LATE: early rebirths multiply your gains many times over (a new dummy,
- * x2 from the rebirth itself, the next sword), later ones much less, and the levels
+ * LEVEL_GROWTH_LATE: early rebirths multiply your gains many times over (a new court,
+ * x2 from the rebirth itself, the next ball), later ones much less, and the levels
  * keep step so every rebirth takes a little longer than the one before.
  */
 export const LEVEL_BASE = 20
@@ -95,104 +95,106 @@ export function nextRebirthGift(rebirths) {
   return rebirthGift(at)
 }
 
-/** Skipping straight to a rebirth costs this many max-level launches' worth of Wins. */
+/** Skipping straight to a rebirth costs this many max-level serves' worth of Wins. */
 export const REBIRTH_SKIP_ROLLS = 10
 
-// --- Training pads (training dummies) ---------------------------------------------
+// --- Training pads (training courts) ----------------------------------------------
 
 /**
- * Training dummies, south to north in world.js order. Standing at one you slash it with
- * your sword, one slash (and one Power gain) every TRAIN_INTERVAL, its multiplier on top.
+ * Training courts, south to north in world.js order. Standing on one you spike balls at
+ * its target, one spike (and one Power gain) every TRAIN_INTERVAL, its multiplier on top.
  * `rebirths` = rebirths needed; `product` = the SHOP pass that unlocks it instead;
- * `world` = the only world it works in (the two fiery dummies at the north end of the row
- * work in Dragonfire Peaks only, and stand locked in World 1 as a teaser).
+ * `world` = the only world it works in (the two volcanic courts at the north end of the
+ * row work on Christmas Village only, and stand locked in World 1 as a teaser).
  */
 export const PADS = [
-  { id: 'starter', name: 'Straw Dummy', mult: 1, rebirths: 0 },
-  { id: 'speed', name: 'Wooden Dummy', mult: 2, rebirths: 1 },
-  { id: 'turbo', name: 'Stone Golem', mult: 4, rebirths: 2 },
-  { id: 'nitro', name: 'Iron Knight', mult: 10, rebirths: 4 },
-  { id: 'rocket', name: 'Crystal Golem', mult: 20, rebirths: 6 },
-  { id: 'diamond', name: 'Diamond Golem', mult: 40, product: 'padVeryOp', tag: 'VERY OP!' },
-  { id: 'galaxy', name: 'Galaxy Titan', mult: 100, product: 'padBest', tag: 'BEST OVERALL!' },
-  // Kept close to the Galaxy Titan: every Power multiplier here speeds up the whole late
-  // game (scripts/balance-sim.mjs) - the fiery dummies are milestones, not a jump.
-  { id: 'surf', name: 'Magma Golem', mult: 115, rebirths: 10, world: 1 },
-  { id: 'tsunami', name: 'Inferno Titan', mult: 130, rebirths: 16, world: 1 },
+  { id: 'starter', name: 'Rookie Court', mult: 1, rebirths: 0 },
+  { id: 'speed', name: 'Bronze Court', mult: 2, rebirths: 1 },
+  { id: 'turbo', name: 'Silver Court', mult: 4, rebirths: 2 },
+  { id: 'nitro', name: 'Gold Court', mult: 10, rebirths: 4 },
+  { id: 'rocket', name: 'Crystal Court', mult: 20, rebirths: 6 },
+  { id: 'diamond', name: 'Diamond Court', mult: 40, product: 'padVeryOp', tag: 'VERY OP!' },
+  { id: 'galaxy', name: 'Galaxy Court', mult: 100, product: 'padBest', tag: 'BEST OVERALL!' },
+  // Kept close to the Galaxy Court: every Power multiplier here speeds up the whole late
+  // game (scripts/balance-sim.mjs) - the Christmas courts are milestones, not a jump.
+  { id: 'surf', name: 'Candy Cane Court', mult: 115, rebirths: 10, world: 1 },
+  { id: 'tsunami', name: 'Ice Palace Court', mult: 130, rebirths: 16, world: 1 },
 ]
 
-// --- Swords (the template's tires) ------------------------------------------------
+// --- Volleyballs (the template's tires) ----------------------------------------------
 
 /**
- * The swords you throw. `power` is the Power every single gain is worth before
- * multipliers (the "+1" of the Wooden Sword); `cost` is in Wins; `rarity` (RARITIES) is
- * shown on its name plate. All hang on the SWORD WALL; bought in order at its SWORD COUNTER. They start as wood, bamboo, stone
- * and bone, turn to copper, iron and steel, knights' and pirates' blades, ice, gold and
- * lava, gems, galaxy, dragon, cyber and infinity blades, then the twelve LEGEND swords
- * (scythe, forked, axe, sawtooth, phoenix, trident... the Eternity Godblade) that pay extra
- * Wins too - every one its own shape, each bigger than the last
- * (client/src/game/swords.js). About x2.6 power for x2.8-x3.3 the Wins each. The ids are the template's (saves and the server key on them).
+ * The volleyballs you serve. `power` is the Power every single gain is worth before
+ * multipliers (the "+1" of the Practice Ball); `cost` is in Wins; `rarity` (RARITIES) is
+ * shown on its name plate. All sit on the BALL WALL; bought in order at its BALL COUNTER.
+ * They start as plain plastic balls in one, two and three colours, then leather, candy,
+ * sunset, chrome, frost, gold, lava, lightning, cut gems, rainbow, unicorn, galaxy,
+ * dragon-scale, cyber and infinity balls - then the twelve LEGEND balls (phantom, twin
+ * moon, titan, spiked, phoenix, abyss... the Eternity Ball) that pay extra Wins too, each
+ * with something extra round it (client/src/game/volleyballs.js), each a little bigger
+ * than the last. About x2.6 power for x2.8-x3.3 the Wins each. The ids are the template's
+ * (saves and the server key on them).
  */
 export const TIRES = [
-  { id: 'bicycle', name: 'Wooden Sword', power: 1, cost: 0, rarity: 'common' },
-  // Cheap enough to buy with the Wins from your very first throw.
-  { id: 'mountain', name: 'Bamboo Blade', power: 3, cost: 1, rarity: 'common' },
-  { id: 'wood', name: 'Stone Sword', power: 5, cost: 15, rarity: 'common' },
-  { id: 'stone', name: 'Bone Cleaver', power: 12, cost: 75, rarity: 'uncommon' },
-  { id: 'cookie', name: 'Copper Gladius', power: 30, cost: 300, rarity: 'uncommon' },
-  { id: 'pizza', name: 'Iron Longsword', power: 75, cost: 1200, rarity: 'rare' },
-  { id: 'donut', name: 'Steel Claymore', power: 200, cost: 4500, rarity: 'rare' },
-  { id: 'watermelon', name: 'Knight Broadsword', power: 500, cost: 16000, rarity: 'rare' },
-  { id: 'monster', name: 'Pirate Cutlass', power: 1250, cost: 55000, rarity: 'epic' },
-  { id: 'mint', name: 'Desert Scimitar', power: 3500, cost: 180000, rarity: 'epic' },
-  { id: 'silver', name: 'Crescent Saber', power: 9000, cost: 600000, rarity: 'epic' },
-  { id: 'ice', name: 'Frost Brand', power: 23000, cost: 2e6, rarity: 'epic' },
-  { id: 'gold', name: 'Royal Greatsword', power: 60000, cost: 6e6, rarity: 'legendary' },
-  { id: 'lava', name: 'Magma Blade', power: 155000, cost: 17e6, rarity: 'legendary' },
-  { id: 'platinum', name: 'Thunder Edge', power: 400000, cost: 48e6, rarity: 'legendary' },
-  { id: 'emerald', name: 'Emerald Fang', power: 1.05e6, cost: 135e6, rarity: 'legendary' },
-  { id: 'ruby', name: 'Ruby Flamberge', power: 2.7e6, cost: 380e6, rarity: 'mythic' },
-  { id: 'diamond', name: 'Diamond Greatblade', power: 7e6, cost: 1.05e9, rarity: 'mythic' },
-  { id: 'rainbow', name: 'Prism Blade', power: 1.8e7, cost: 3e9, rarity: 'mythic' },
-  { id: 'unicorn', name: 'Unicorn Spiral', power: 4.8e7, cost: 8.5e9, rarity: 'mythic' },
-  { id: 'galaxy', name: 'Galaxy Saber', power: 1.25e8, cost: 2.4e10, rarity: 'secret' },
-  { id: 'dragon', name: 'Dragon Slayer', power: 3.3e8, cost: 6.8e10, rarity: 'secret' },
-  { id: 'cosmic', name: 'Cyber Blade', power: 8.6e8, cost: 1.9e11, rarity: 'secret' },
-  { id: 'infinity', name: 'Infinity Blade', power: 2.2e9, cost: 5.4e11, rarity: 'secret' },
-  // The LEGEND swords: twelve new kinds of blade along the Sword Wall's top tier, for players past
-  // the Infinity Blade. Each keeps the climb going (about x2.6 power for x2.85 the Wins) and
-  // pays more Wins on every throw too (`wins`): +10% up to +200%.
-  { id: 'reaper', name: 'Soul Reaper', power: 5.7e9, cost: 1.55e12, rarity: 'divine', wins: 1.1 },
-  { id: 'twinmoon', name: 'Twin Moon Blade', power: 1.5e10, cost: 4.4e12, rarity: 'divine', wins: 1.2 },
-  { id: 'titanaxe', name: 'Titan Axe-Sword', power: 3.9e10, cost: 1.25e13, rarity: 'divine', wins: 1.3 },
-  { id: 'sawtooth', name: 'Sawtooth Ripper', power: 1e11, cost: 3.6e13, rarity: 'divine', wins: 1.4 },
-  { id: 'phoenixwing', name: 'Phoenix Wing', power: 2.6e11, cost: 1e14, rarity: 'divine', wins: 1.5 },
-  { id: 'abyssal', name: 'Abyssal Trident Blade', power: 6.8e11, cost: 2.9e14, rarity: 'divine', wins: 1.65 },
-  { id: 'blossom', name: 'Blossom Dancer', power: 1.75e12, cost: 8.3e14, rarity: 'divine', wins: 1.8 },
-  { id: 'celestial', name: 'Celestial Halo Blade', power: 4.6e12, cost: 2.4e15, rarity: 'divine', wins: 2 },
-  { id: 'voidrift', name: 'Void Rift Edge', power: 1.2e13, cost: 6.8e15, rarity: 'divine', wins: 2.2 },
-  { id: 'aurora', name: 'Aurora Crystal Blade', power: 3.1e13, cost: 1.9e16, rarity: 'divine', wins: 2.4 },
-  { id: 'tempest', name: 'Tempest Greatblade', power: 8e13, cost: 5.5e16, rarity: 'divine', wins: 2.7 },
-  { id: 'eternity', name: 'Eternity Godblade', power: 2.1e14, cost: 1.6e17, rarity: 'divine', wins: 3 },
+  { id: 'bicycle', name: 'Practice Ball', power: 1, cost: 0, rarity: 'common' },
+  // Cheap enough to buy with the Wins from your very first serve.
+  { id: 'mountain', name: 'Sunny Ball', power: 3, cost: 1, rarity: 'common' },
+  { id: 'wood', name: 'Ocean Ball', power: 5, cost: 15, rarity: 'common' },
+  { id: 'stone', name: 'Beach Ball', power: 12, cost: 75, rarity: 'uncommon' },
+  { id: 'cookie', name: 'Watermelon Ball', power: 30, cost: 300, rarity: 'uncommon' },
+  { id: 'pizza', name: 'Leather Ball', power: 75, cost: 1200, rarity: 'rare' },
+  { id: 'donut', name: 'Candy Ball', power: 200, cost: 4500, rarity: 'rare' },
+  { id: 'watermelon', name: 'Pro Match Ball', power: 500, cost: 16000, rarity: 'rare' },
+  { id: 'monster', name: 'Sunset Ball', power: 1250, cost: 55000, rarity: 'epic' },
+  { id: 'mint', name: 'Tropical Ball', power: 3500, cost: 180000, rarity: 'epic' },
+  { id: 'silver', name: 'Chrome Ball', power: 9000, cost: 600000, rarity: 'epic' },
+  { id: 'ice', name: 'Frost Ball', power: 23000, cost: 2e6, rarity: 'epic' },
+  { id: 'gold', name: 'Golden Ball', power: 60000, cost: 6e6, rarity: 'legendary' },
+  { id: 'lava', name: 'Lava Ball', power: 155000, cost: 17e6, rarity: 'legendary' },
+  { id: 'platinum', name: 'Thunder Ball', power: 400000, cost: 48e6, rarity: 'legendary' },
+  { id: 'emerald', name: 'Emerald Ball', power: 1.05e6, cost: 135e6, rarity: 'legendary' },
+  { id: 'ruby', name: 'Ruby Ball', power: 2.7e6, cost: 380e6, rarity: 'mythic' },
+  { id: 'diamond', name: 'Diamond Ball', power: 7e6, cost: 1.05e9, rarity: 'mythic' },
+  { id: 'rainbow', name: 'Rainbow Ball', power: 1.8e7, cost: 3e9, rarity: 'mythic' },
+  { id: 'unicorn', name: 'Unicorn Ball', power: 4.8e7, cost: 8.5e9, rarity: 'mythic' },
+  { id: 'galaxy', name: 'Galaxy Ball', power: 1.25e8, cost: 2.4e10, rarity: 'secret' },
+  { id: 'dragon', name: 'Dragon Scale Ball', power: 3.3e8, cost: 6.8e10, rarity: 'secret' },
+  { id: 'cosmic', name: 'Cyber Ball', power: 8.6e8, cost: 1.9e11, rarity: 'secret' },
+  { id: 'infinity', name: 'Infinity Ball', power: 2.2e9, cost: 5.4e11, rarity: 'secret' },
+  // The LEGEND balls: twelve along the Ball Wall's top tier, for players past the Infinity
+  // Ball. Each keeps the climb going (about x2.6 power for x2.85 the Wins) and pays more
+  // Wins on every serve too (`wins`): +10% up to +200%.
+  { id: 'reaper', name: 'Phantom Ball', power: 5.7e9, cost: 1.55e12, rarity: 'divine', wins: 1.1 },
+  { id: 'twinmoon', name: 'Twin Moon Ball', power: 1.5e10, cost: 4.4e12, rarity: 'divine', wins: 1.2 },
+  { id: 'titanaxe', name: 'Titan Ball', power: 3.9e10, cost: 1.25e13, rarity: 'divine', wins: 1.3 },
+  { id: 'sawtooth', name: 'Spike Storm Ball', power: 1e11, cost: 3.6e13, rarity: 'divine', wins: 1.4 },
+  { id: 'phoenixwing', name: 'Phoenix Ball', power: 2.6e11, cost: 1e14, rarity: 'divine', wins: 1.5 },
+  { id: 'abyssal', name: 'Abyss Ball', power: 6.8e11, cost: 2.9e14, rarity: 'divine', wins: 1.65 },
+  { id: 'blossom', name: 'Blossom Ball', power: 1.75e12, cost: 8.3e14, rarity: 'divine', wins: 1.8 },
+  { id: 'celestial', name: 'Celestial Ball', power: 4.6e12, cost: 2.4e15, rarity: 'divine', wins: 2 },
+  { id: 'voidrift', name: 'Void Ball', power: 1.2e13, cost: 6.8e15, rarity: 'divine', wins: 2.2 },
+  { id: 'aurora', name: 'Aurora Ball', power: 3.1e13, cost: 1.9e16, rarity: 'divine', wins: 2.4 },
+  { id: 'tempest', name: 'Tempest Ball', power: 8e13, cost: 5.5e16, rarity: 'divine', wins: 2.7 },
+  { id: 'eternity', name: 'Eternity Ball', power: 2.1e14, cost: 1.6e17, rarity: 'divine', wins: 3 },
 ]
 
-/** How many more Wins sword `tireId` pays on every throw (its `wins`; x1 for all but the Legend swords). */
+/** How many more Wins volleyball `tireId` pays on every serve (its `wins`; x1 for all but the Legend balls). */
 export const swordWins = (tireId) => TIRES.find((t) => t.id === tireId)?.wins ?? 1
 
-// --- Enchantments (the template's balls) -------------------------------------------
+// --- Auras (the template's balls) ---------------------------------------------------
 
 /**
- * Enchantments for your sword, bought one by one at the ENCHANT ALTAR (and equipped from
- * it). Each throws further (`reach`: times the distance your Power alone would send it)
- * and pays more (`wins`: times every throw's Wins) than the last, and wraps your sword in
- * its own aura and trail as it flies: the Flame Aura streams fire down the valley. `cost`
- * is in Wins; the first one is the bare blade you start with. How each looks and burns is
+ * Auras for your serve, bought one by one at the AURA SHRINE (and equipped from it). Each
+ * serves further (`reach`: times the distance your Power alone would send it) and pays
+ * more (`wins`: times every serve's Wins) than the last, and wraps your ball in its own
+ * glow and trail as it flies: the Flame Aura streams fire down the court. `cost` is in
+ * Wins; the first one is the plain ball you start with. How each looks and burns is
  * client/src/game/enchants.js. (The code's `balls`: the template's names stay.)
  */
 export const BALLS = [
-  { id: 'plain', name: 'No Enchant', reach: 1, wins: 1, cost: 0, rarity: 'common' },
-  { id: 'keen', name: 'Keen Edge', reach: 1.04, wins: 1.1, cost: 40, rarity: 'common' },
-  { id: 'swift', name: 'Swift Wind', reach: 1.08, wins: 1.2, cost: 900, rarity: 'uncommon' },
+  { id: 'plain', name: 'No Aura', reach: 1, wins: 1, cost: 0, rarity: 'common' },
+  { id: 'keen', name: 'Sparkle Aura', reach: 1.04, wins: 1.1, cost: 40, rarity: 'common' },
+  { id: 'swift', name: 'Wind Aura', reach: 1.08, wins: 1.2, cost: 900, rarity: 'uncommon' },
   { id: 'flame', name: 'Flame Aura', reach: 1.12, wins: 1.35, cost: 12000, rarity: 'rare' },
   { id: 'frost', name: 'Frost Aura', reach: 1.16, wins: 1.5, cost: 150000, rarity: 'rare' },
   { id: 'storm', name: 'Storm Aura', reach: 1.2, wins: 1.65, cost: 2e6, rarity: 'epic' },
@@ -204,10 +206,10 @@ export const BALLS = [
   { id: 'void', name: 'Void Aura', reach: 1.5, wins: 2.6, cost: 8e12, rarity: 'secret' },
 ]
 
-// --- Throwing (the template's rolls) -----------------------------------------------
+// --- Serving (the template's rolls) ------------------------------------------------
 
 /**
- * How far a throw sends your sword (in metres): 0 Power still throws it ROLL_BASE metres, and each stage's start
+ * How far a serve sends your ball (in metres): 0 Power still serves it ROLL_BASE metres, and each stage's start
  * is reached with the Power in its `wall`, less WALL_MARGIN; in between, distance
  * follows Power (in log terms) from one stage's start to the next. So the stages'
  * `wall` Power sets the pace. Nothing on the road stops it: there are no gates.
@@ -219,7 +221,7 @@ export const ROLL_H0 = 50
 export const WALL_MARGIN = 1.3
 
 /**
- * Sunblade Valley's eighty stages down the long road: stretches of distance, each a little
+ * Sunny Shores' eighty stages down the endless court: stretches of distance, each a little
  * longer than the one before (100 m, 106 m, 112 m ... about 570 m, nearly 26 km in all),
  * with no gates between them - just a new name, landscape and sky. `theme` picks the look
  * (one of twenty: Lane.jsx and themes.js). The first sixty pace the game; the last twenty
@@ -231,7 +233,7 @@ export const WALL_MARGIN = 1.3
  * scripts/gen-stages.py.
  */
 export const ZONES = [
-  { id: 'grassy', name: 'Sunny Meadow', theme: 'grassy', start: 0, wall: 0, winsPerMeter: 0.006, smash: 0, discover: 0 },
+  { id: 'grassy', name: 'Sunset Beach', theme: 'grassy', start: 0, wall: 0, winsPerMeter: 0.006, smash: 0, discover: 0 },
   { id: 'autumn', name: 'Maple Trail', theme: 'autumn', start: 100, wall: 11, winsPerMeter: 0.0072, smash: 2, discover: 5 },
   { id: 'desert', name: 'Sandstone Pass', theme: 'desert', start: 200, wall: 21, winsPerMeter: 0.00984, smash: 3, discover: 7 },
   { id: 'beach', name: 'Seashell Coast', theme: 'beach', start: 306, wall: 41, winsPerMeter: 0.0135, smash: 4, discover: 9 },
@@ -320,46 +322,46 @@ export const TROPHY_SPACING = 80
 export const TROPHY_METERS = 80
 
 /**
- * Seconds from letting go of THROW to the sword leaving your hand: the throw itself (the
- * wind-up before it is yours: you hold for as long as you like, and the server only hears
+ * Seconds from letting go of SERVE to your hand meeting the ball: the toss and the jump (the
+ * load-up before it is yours: you hold for as long as you like, and the server only hears
  * about the release).
  */
-export const ROLL_LAUNCH = 0.45
+export const ROLL_LAUNCH = 0.5
 /**
- * Seconds a throw of `distance` metres takes, the throw itself included: the sword's
- * spinning flight and its stab into the ground. Logarithmic: long throws stay short.
+ * Seconds a serve of `distance` metres takes, the serve itself included: the ball's
+ * flight, its bounces and its roll to a stop. Logarithmic: long serves stay short.
  */
 export const rollDuration = (distance) => ROLL_LAUNCH + 3 + 2.2 * Math.log(1 + distance / 60)
-/** The result popup once the sword sticks, before you're back at your throw spot. */
+/** The result popup once the ball stops, before you're back on the serve line. */
 export const ROLL_RECOVERY = 2.2
 
 /**
- * The throw meter. Step onto a throw spot and HOLD THROW (or E, or click): you wind up and
+ * The serve meter. Step onto a serve spot and HOLD SERVE (or E, or click): you wind up and
  * the meter charges over CHARGE_TIME; once full it wobbles - bouncing off the top and
- * back, again and again (TWANG_PERIOD a bounce, dipping TWANG_DEPTH). Let go to throw:
+ * back, again and again (TWANG_PERIOD a bounce, dipping TWANG_DEPTH). Let go to serve:
  * `accuracy` is how full the meter was, 1 at the very top of a bounce. The grade it lands
- * in decides the throw, each grade clearly apart from the next: how far the sword flies
+ * in decides the serve, each grade clearly apart from the next: how far the ball flies
  * (`reach`, a share of what your Power alone would send it - half the distance for a WEAK
  * one, half as far again for a PERFECT one) and how many Wins it pays (`bonus`). Auto
- * Throw skips the meter: a plain x1 throw, between GOOD and GREAT.
+ * Serve skips the meter: a plain x1 serve, between GOOD and GREAT.
  *
  * Wins are the Power's worth times `bonus` - not paid by the metres the grade adds: late
  * in the game each stage pays ~1.4 times the last, so paying for half as far again would
- * multiply a PERFECT throw's Wins dozens of times over (logic.applyRoll).
+ * multiply a PERFECT serve's Wins dozens of times over (logic.applyRoll).
  */
 /** Seconds the meter takes to charge from empty to full. */
 export const CHARGE_TIME = 0.85
 /**
  * Seconds per wobble at full charge, and how far down the meter each one dips. The
  * bounce is sharp at the top (|sin|), so the PERFECT moment is ~0.1 s each time: a real
- * test of timing, still fair on a phone, and a throw let go at full charge is never
+ * test of timing, still fair on a phone, and a serve let go at full charge is never
  * worse than GOOD.
  */
 export const TWANG_PERIOD = 0.75
 export const TWANG_DEPTH = 0.5
 /** The meter (0-1) `seconds` after reaching full charge: bouncing off the top. */
 export const twangAt = (seconds) => 1 - TWANG_DEPTH * Math.abs(Math.sin((Math.PI * Math.max(0, seconds)) / TWANG_PERIOD))
-/** The meter (0-1) after holding THROW for `held` seconds: charging, then wobbling. */
+/** The meter (0-1) after holding SERVE for `held` seconds: charging, then wobbling. */
 export const chargeAt = (held) => (held < CHARGE_TIME ? Math.max(0, held) / CHARGE_TIME : twangAt(held - CHARGE_TIME))
 /**
  * Grades by `min` accuracy: PERFECT is the top 12% of the meter, GREAT 30%, GOOD 60%.
@@ -367,17 +369,17 @@ export const chargeAt = (held) => (held < CHARGE_TIME ? Math.max(0, held) / CHAR
  * the top within a grade, and a big step up to the next.
  */
 export const HIT_GRADES = [
-  { id: 'perfect', min: 0.88, reach: [1.4, 1.5], bonus: 1.6, label: 'PERFECT THROW!' },
-  { id: 'great', min: 0.7, reach: [1.1, 1.2], bonus: 1.25, label: 'GREAT THROW!' },
-  { id: 'good', min: 0.4, reach: [0.8, 0.9], bonus: 1, label: 'GOOD THROW' },
-  { id: 'weak', min: 0, reach: [0.5, 0.6], bonus: 0.75, label: 'WEAK THROW...' },
+  { id: 'perfect', min: 0.88, reach: [1.4, 1.5], bonus: 1.6, label: 'PERFECT SERVE!' },
+  { id: 'great', min: 0.7, reach: [1.1, 1.2], bonus: 1.25, label: 'GREAT SERVE!' },
+  { id: 'good', min: 0.4, reach: [0.8, 0.9], bonus: 1, label: 'GOOD SERVE' },
+  { id: 'weak', min: 0, reach: [0.5, 0.6], bonus: 0.75, label: 'WEAK SERVE...' },
 ]
 const clampAccuracy = (accuracy) => Math.min(1, Math.max(0, accuracy))
-/** The grade for a meter `accuracy` (0-1), or null for a throw without the meter. */
+/** The grade for a meter `accuracy` (0-1), or null for a serve without the meter. */
 export const hitGrade = (accuracy) => (Number.isFinite(accuracy) ? HIT_GRADES.find((g) => clampAccuracy(accuracy) >= g.min) : null)
 /**
- * How far a throw at meter `accuracy` sends the sword, as a share of what your Power alone
- * would: 0.5 badly timed, 1.5 bang on time, in a clear step per grade; 1 for a throw
+ * How far a serve at meter `accuracy` sends the ball, as a share of what your Power alone
+ * would: 0.5 badly timed, 1.5 bang on time, in a clear step per grade; 1 for a serve
  * without the meter.
  */
 export function hitReach(accuracy) {
@@ -426,19 +428,19 @@ export const PETS = {
   dragon: { name: 'Dragon', rarity: 'epic', mult: 2.5 },
   crab: { name: 'Lucky Crab', rarity: 'uncommon', mult: 1.2 },
   sphinx: { name: 'Sphinx', rarity: 'secret', mult: 80 },
-  // Dragonfire Peaks' Lava Egg: the Inferno Kraken is the best pet in the game, but only
+  // Christmas Village's Gift Egg: the Candy Kraken is the best pet in the game, but only
   // just - the best three pets set the late game's pace (scripts/balance-sim.mjs). (The ids
-  // are the template's beach pets; the names and colours are Dragonfire Peaks'.)
-  seagull: { name: 'Fire Hawk', rarity: 'rare', mult: 16 },
-  dolphin: { name: 'Magma Dolphin', rarity: 'epic', mult: 22 },
-  shark: { name: 'Lava Shark', rarity: 'legendary', mult: 32 },
-  kraken: { name: 'Inferno Kraken', rarity: 'mythic', mult: 55 },
+  // are the template's beach pets; the names and colours are Christmas Village's.)
+  seagull: { name: 'Snowy Owl', rarity: 'rare', mult: 16 },
+  dolphin: { name: 'Penguin', rarity: 'epic', mult: 22 },
+  shark: { name: 'Frost Shark', rarity: 'legendary', mult: 32 },
+  kraken: { name: 'Candy Kraken', rarity: 'mythic', mult: 55 },
 }
 
 /**
- * Eggs, bought with Wins. `world` = the only world it hatches in (the Lava Egg:
- * Dragonfire Peaks). `pets` are [petId, weight] - weights are percentages and sum to 100.
- * Each egg is priced at about the Wins of a few throws at the stage of the game whose
+ * Eggs, bought with Wins. `world` = the only world it hatches in (the Gift Egg:
+ * Christmas Village). `pets` are [petId, weight] - weights are percentages and sum to 100.
+ * Each egg is priced at about the Wins of a few serves at the stage of the game whose
  * pets it beats.
  */
 export const EGGS = {
@@ -447,7 +449,7 @@ export const EGGS = {
   sunset: { name: 'Sunset', cost: { wins: 750 }, pets: [['flamingo', 45], ['turtle', 30], ['owl', 20], ['phoenix', 5]] },
   unicorn: { name: 'Unicorn', cost: { wins: 6000 }, pets: [['pony', 50], ['unicorn', 35], ['pegasus', 15]] },
   volcano: { name: 'Volcano', cost: { wins: 35000 }, pets: [['salamander', 50], ['firebird', 30], ['golem', 15], ['inferno', 5]] },
-  beach: { name: 'Lava', cost: { wins: 2000000 }, world: 1, pets: [['seagull', 45], ['dolphin', 30], ['shark', 20], ['kraken', 5]] },
+  beach: { name: 'Gift', cost: { wins: 2000000 }, world: 1, pets: [['seagull', 45], ['dolphin', 30], ['shark', 20], ['kraken', 5]] },
 }
 
 export const MAX_EQUIPPED_PETS = 3
@@ -498,7 +500,7 @@ export const PLAYTIME_REWARDS = [
 /** The stand by spawn: a pet the first time, a potion on later sessions. */
 export const FREE_REWARD = { firstTime: { pet: 'crab' }, repeat: { item: 'potionHealth' } }
 
-/** Offline training: a quarter of your dummy's rate, for up to 8 hours away. */
+/** Offline training: a quarter of your court's rate, for up to 8 hours away. */
 export const OFFLINE_RATE = 0.25
 export const OFFLINE_MAX_MS = 8 * 60 * 60 * 1000
 export const OFFLINE_MIN_MS = 60 * 1000
@@ -509,11 +511,11 @@ export const OFFLINE_MIN_MS = 60 * 1000
  * open for good, both ways. Stepping through earns the badge of the same id.
  */
 export const WORLD_PORTALS = {
-  world2: { name: 'Dragonfire Peaks', wins: 1000000, rebirths: 8 },
+  world2: { name: 'Christmas Village', wins: 1000000, rebirths: 8 },
 }
 
 /**
- * Dragonfire Peaks' Secret Star, hidden somewhere in its lobby (STAR in world.js): finding it
+ * Christmas Village's Secret Star, hidden somewhere in its lobby (STAR in world.js): finding it
  * doubles every Power gain for good, in every world.
  */
 export const SECRET_STAR = { world: 1, power: 2 }
@@ -521,101 +523,101 @@ export const SECRET_STAR = { world: 1, power: 2 }
 // --- Worlds -----------------------------------------------------------------------
 
 /**
- * Dragonfire Peaks (World 2), through the portal once you've rebirthed 8 times and hold 1M
- * Wins: the academy's twin courtyard on a volcano, by a sea of lava. Its own Lava Egg, two
- * fiery dummies and a Secret Star, and its own road - eighty fiery stages, one for each of
- * Sunblade Valley's - where every metre, trophy and first-visit prize pays `wins` times as
+ * Christmas Village (World 2), through the portal once you've rebirthed 8 times and hold 1M
+ * Wins: the arena's twin in the snow, by a frozen sea. Its own Gift Egg, two Christmas
+ * courts and a Secret Star, and its own court - eighty fiery stages, one for each of
+ * Sunny Shores' - where every metre, trophy and first-visit prize pays `wins` times as
  * much. Its stages need the same Power as World 1's - a harder World 2 would pay less than
  * World 1 right after each rebirth - so going over is always worth it, and coming back
  * (the same portal) costs nothing.
  */
 export const WORLDS = [
-  { id: 'world1', name: 'Sunblade Valley', wins: 1 },
-  { id: 'world2', name: 'Dragonfire Peaks', wins: 3 },
+  { id: 'world1', name: 'Sunny Shores', wins: 1 },
+  { id: 'world2', name: 'Christmas Village', wins: 3 },
 ]
 
-/** Dragonfire Peaks' stages: [id, name, theme], one for each of World 1's. */
+/** Christmas Village's stages: [id, name, theme], one for each of World 1's. */
 const WORLD2_STAGES = [
-  ['w2-ember-gate', 'Ember Gate', 'volcano'],
-  ['w2-ash-field', 'Ash Field', 'desert'],
-  ['w2-magma-meadow', 'Magma Meadow', 'volcano'],
-  ['w2-cinder-park', 'Cinder Park', 'moon'],
-  ['w2-smoke-stacks', 'Smoke Stacks', 'swamp'],
-  ['w2-lava-falls', 'Lava Falls', 'volcano'],
-  ['w2-obsidian-yard', 'Obsidian Yard', 'crystal'],
-  ['w2-scorch-desert', 'Scorch Desert', 'desert'],
-  ['w2-fire-pit', 'Fire Pit', 'volcano'],
-  ['w2-basalt-bluffs', 'Basalt Bluffs', 'moon'],
-  ['w2-sulfur-springs', 'Sulfur Springs', 'swamp'],
-  ['w2-dragon-nest', 'Dragon Nest', 'volcano'],
-  ['w2-ruby-caverns', 'Ruby Caverns', 'crystal'],
-  ['w2-neon-forge', 'Neon Forge', 'neon'],
-  ['w2-heat-wave', 'Heat Wave', 'desert'],
-  ['w2-phoenix-peak', 'Phoenix Peak', 'volcano'],
-  ['w2-ember-moon', 'Ember Moon', 'moon'],
-  ['w2-burning-sky', 'Burning Sky', 'aurora'],
-  ['w2-meteor-crater', 'Meteor Crater', 'space'],
-  ['w2-solar-flare', 'Solar Flare', 'cosmic'],
-  ['w2-charcoal-hills', 'Charcoal Hills', 'moon'],
-  ['w2-molten-river', 'Molten River', 'volcano'],
-  ['w2-cactus-inferno', 'Cactus Inferno', 'desert'],
-  ['w2-geyser-flats', 'Geyser Flats', 'swamp'],
-  ['w2-flame-temple', 'Flame Temple', 'volcano'],
-  ['w2-crystal-core', 'Crystal Core', 'crystal'],
-  ['w2-blaze-city', 'Blaze City', 'neon'],
-  ['w2-firefly-marsh', 'Firefly Marsh', 'swamp'],
-  ['w2-ashen-peaks', 'Ashen Peaks', 'moon'],
-  ['w2-magma-chamber', 'Magma Chamber', 'volcano'],
-  ['w2-dune-of-fire', 'Dunes of Fire', 'desert'],
-  ['w2-garnet-mines', 'Garnet Mines', 'crystal'],
-  ['w2-hot-springs', 'Hot Springs', 'swamp'],
-  ['w2-cyber-furnace', 'Cyber Furnace', 'neon'],
-  ['w2-sky-embers', 'Sky Embers', 'aurora'],
-  ['w2-red-giant', 'Red Giant', 'space'],
-  ['w2-lava-lagoon', 'Lava Lagoon', 'volcano'],
-  ['w2-scorched-moon', 'Scorched Moon', 'moon'],
-  ['w2-star-furnace', 'Star Furnace', 'cosmic'],
-  ['w2-inferno-gate', 'Inferno Gate', 'volcano'],
-  ['w2-sunfire-sands', 'Sunfire Sands', 'desert'],
-  ['w2-amber-grotto', 'Amber Grotto', 'crystal'],
-  ['w2-boiling-bog', 'Boiling Bog', 'swamp'],
-  ['w2-volcano-arena', 'Volcano Arena', 'volcano'],
-  ['w2-neon-lava', 'Neon Lava', 'neon'],
-  ['w2-ember-aurora', 'Ember Aurora', 'aurora'],
-  ['w2-black-rock', 'Black Rock', 'moon'],
-  ['w2-firestorm', 'Firestorm', 'volcano'],
-  ['w2-mirage', 'Mirage', 'desert'],
-  ['w2-topaz-tunnels', 'Topaz Tunnels', 'crystal'],
-  ['w2-plasma-plant', 'Plasma Plant', 'neon'],
-  ['w2-comet-fire', 'Comet Fire', 'space'],
-  ['w2-dragon-throne', 'Dragon Throne', 'volcano'],
-  ['w2-supernova', 'Supernova', 'cosmic'],
-  ['w2-lava-champions', 'Lava Champions', 'volcano'],
-  ['w2-ember-galaxy', 'Ember Galaxy', 'space'],
-  ['w2-sun-core', 'Sun Core', 'cosmic'],
-  ['w2-fire-dimension', 'Fire Dimension', 'aurora'],
-  ['w2-eternal-flame', 'Eternal Flame', 'volcano'],
-  ['w2-hall-of-legends', 'Hall of Legends', 'cosmic'],
-  ['w2-cinder-crown', 'Cinder Crown', 'volcano'],
-  ['w2-smoldering-dunes', 'Smoldering Dunes', 'desert'],
-  ['w2-obsidian-throne', 'Obsidian Throne', 'crystal'],
-  ['w2-ashfall-moor', 'Ashfall Moor', 'swamp'],
-  ['w2-wyrm-lair', 'Wyrm Lair', 'volcano'],
-  ['w2-forge-city', 'Forge City', 'neon'],
-  ['w2-crater-of-ash', 'Crater of Ash', 'moon'],
-  ['w2-flare-veil', 'Flare Veil', 'aurora'],
-  ['w2-ruby-nebula', 'Ruby Nebula', 'space'],
-  ['w2-ember-cosmos', 'Ember Cosmos', 'cosmic'],
-  ['w2-titan-forge', 'Titan Forge', 'volcano'],
-  ['w2-blazing-mesa', 'Blazing Mesa', 'desert'],
-  ['w2-magma-geodes', 'Magma Geodes', 'crystal'],
-  ['w2-steam-vents', 'Steam Vents', 'swamp'],
-  ['w2-fireheart-gorge', 'Fireheart Gorge', 'volcano'],
-  ['w2-plasma-spire', 'Plasma Spire', 'neon'],
-  ['w2-brimstone-plateau', 'Brimstone Plateau', 'moon'],
-  ['w2-solar-wind', 'Solar Wind', 'aurora'],
-  ['w2-dying-star', 'Dying Star', 'space'],
-  ['w2-dragonfire-summit', 'Dragonfire Summit', 'cosmic'],
+  ['w2-ember-gate', 'Snowflake Gate', 'frozen'],
+  ['w2-ash-field', 'Candy Cane Lane', 'candy'],
+  ['w2-magma-meadow', 'Jingle Meadow', 'frozen'],
+  ['w2-cinder-park', 'Frosty Park', 'sky'],
+  ['w2-smoke-stacks', 'Gingerbread Row', 'candy'],
+  ['w2-lava-falls', 'Twinkle Hill', 'aurora'],
+  ['w2-obsidian-yard', 'Snowball Yard', 'frozen'],
+  ['w2-scorch-desert', 'Sleigh Bell Path', 'moon'],
+  ['w2-fire-pit', 'Holly Grove', 'cherry'],
+  ['w2-basalt-bluffs', 'Mistletoe Square', 'candy'],
+  ['w2-sulfur-springs', 'Icicle Falls', 'crystal'],
+  ['w2-dragon-nest', 'Cocoa Corner', 'candy'],
+  ['w2-ruby-caverns', 'Reindeer Run', 'frozen'],
+  ['w2-neon-forge', 'Light Parade', 'neon'],
+  ['w2-heat-wave', 'Starry Slopes', 'aurora'],
+  ['w2-phoenix-peak', 'Elf Workshop', 'candy'],
+  ['w2-ember-moon', 'Frost Moon', 'moon'],
+  ['w2-burning-sky', 'Northern Glow', 'aurora'],
+  ['w2-meteor-crater', 'Wishing Star', 'space'],
+  ['w2-solar-flare', "Santa's Gate", 'cosmic'],
+  ['w2-charcoal-hills', 'Pine Hollow', 'frozen'],
+  ['w2-molten-river', 'Peppermint Plaza', 'candy'],
+  ['w2-cactus-inferno', 'Snowdrift Dunes', 'frozen'],
+  ['w2-geyser-flats', 'Ornament Alley', 'neon'],
+  ['w2-flame-temple', 'Present Pile Peak', 'candy'],
+  ['w2-crystal-core', 'Crystal Cavern', 'crystal'],
+  ['w2-blaze-city', 'Tinsel Town', 'neon'],
+  ['w2-firefly-marsh', 'Wreath Woods', 'cherry'],
+  ['w2-ashen-peaks', 'Polar Plains', 'frozen'],
+  ['w2-magma-chamber', 'Sugarplum Valley', 'candy'],
+  ['w2-dune-of-fire', 'Frozen Pond', 'frozen'],
+  ['w2-garnet-mines', 'Glacier Gardens', 'crystal'],
+  ['w2-hot-springs', 'Fireside Lodge', 'cherry'],
+  ['w2-cyber-furnace', 'Neon Snowfall', 'neon'],
+  ['w2-sky-embers', 'Aurora Bay', 'aurora'],
+  ['w2-red-giant', 'Comet Trail', 'space'],
+  ['w2-lava-lagoon', 'Marshmallow Mile', 'candy'],
+  ['w2-scorched-moon', 'Silent Night Moon', 'moon'],
+  ['w2-star-furnace', 'Star Workshop', 'cosmic'],
+  ['w2-inferno-gate', 'Snow Globe City', 'sky'],
+  ['w2-sunfire-sands', 'Yule Log Lane', 'cherry'],
+  ['w2-amber-grotto', 'Ice Rink Ridge', 'frozen'],
+  ['w2-boiling-bog', 'Candy Castle', 'candy'],
+  ['w2-volcano-arena', 'Lantern Snowfield', 'cherry'],
+  ['w2-neon-lava', 'Toy Factory', 'neon'],
+  ['w2-ember-aurora', 'Shimmer Skies', 'aurora'],
+  ['w2-black-rock', 'Moonlit Pines', 'moon'],
+  ['w2-firestorm', 'Blizzard Pass', 'frozen'],
+  ['w2-mirage', 'Gumdrop Gardens', 'candy'],
+  ['w2-topaz-tunnels', 'Frost Crystal Mines', 'crystal'],
+  ['w2-plasma-plant', 'Bright Lights Avenue', 'neon'],
+  ['w2-comet-fire', 'Galaxy Sleigh Ride', 'space'],
+  ['w2-dragon-throne', 'Penguin Point', 'frozen'],
+  ['w2-supernova', 'Starlight Summit', 'cosmic'],
+  ['w2-lava-champions', 'Sleigh Champions', 'candy'],
+  ['w2-ember-galaxy', 'Snow Galaxy', 'space'],
+  ['w2-sun-core', 'Polar Star Core', 'cosmic'],
+  ['w2-fire-dimension', 'Aurora Dimension', 'aurora'],
+  ['w2-eternal-flame', 'Eternal Winter', 'frozen'],
+  ['w2-hall-of-legends', 'Hall of Holidays', 'cosmic'],
+  ['w2-cinder-crown', 'Frost Crown', 'frozen'],
+  ['w2-smoldering-dunes', 'Cookie Dunes', 'candy'],
+  ['w2-obsidian-throne', 'Diamond Ice Throne', 'crystal'],
+  ['w2-ashfall-moor', 'Holly Moor', 'cherry'],
+  ['w2-wyrm-lair', 'Snow Queen Lair', 'frozen'],
+  ['w2-forge-city', 'Festive City', 'neon'],
+  ['w2-crater-of-ash', 'Crater of Snow', 'moon'],
+  ['w2-flare-veil', 'Glitter Veil', 'aurora'],
+  ['w2-ruby-nebula', 'Icy Nebula', 'space'],
+  ['w2-ember-cosmos', 'Holiday Cosmos', 'cosmic'],
+  ['w2-titan-forge', 'Toymaker Forge', 'candy'],
+  ['w2-blazing-mesa', 'Frosted Mesa', 'frozen'],
+  ['w2-magma-geodes', 'Ice Geodes', 'crystal'],
+  ['w2-steam-vents', 'Hot Cocoa Springs', 'cherry'],
+  ['w2-fireheart-gorge', 'Snowy Gorge', 'frozen'],
+  ['w2-plasma-spire', 'Light Spire', 'neon'],
+  ['w2-brimstone-plateau', 'Moonbeam Plateau', 'moon'],
+  ['w2-solar-wind', 'Solstice Wind', 'aurora'],
+  ['w2-dying-star', 'Shooting Star', 'space'],
+  ['w2-dragonfire-summit', 'Christmas Summit', 'cosmic'],
 ]
 
 const worldZones = (world) =>
@@ -640,32 +642,32 @@ export const zonesOf = (world) => WORLD_ZONES[world] ?? ZONES
 // --- Shop -------------------------------------------------------------------------
 
 /**
- * The shop. Wins are the game's only currency: everything here, like swords, enchantments and eggs,
+ * The shop. Wins are the game's only currency: everything here, like volleyballs, auras and eggs,
  * is bought with them. `pass` = permanent unlock; `consumable` = grants every time.
  */
 export const SHOP = {
   healthX2: { name: 'x2 Power', price: 400, kind: 'pass' },
   winsX2: { name: 'x2 Wins', price: 2500, kind: 'pass' },
-  autoRoll: { name: 'Auto Throw', price: 150, kind: 'pass' },
-  padVeryOp: { name: 'VERY OP! Dummy', price: 150000, kind: 'pass' },
-  padBest: { name: 'BEST OVERALL! Dummy', price: 2500000, kind: 'pass' },
+  autoRoll: { name: 'Auto Serve', price: 150, kind: 'pass' },
+  padVeryOp: { name: 'VERY OP! Court', price: 150000, kind: 'pass' },
+  padBest: { name: 'BEST OVERALL! Court', price: 2500000, kind: 'pass' },
   sphinx: { name: 'Sphinx', price: 2500000, kind: 'consumable', grant: { pet: 'sphinx' }, stock: 1000 },
 }
 
 /**
  * Boxity Gems products, by sku. Prices live in Boxity's catalog, never here: the game
  * only names the sku and, once Boxity confirms the sale, grants what it says. Wins
- * packs grow with you: `winsRolls` max-level throws' worth of Wins.
+ * packs grow with you: `winsRolls` max-level serves' worth of Wins.
  */
 export const GEM_PRODUCTS = {
-  wins_small: { name: 'Pile of Wins', blurb: '10 max-level throws of Wins', icon: 'trophy', grant: { winsRolls: 10 } },
-  wins_big: { name: 'Mountain of Wins', blurb: '60 max-level throws of Wins', icon: 'trophy', grant: { winsRolls: 60 } },
+  wins_small: { name: 'Pile of Wins', blurb: '10 max-level serves of Wins', icon: 'trophy', grant: { winsRolls: 10 } },
+  wins_big: { name: 'Mountain of Wins', blurb: '60 max-level serves of Wins', icon: 'trophy', grant: { winsRolls: 60 } },
   potion_bundle: { name: 'Potion Bundle', blurb: '3 x2 Power + 3 x2 Wins potions', icon: 'potionHealth', grant: { items: { potionHealth: 3, potionWins: 3 } } },
   volcano_eggs: { name: '3 Volcano Eggs', blurb: 'The best pets in the game', icon: 'egg:volcano', grant: { items: { eggVolcano: 3 } } },
-  auto_roll: { name: 'Auto Throw', blurb: 'Throws your sword for you from a throw spot', icon: 'tire', grant: { pass: 'autoRoll' } },
+  auto_roll: { name: 'Auto Serve', blurb: 'Serves for you from the serve line', icon: 'tire', grant: { pass: 'autoRoll' } },
   health_x2: { name: 'x2 Power', blurb: 'Double every Power gain, forever', icon: 'heart', grant: { pass: 'healthX2' } },
-  wins_x2: { name: 'x2 Wins', blurb: 'Double every throw’s Wins, forever', icon: 'trophy', grant: { pass: 'winsX2' } },
-  pad_best: { name: 'Galaxy Titan', blurb: 'Unlocks the x100 Galaxy Titan training dummy', icon: 'portal', grant: { pass: 'padBest' } },
+  wins_x2: { name: 'x2 Wins', blurb: 'Double every serve’s Wins, forever', icon: 'trophy', grant: { pass: 'winsX2' } },
+  pad_best: { name: 'Galaxy Court', blurb: 'Unlocks the x100 Galaxy Court for training', icon: 'portal', grant: { pass: 'padBest' } },
 }
 
 /**
@@ -682,7 +684,7 @@ export const SPHINX_STOCK_DEFAULT = 954
 
 /**
  * The three Health packs under the level bar. They grow with you: each gives `share`
- * of the Power your next level needs, for `rolls` throws' worth of Wins at that Power.
+ * of the Power your next level needs, for `rolls` serves' worth of Wins at that Power.
  * Packs aren't held back by the level cap.
  */
 export const HEALTH_PACKS = [
@@ -701,7 +703,7 @@ export const DAY_MS = 24 * 60 * 60 * 1000
 export const dayNumber = (now) => Math.floor(now / DAY_MS)
 
 /**
- * Login streak: play on consecutive days and every throw pays STREAK_STEP more Wins per
+ * Login streak: play on consecutive days and every serve pays STREAK_STEP more Wins per
  * day in a row (day 1 x1, day 2 x1.1 ... day 11 and on x2). Miss a day and it starts again
  * from day 1 - the reason to come back tomorrow.
  */
@@ -710,7 +712,7 @@ export const STREAK_MAX_DAYS = 11
 export const streakMultiplier = (days) => 1 + STREAK_STEP * (Math.min(STREAK_MAX_DAYS, Math.max(1, days)) - 1)
 
 /**
- * PERFECT combo: PERFECT throws in a row each pay COMBO_STEP more Wins than the last
+ * PERFECT combo: PERFECT serves in a row each pay COMBO_STEP more Wins than the last
  * (the 2nd +10%, the 3rd +20% ... up to +COMBO_MAX); anything less than PERFECT breaks it.
  * Kept for the session, never saved.
  */
@@ -720,15 +722,15 @@ export const comboBonus = (combo) => 1 + Math.min(COMBO_MAX, COMBO_STEP * Math.m
 
 /**
  * Playing together: every other player in your server (and your world) adds CROWD_STEP
- * to your throws' Wins, up to CROWD_MAX - bring your friends.
+ * to your serves' Wins, up to CROWD_MAX - bring your friends.
  */
 export const CROWD_STEP = 0.1
 export const CROWD_MAX = 0.3
 export const crowdBonus = (others) => 1 + Math.min(CROWD_MAX, CROWD_STEP * Math.max(0, others))
 
 /**
- * Lucky gifts: each throw has LUCKY_CHANCE of landing a surprise on top of its Wins.
- * `weight`s are relative. Wins gifts grow with you (`winsRolls` max-level throws' worth);
+ * Lucky gifts: each serve has LUCKY_CHANCE of landing a surprise on top of its Wins.
+ * `weight`s are relative. Wins gifts grow with you (`winsRolls` max-level serves' worth);
  * an egg gift is an egg that fits how far you've got (logic.eggItemFor).
  */
 export const LUCKY_CHANCE = 0.08
@@ -742,12 +744,12 @@ export const LUCKY_GIFTS = [
 /**
  * Daily quests: QUESTS_PER_DAY a day - an EASY, a MEDIUM and a HARD one of different
  * kinds, picked fresh each day for each player - and a bonus chest for finishing all
- * three. Rewards grow with you: `winsRolls` max-level throws' worth of Wins (HARD adds
+ * three. Rewards grow with you: `winsRolls` max-level serves' worth of Wins (HARD adds
  * a potion; the chest adds an egg that fits your progress).
  *
  * Each kind counts one thing (`counter`, fed by the session as you play) up to its
  * target; `mode: 'best'` keeps the best single value instead of adding up. `targets` are
- * per tier; `scale` scales them with your best throw so far ('total': that many of it in
+ * per tier; `scale` scales them with your best serve so far ('total': that many of it in
  * metres, 'best': that share of it). `{n}` in `text` is the target.
  */
 export const QUESTS_PER_DAY = 3
@@ -758,13 +760,13 @@ export const QUEST_TIERS = [
 ]
 export const QUEST_BONUS = { winsRolls: 15 }
 export const QUEST_TYPES = {
-  launch: { counter: 'launch', text: 'Throw your sword {n} times', targets: [5, 12, 25] },
-  great: { counter: 'great', text: 'Get {n} GREAT or PERFECT throws', targets: [2, 5, 10] },
-  perfect: { counter: 'perfect', text: 'Get {n} PERFECT throws', targets: [1, 3, 6] },
-  combo: { counter: 'combo', mode: 'best', text: 'Hit a PERFECT throw combo of {n}', targets: [2, 3, 4] },
-  reps: { counter: 'rep', text: 'Slash with your sword {n} times', targets: [40, 120, 300] },
-  meters: { counter: 'meters', text: 'Throw {n} m in total', scale: 'total', targets: [4, 10, 25] },
-  far: { counter: 'far', mode: 'best', text: 'Throw your sword {n} m in one go', scale: 'best', targets: [0.6, 0.8, 0.95] },
+  launch: { counter: 'launch', text: 'Serve {n} times', targets: [5, 12, 25] },
+  great: { counter: 'great', text: 'Get {n} GREAT or PERFECT serves', targets: [2, 5, 10] },
+  perfect: { counter: 'perfect', text: 'Get {n} PERFECT serves', targets: [1, 3, 6] },
+  combo: { counter: 'combo', mode: 'best', text: 'Hit a PERFECT serve combo of {n}', targets: [2, 3, 4] },
+  reps: { counter: 'rep', text: 'Spike {n} balls in training', targets: [40, 120, 300] },
+  meters: { counter: 'meters', text: 'Serve {n} m in total', scale: 'total', targets: [4, 10, 25] },
+  far: { counter: 'far', mode: 'best', text: 'Serve {n} m in one go', scale: 'best', targets: [0.6, 0.8, 0.95] },
   hatch: { counter: 'hatch', text: 'Hatch {n} pets', targets: [1, 3, 6] },
   minutes: { counter: 'minute', text: 'Play for {n} minutes', targets: [5, 15, 30] },
 }
@@ -772,25 +774,25 @@ export const QUEST_TYPES = {
 // --- Tutorial & badges ------------------------------------------------------------
 
 /**
- * The guide for new players: slash for Power, throw from a throw spot, spend the Wins on
- * a new sword, throw further, rebirth. Each step completes when its
+ * The guide for new players: spike for Power, serve from the serve line, spend the Wins
+ * on a new volleyball, serve further, rebirth. Each step completes when its
  * event fires (and, with `health`, once you have that much); after the last the guide is
  * done.
  */
 export const TUTORIAL = [
-  { text: 'Click to slash with your sword and gain Power', event: 'train', target: 'pad0', health: 12 },
-  { text: 'Go up on the THROW STAGE, HOLD THROW and let go at the top!', event: 'roll', target: 'roll' },
-  { text: 'Buy the Bamboo Blade at the SWORD COUNTER by the Sword Wall!', event: 'buyTire', target: 'tires' },
+  { text: 'Click to spike the ball and gain Power', event: 'train', target: 'pad0', health: 12 },
+  { text: 'Step onto the SERVE LINE, HOLD SERVE and let go at the top!', event: 'roll', target: 'roll' },
+  { text: 'Buy the Sunny Ball at the BALL COUNTER by the Ball Wall!', event: 'buyTire', target: 'tires' },
 ]
 
 export const BADGES = {
-  firstRoll: { name: 'First Throw' },
+  firstRoll: { name: 'First Serve' },
   firstRebirth: { name: 'First Rebirth' },
   firstPet: { name: 'Pet Owner' },
   firstWall: { name: 'Explorer' },
-  kilometer: { name: '1 Kilometre Throw' },
-  space: { name: 'Star Thrower' },
+  kilometer: { name: '1 Kilometre Serve' },
+  space: { name: 'Star Server' },
   cosmic: { name: 'Living Legend' },
-  world2: { name: 'Dragon Rider' },
+  world2: { name: 'Holiday Hero' },
   secretStar: { name: 'Star Finder' },
 }

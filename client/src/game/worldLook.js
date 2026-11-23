@@ -7,7 +7,7 @@ import { skyUniforms } from './skyState'
 
 /**
  * The world you're in (index into balance WORLDS) and what it changes on screen: the
- * stages the valley shows - their names, colours and scenery; every world's stages start
+ * stages the court shows - their names, colours and scenery; every world's stages start
  * at the same metres - and the sky. GameScene remounts the field when the world changes,
  * so whatever it builds on mount follows; tables derived from the stages are built once
  * per world (`perWorld`) and picked when used.
@@ -37,7 +37,7 @@ export function skyLook({ top, horizon, sun = '#ffffff', glow = 0.5, clouds = 0.
  * sea, a hot low sun haze, the first stars through the ash, and its fog the colour of the
  * glow at the horizon.
  */
-const LOBBY_SKIES = [skyLook(SKY), skyLook({ top: '#2a0c22', horizon: '#ff7030', sun: '#ffb468', glow: 1.15, clouds: 0.5, stars: 0.22 })]
+const LOBBY_SKIES = [skyLook(SKY), skyLook({ top: '#03061c', horizon: '#22366a', sun: '#dfe8ff', glow: 0.4, clouds: 0.18, stars: 1 })]
 export const lobbySky = () => LOBBY_SKIES[activeWorld()] ?? LOBBY_SKIES[0]
 
 /**

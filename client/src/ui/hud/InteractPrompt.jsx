@@ -34,7 +34,7 @@ function usePrompt() {
     const world = WORLD_PORTALS[atPortal]
     if (inWorld === 1) return { title: WORLDS[0].name, action: 'Step out and back in to go home', run: null }
     if (unlocked || (rebirths >= world.rebirths && wins >= world.wins)) {
-      return { title: world.name, action: `x${WORLDS[1].wins} Wins on every throw!`, run: null }
+      return { title: world.name, action: `x${WORLDS[1].wins} Wins on every serve!`, run: null }
     }
     if (rebirths < world.rebirths) return { title: world.name, action: `Needs ${world.rebirths} Rebirths (you have ${rebirths})`, run: null }
     return { title: world.name, action: `Needs ${formatNumber(world.wins)} Wins (you have ${formatNumber(wins)})`, run: null }
@@ -58,7 +58,7 @@ function usePrompt() {
   }
 
   if (atBallShop) {
-    return { title: 'Enchant Altar', action: 'Enchant your sword', run: () => openPanel('balls') }
+    return { title: 'Aura Shrine', action: 'Pick an aura for your serve', run: () => openPanel('balls') }
   }
 
   if (atFreeReward) {
@@ -67,13 +67,13 @@ function usePrompt() {
       : { title: 'Free Reward', action: 'Claim', run: () => actions.claimFreeReward() }
   }
 
-  // The Sword Counter sells swords in order, so it always offers your next one. Buying
+  // The Ball Counter sells balls in order, so it always offers your next one. Buying
   // equips it; if you've picked an older one to hold, it offers your best back.
-  // The Sword Counter opens the Sword Shop (every sword, bought and equipped there); this
+  // The Ball Counter opens the Ball Shop (every ball, bought and equipped there); this
   // brings it back if you closed it while still standing on the counter.
   if (atCounter) {
     const next = nextTire({ ownedTires: owned })
-    const title = next ? `Sword Shop - next: ${next.name}` : `Sword Shop - all ${TIRES.length} swords collected!`
+    const title = next ? `Ball Shop - next: ${next.name}` : `Ball Shop - all ${TIRES.length} volleyballs collected!`
     return { title, action: 'Open', run: () => openPanel('swords') }
   }
   return null

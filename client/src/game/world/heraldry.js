@@ -2,13 +2,13 @@ import { STYLE } from '../materials'
 
 /**
  * The academy's heraldry and fixtures, as boxes for the world's block set (no draw calls
- * of their own): hanging banners with the academy's crest - two crossed swords, point up,
- * over a gold border - giant crossed swords for the crests on the arch and the great board,
+ * of their own): hanging banners with the academy's crest - two crossed balls, point up,
+ * over a gold border - giant crossed balls for the crests on the arch and the great board,
  * braziers and wall torches. Everything is placed in a local frame turned by `yaw` about
  * the vertical (local +Z is the way it faces: yaw 0 faces south, +Z), so the same piece
  * hangs on any wall.
  *
- * The crest is original: a blue field, a gold border and two steel swords crossed in a
+ * The crest is original: a blue field, a gold border and two steel balls crossed in a
  * saltire with gold guards - no lettering, no borrowed symbol.
  */
 
@@ -32,7 +32,7 @@ export function localBox(blocks, x, y, z, yaw, lx, ly, lz, sx, sy, sz, color, st
 }
 
 /**
- * One sword lying flat in a turned frame's XY plane: its grip at local (lx, ly), pointing
+ * One ball lying flat in a turned frame's XY plane: its grip at local (lx, ly), pointing
  * along `tilt` from straight up (positive tilts it towards local -X), `length` from guard
  * to tip, `width` across the blade, `depth` its thickness (out along local Z, at lz).
  */
@@ -56,24 +56,26 @@ export function flatSword(blocks, x, y, z, yaw, lx, ly, lz, tilt, length, width,
 }
 
 /**
- * The crest's two swords crossed, centred on local (lx, ly), `size` tall overall, lying
- * `lz` out in front of whatever they're on.
+ * The crest: a blocky volleyball, centred on local (lx, ly), `size` across, lying `lz` out in
+ * front of whatever it's on - a white disc of three blocks, two bands of panel colour
+ * curving across it (the trim and the blade colours) and a dark ring round it. (The name is
+ * the template's: every crest calls it.)
  */
 export function crossedSwords(blocks, x, y, z, yaw, lx, ly, lz, size, c) {
-  const length = size * 0.72
-  const width = size * 0.085
-  for (const side of [-1, 1]) {
-    const tilt = side * 0.62
-    // Each grip low on its own side, so the blades cross a little above the middle.
-    const gx = side * size * 0.24
-    const gy = -size * 0.3
-    flatSword(blocks, x, y, z, yaw, lx + gx, ly + gy, lz + side * 0.012, tilt, length, width, Math.max(0.03, size * 0.03), c)
-  }
+  const r = size * 0.36
+  // A round-ish disc: a square and the same square turned an eighth, and a dark rim behind.
+  localBox(blocks, x, y, z, yaw, lx, ly, lz - 0.02, r * 2.12, r * 2.12, 0.04, '#1b1b1f', STYLE.SMOOTH, Math.PI / 8)
+  localBox(blocks, x, y, z, yaw, lx, ly, lz, r * 1.95, r * 1.95, 0.05, '#ffffff', STYLE.SMOOTH)
+  localBox(blocks, x, y, z, yaw, lx, ly, lz, r * 1.95, r * 1.95, 0.05, '#ffffff', STYLE.SMOOTH, Math.PI / 4)
+  // Two panel bands sweeping across it, and one up through it.
+  localBox(blocks, x, y, z, yaw, lx - r * 0.1, ly + r * 0.42, lz + 0.03, r * 1.7, r * 0.42, 0.05, c.trim, STYLE.SMOOTH, -0.35)
+  localBox(blocks, x, y, z, yaw, lx + r * 0.1, ly - r * 0.42, lz + 0.03, r * 1.7, r * 0.42, 0.05, c.blade ?? c.trim, STYLE.SMOOTH, -0.35)
+  localBox(blocks, x, y, z, yaw, lx + r * 0.05, ly, lz + 0.035, r * 0.34, r * 1.9, 0.05, '#ffffff', STYLE.SMOOTH, -0.35)
 }
 
 /**
  * A banner hanging from a bar with its top at (x, top, z), facing `yaw`: the field in
- * `field`, a gold border, a swallow-tailed foot, and the crest's crossed swords on it.
+ * `field`, a gold border, a swallow-tailed foot, and the crest's volleyball on it.
  * `w` wide, `h` long; `out` is how far in front of the wall it hangs.
  */
 export function banner(blocks, x, top, z, yaw, w, h, c, { field = c.banner, out = 0.12, crest = true } = {}) {

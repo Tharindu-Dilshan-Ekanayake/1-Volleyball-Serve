@@ -18,7 +18,7 @@ function hashString(text) {
   return h >>> 0
 }
 
-/** A quest's target for `tier`, scaled by your best throw where its kind asks. */
+/** A quest's target for `tier`, scaled by your best serve where its kind asks. */
 function questTarget(type, tier, profile) {
   const raw = type.targets[tier]
   const best = Math.max(120, profile.stats.bestDistance || 0)
@@ -51,7 +51,7 @@ export function ensureQuests(profile, now) {
 /**
  * A whole number with thousands commas ("12,500"). By hand, not toLocaleString: the
  * browser's first number-format call sets up its locale data (~12 ms on a phone), and the
- * first quest finishes on the release of your very first throw.
+ * first quest finishes on the release of your very first serve.
  */
 const withCommas = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 

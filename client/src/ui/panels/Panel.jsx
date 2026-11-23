@@ -7,10 +7,12 @@ import { u } from '../hud/style'
 
 /**
  * Room kept clear along the bottom while a panel is open: the portal draws its banner ad
- * there (Boxity screen ads, integration.js 'panel' screen), and it would otherwise sit on
- * top of the panel's lower rows. About a banner tall on a desktop, less on a short phone.
+ * there (Boxity screen ads, integration.js 'panel' screen: a 90 px banner under a small
+ * "ADVERTISEMENT" label), and it would otherwise sit on top of the panel's lower rows -
+ * so never less than the banner and its label, and a little more on tall screens. Down the
+ * sides, wide screens also keep clear of the portal's side ads (index.css --ad-side).
  */
-export const AD_STRIP = 'clamp(54px, 12vh, 110px)'
+export const AD_STRIP = 'clamp(108px, 17vh, 160px)'
 
 /** The red square X that sits on every panel's top-right corner. */
 export function CloseButton({ onClick, style }) {
@@ -63,14 +65,15 @@ export function Panel({ title, icon, width = 920, children, footer, onClose }) {
   return (
     <div
       className="pp-font pointer-events-auto absolute inset-0 z-40 flex items-center justify-center"
-      // Dimmed well down: the lobby's labels and swords behind must not show through or compete.
-      style={{ background: 'rgba(0, 0, 0, 0.6)', paddingBottom: AD_STRIP }}
+      // Dimmed well down: the lobby's labels and balls behind must not show through or compete.
+      // --px is the panel's own, smaller unit (index.css --panel-px): every size inside shrinks with it.
+      style={{ background: 'rgba(0, 0, 0, 0.6)', paddingBottom: AD_STRIP, '--px': 'var(--panel-px)' }}
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) close()
       }}
     >
       {/* Room for the close button at the right, and to scroll on short screens. */}
-      <div className="pp-panel-in relative flex flex-col items-center" style={{ width: `min(${u(width)}, calc(100vw - ${u(60)} - 16px))` }}>
+      <div className="pp-panel-in relative flex flex-col items-center" style={{ width: `min(${u(width)}, calc(100vw - ${u(60)} - 16px - var(--ad-side) * 2))` }}>
         <div
           className="relative w-full"
           style={{

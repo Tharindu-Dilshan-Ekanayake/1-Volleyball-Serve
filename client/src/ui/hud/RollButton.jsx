@@ -25,13 +25,13 @@ const BAND_COLORS = {
 /** Each grade's colour for the live label over the meter. */
 const GRADE_COLORS = { perfect: '#ffd21f', great: '#7dff4a', good: '#9fe8ff', weak: '#ff6a5a' }
 /** What the label says when idle on a spot. */
-const IDLE_TEXT = 'HOLD THROW - let go at the top!'
+const IDLE_TEXT = 'HOLD SERVE - let go at the top!'
 
 /**
- * The THROW STAGE's HUD: the THROW! button and the throw meter. Step up onto the stage -
- * anywhere on it - and you're ready to throw. HOLD THROW (the button, Space, E, Enter, or press and
+ * The SERVE STAGE's HUD: the SERVE! button and the serve meter. Step up onto the stage -
+ * anywhere on it - and you're ready to serve. HOLD SERVE (the button, Space, E, Enter, or press and
  * hold on the game) and you wind up: the meter fills, then wobbles at the top - let go as
- * it touches the gold PERFECT band: the higher it stands, the further your sword flies and
+ * it touches the gold PERFECT band: the higher it stands, the further your ball flies and
  * the more it pays (HIT_GRADES). A screen-edge vignette tightens as you wind up. Walk off to step away.
  *
  * The meter and the vignette move straight on the DOM every animation frame (launch.js
@@ -39,7 +39,7 @@ const IDLE_TEXT = 'HOLD THROW - let go at the top!'
  */
 export function RollButton() {
   const near = useGame((s) => s.zone.atPlate && !s.roll && !s.rollResult && !s.panel)
-  /** Up on the throw stage right now (mirrors launch.gripping for React). */
+  /** Up on the serve stage right now (mirrors launch.gripping for React). */
   const [atBat, setAtBat] = useState(false)
   const lastPress = useRef(-Infinity)
   const fillRef = useRef(null)
@@ -65,7 +65,7 @@ export function RollButton() {
     return () => clearInterval(id)
   }, [visible])
 
-  // A panel opened or the throw started: step off (a throw steps you back on after).
+  // A panel opened or the serve started: step off (a serve steps you back on after).
   const panel = useGame((s) => s.panel)
   const rolling = useGame((s) => Boolean(s.roll))
   const [blocked, setBlocked] = useState(false)
@@ -77,7 +77,7 @@ export function RollButton() {
     if (blocked && panel && launch.gripping && !launch.released) cancelPull()
   }, [blocked, panel])
 
-  // E / Enter / F: hold to wind up, let go to throw. (Space is the player's: Player.jsx.)
+  // E / Enter / F: hold to wind up, let go to serve. (Space is the player's: Player.jsx.)
   useEffect(() => {
     if (!visible) return undefined
     const keys = new Set(['KeyE', 'Enter', 'KeyF'])
@@ -120,7 +120,7 @@ export function RollButton() {
         color = GRADE_COLORS[grade.id]
       } else if (winding) {
         const grade = hitGrade(launch.charge)
-        text = grade.id === 'perfect' ? 'LET GO NOW!' : grade.label.replace(/ THROW|[!.]+$/g, '')
+        text = grade.id === 'perfect' ? 'LET GO NOW!' : grade.label.replace(/ SERVE|[!.]+$/g, '')
         color = GRADE_COLORS[grade.id]
       }
       for (const layer of labelRef.current?.querySelectorAll('.pp-text-stroke, .pp-text-fill') ?? []) layer.textContent = text
@@ -195,7 +195,7 @@ export function RollButton() {
               />
             </div>
             <span className="flex items-center" style={{ fontSize: u(28), marginTop: u(10), gap: u(8) }}>
-              <StrokeText stroke={u(7)}>Let go in the gold for a PERFECT throw!</StrokeText>
+              <StrokeText stroke={u(7)}>Let go in the gold for a PERFECT serve!</StrokeText>
             </span>
           </div>
         </div>
@@ -206,7 +206,7 @@ export function RollButton() {
         {!atBat && (
           <span className="pointer-events-none flex items-center" style={{ fontSize: u(34), gap: u(8), marginBottom: u(14) }}>
             <Icon name="arrowDown" size={u(40)} />
-            <StrokeText stroke={u(7)}>Step up onto the THROW STAGE to throw your sword!</StrokeText>
+            <StrokeText stroke={u(7)}>Step onto the SERVE LINE to serve!</StrokeText>
           </span>
         )}
         {(manual || !atBat) && (
@@ -222,14 +222,14 @@ export function RollButton() {
               onPointerUp={release}
               onPointerCancel={release}
               onLostPointerCapture={release}
-              title="Hold to wind up, let go to throw (Space / E)"
+              title="Hold to load up, let go to serve (Space / E)"
               radius={30}
               border={6}
               style={{ height: u(124), padding: `0 ${u(56)}`, minWidth: u(380), touchAction: 'none' }}
             >
               <span className="flex items-center" style={{ fontSize: u(64), gap: u(16) }}>
                 <Icon name="bat" size={u(68)} />
-                <StrokeText stroke={u(12)}>THROW!</StrokeText>
+                <StrokeText stroke={u(12)}>SERVE!</StrokeText>
               </span>
             </ChunkyButton>
           </div>

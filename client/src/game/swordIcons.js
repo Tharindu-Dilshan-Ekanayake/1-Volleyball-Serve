@@ -4,11 +4,11 @@ import { Color, DirectionalLight, Group, HemisphereLight, OrthographicCamera, Sc
 import { TIRES } from '@shared/balance'
 
 import { glowTime } from './glow'
-import { createSwordMesh, getSwordGeometry } from './swords'
+import { createBallMesh, getBallGeometry } from './volleyballs'
 
 /**
- * Sword portraits for the Sword Shop panel, rendered from the very models the world uses
- * (swords.js: the same geometry and the same painted material), so a sword looks the same
+ * Ball portraits for the Ball Shop panel, rendered from the very models the world uses
+ * (balls.js: the same geometry and the same painted material), so a ball looks the same
  * in the shop as on the wall, in your hand and in flight. No image assets to download.
  *
  * Like the pet portraits (pets/petIcons.js): queued once the game has been up a moment
@@ -18,12 +18,12 @@ import { createSwordMesh, getSwordGeometry } from './swords'
  * small canvas. Bitmaps live on the CPU side, so a lost WebGL context costs none of them;
  * the baker re-attaches to the new renderer and carries on with whatever was left.
  *
- * Every portrait: the sword diagonal, point up-right, turned a little on its long axis so
+ * Every portrait: the ball diagonal, point up-right, turned a little on its long axis so
  * its faces catch the light, filling the square, on a transparent background.
  */
 
 const SIZE = 160
-/** Sword id -> ImageBitmap. */
+/** Ball id -> ImageBitmap. */
 const bitmaps = new Map()
 const queue = []
 const listeners = new Set()
@@ -53,7 +53,7 @@ function buildRig() {
   const fill = new DirectionalLight('#bfe0ff', 0.9)
   fill.position.set(3, -1, 2)
   scene.add(fill)
-  // The square is -1..1 both ways: the sword is scaled to fill its diagonal.
+  // The square is -1..1 both ways: the ball is scaled to fill its diagonal.
   const camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 20)
   camera.position.set(0, 0, 6)
   camera.lookAt(0, 0, 0)
@@ -62,16 +62,16 @@ function buildRig() {
   const pose = new Group()
   pose.rotation.order = 'ZYX'
   pose.rotation.set(0, 0.5, -Math.PI / 4)
-  const mesh = createSwordMesh()
+  const mesh = createBallMesh()
   pose.add(mesh)
   scene.add(pose)
   return { scene, camera, target, pose, mesh, pixels: new Uint8Array(SIZE * SIZE * 4) }
 }
 
-/** Dresses the rig as sword `id`: centred on its middle, as big as the square allows. */
+/** Dresses the rig as ball `id`: centred on its middle, as big as the square allows. */
 function pose(id) {
-  rig.mesh.setSword(id)
-  const box = getSwordGeometry(id).boundingBox
+  rig.mesh.setBall(id)
+  const box = getBallGeometry(id).boundingBox
   const length = box.max.y - box.min.y
   const width = Math.max(box.max.x - box.min.x, box.max.z - box.min.z)
   // Pommel to tip along the diagonal (2.83 across), and the guard's span across it.
@@ -83,7 +83,7 @@ function pose(id) {
 /** The glow clock (glow.js glowTime) a portrait is drawn at: between two gleams. */
 const PORTRAIT_CLOCK = 2.0
 
-/** Draws sword `id` into the offscreen target. */
+/** Draws ball `id` into the offscreen target. */
 function draw(id) {
   pose(id)
   const previousTarget = renderer.getRenderTarget()
@@ -92,7 +92,7 @@ function draw(id) {
   renderer.setRenderTarget(rig.target)
   renderer.setClearColor(0x000000, 0)
   renderer.clear()
-  // A still between the blades' gleams (swords.js sweeps one every 3.6 s), so no
+  // A still between the blades' gleams (balls.js sweeps one every 3.6 s), so no
   // portrait freezes a bright band across its blade; the clock is put back straight after.
   const clock = glowTime.value
   glowTime.value = PORTRAIT_CLOCK
@@ -130,7 +130,7 @@ async function store(id) {
 export function attachSwordIconRenderer(gl) {
   renderer = gl
   ready = false
-  // A read-back cut off by a lost context never finishes: its sword goes back in the queue.
+  // A read-back cut off by a lost context never finishes: its ball goes back in the queue.
   if (busy) {
     if (!bitmaps.has(busy) && !queue.includes(busy)) queue.unshift(busy)
     busy = null
@@ -139,7 +139,7 @@ export function attachSwordIconRenderer(gl) {
   pose(TIRES[0].id)
   // Compiled with the portrait target bound: three builds a material a separate shader for
   // a render target (linear output, no tone mapping), and compileAsync gathers for whatever
-  // target is bound when it's called. Without this the first portrait compiled the sword
+  // target is bound when it's called. Without this the first portrait compiled the ball
   // shader there and then - a 2-3 s freeze in the lobby on some GPUs.
   let compiled = Promise.resolve()
   if (!import.meta.env.DEV && gl.compileAsync) {
@@ -155,7 +155,7 @@ export function attachSwordIconRenderer(gl) {
     })
 }
 
-/** Queues every sword's portrait (GameScene, a little after the game is on screen). */
+/** Queues every ball's portrait (GameScene, a little after the game is on screen). */
 export function queueAllSwordIcons() {
   for (const tire of TIRES) request(tire.id)
 }
@@ -200,7 +200,7 @@ function subscribe(fn) {
   return () => listeners.delete(fn)
 }
 
-/** Portrait bitmap for sword `id`; null until it has been rendered (asking queues it). */
+/** Portrait bitmap for ball `id`; null until it has been rendered (asking queues it). */
 export function useSwordIcon(id) {
   request(id)
   return useSyncExternalStore(subscribe, () => bitmaps.get(id) ?? null)

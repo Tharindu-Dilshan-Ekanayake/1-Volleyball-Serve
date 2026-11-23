@@ -24,48 +24,48 @@ import { COS, SIN, TIRE_SIZE } from './path'
 import { roll } from './rollControl'
 
 /**
- * The thrown sword's trail: a glowing comet tail streaming out behind it, in its
- * enchantment's colours (enchants.js head to tail - a bare blade's own glow colour; every
- * colour of the rainbow, flowing, behind the Rainbow Aura; fire behind a PERFECT throw with
- * a bare blade). It follows where the sword has been over
- * the last TRAIL_TIME, so the faster the sword, the longer the streak, and it shrinks
- * away by itself once the sword comes to rest. Two layers, so it reads from any angle:
- *  - a smooth ribbon, widest at the sword and tapering to nothing, bright down its middle
+ * The served ball's trail: a glowing comet tail streaming out behind it, in its
+ * aura's colours (enchants.js head to tail - a bare blade's own glow colour; every
+ * colour of the rainbow, flowing, behind the Rainbow Aura; fire behind a PERFECT serve with
+ * a bare blade). It follows where the ball has been over
+ * the last TRAIL_TIME, so the faster the ball, the longer the streak, and it shrinks
+ * away by itself once the ball comes to rest. Two layers, so it reads from any angle:
+ *  - a smooth ribbon, widest at the ball and tapering to nothing, bright down its middle
  *    and soft at its edges - the streak you see from the side;
  *  - a string of soft glowing discs down the same path, shrinking and fading towards
  *    the tip - the comet's cone you see from the chase camera, which looks along the
  *    path, where a ribbon is edge-on.
- * On presets with particles, what flies off it is the sword's own (enchants.js `fx`): the Flame
+ * On presets with particles, what flies off it is the ball's own (enchants.js `fx`): the Flame
  * Aura spits flames and embers that rise and swirl, the Frost Aura sheds frost that drifts
  * down, the Storm and Plasma Auras crackle with sparks, the Golden Aura glitters, the
  * Galaxy and Rainbow Auras shed stars and the Void Aura drags glowing matter in after it.
  *
  * Three draw calls at most: the ribbon (a strip of quads rebuilt each frame from a ring
  * of past positions), the discs and the sparkles (camera-facing instanced quads, fixed
- * pools). No textures, nothing allocated per frame, nothing drawn while no sword is
- * flying. The shaders are compiled when the field loads, so the first throw can't stutter.
+ * pools). No textures, nothing allocated per frame, nothing drawn while no ball is
+ * flying. The shaders are compiled when the field loads, so the first serve can't stutter.
  */
 
-/** Seconds of the sword's path the ribbon covers, and the most positions it keeps. */
+/** Seconds of the ball's path the ribbon covers, and the most positions it keeps. */
 const TRAIL_TIME = 0.7
 const SAMPLES = 64
-/** The ribbon's half-width at the sword, as a share of the sword's size. */
+/** The ribbon's half-width at the ball, as a share of the ball's size. */
 const HEAD_WIDTH = 0.95
-/** Glowing discs down the path, and the first one's radius as a share of the sword's size. */
+/** Glowing discs down the path, and the first one's radius as a share of the ball's size. */
 const ORBS = 20
 const ORB_SIZE = 2.1
 
 const WHITE = new Color('#ffffff')
 
-/** Sparkles alive at once (the sword's own and its enchantment's), how long each lasts (seconds) and how many a second. */
+/** Sparkles alive at once (the ball's own and its aura's), how long each lasts (seconds) and how many a second. */
 const SPARKLES = 96
 const SPARKLE_LIFE = 0.7
 const SPARKLE_RATE = 26
 
 /**
- * What flies off each kind of sword: how many a second (times SPARKLE_RATE), how long they
- * last (times SPARKLE_LIFE), how big (times the sword), their drift (`rise` up, `spread`
- * sideways, `pull` towards the sword) and colours.
+ * What flies off each kind of ball: how many a second (times SPARKLE_RATE), how long they
+ * last (times SPARKLE_LIFE), how big (times the ball), their drift (`rise` up, `spread`
+ * sideways, `pull` towards the ball) and colours.
  */
 const FX = {
   none: { rate: 0.6, life: 1, size: 1, rise: 2, spread: 3, pull: 0, colors: ['#ffffff'] },
@@ -77,7 +77,7 @@ const FX = {
   stars: { rate: 1.6, life: 1.1, size: 1.1, rise: 0.5, spread: 3.5, pull: 0, colors: ['#ffffff', '#ff7ad9', '#7fd2ff', '#ffe27a'] },
   void: { rate: 2, life: 0.8, size: 1, rise: 0, spread: 6, pull: 7, colors: ['#d18bff', '#ffb3ff', '#7a3cff'] },
   wind: { rate: 1.8, life: 0.6, size: 0.8, rise: 0.5, spread: 5, pull: 0, colors: ['#ffffff', '#c6ffe0', '#7dffb0'] },
-  // The swords' own (swordTrails.js): what flies off each kind of blade.
+  // The balls' own (swordTrails.js): what flies off each kind of blade.
   chips: { rate: 1.4, life: 0.9, size: 0.9, rise: -2.5, spread: 3, pull: 0, colors: ['#e9c48e', '#b07840', '#fff2d6'] },
   leaves: { rate: 1.3, life: 1.4, size: 1.2, rise: -1, spread: 3.5, pull: 0, colors: ['#9fe060', '#5fb83a', '#e0ff9a'] },
   dust: { rate: 1.6, life: 1.1, size: 1.5, rise: 0.8, spread: 2.5, pull: 0, colors: ['#c9ced6', '#9aa0a8', '#ffffff'] },
@@ -99,7 +99,7 @@ const ribbonVertex = /* glsl */ `
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
 `
-/** The trail's colour `f` of the way from the sword (0) to the tip (1): both layers use it. */
+/** The trail's colour `f` of the way from the ball (0) to the tip (1): both layers use it. */
 const TRAIL_COLOR = /* glsl */ `
   uniform vec3 uHead;
   uniform vec3 uTail;
@@ -116,13 +116,13 @@ const ribbonFragment = /* glsl */ `
   ${TRAIL_COLOR}
   varying vec2 vTrail;
   void main() {
-    // x runs 0 at the sword to 1 at the tail's tip; y -1..1 across the ribbon.
+    // x runs 0 at the ball to 1 at the tail's tip; y -1..1 across the ribbon.
     float f = vTrail.x;
     float across = 1.0 - abs(vTrail.y);
     float body = smoothstep(0.0, 0.8, across);
     float core = smoothstep(0.6, 1.0, across);
     float along = pow(1.0 - f, 1.3);
-    // Faded right at the sword, so the glow never washes over the sword itself.
+    // Faded right at the ball, so the glow never washes over the ball itself.
     float head = smoothstep(0.0, 0.08, f);
     vec3 col = trailColor(f);
     col = mix(col, vec3(1.0), core * 0.55 * (1.0 - f));
@@ -201,7 +201,7 @@ const sparkleFragment = /* glsl */ `
 
 const DOWN_FIELD = new Vector3(0, -SIN, -COS)
 
-/** The sword's recent path: a ring of positions and the time each was taken (seconds). */
+/** The ball's recent path: a ring of positions and the time each was taken (seconds). */
 const path = { xyz: new Float32Array(SAMPLES * 3), t: new Float64Array(SAMPLES), head: 0, count: 0 }
 
 const sparkles = Array.from({ length: SPARKLES }, () => ({ life: 0, max: SPARKLE_LIFE, pull: 0, pos: new Vector3(), vel: new Vector3(), size: 1 }))
@@ -246,7 +246,7 @@ function createRibbon() {
     },
     vertexShader: ribbonVertex,
     fragmentShader: ribbonFragment,
-    // Normal blending, not additive: added onto the bright turf and sky, the sword's colour
+    // Normal blending, not additive: added onto the bright turf and sky, the ball's colour
     // washed out to white.
     transparent: true,
     depthWrite: false,
@@ -258,7 +258,7 @@ function createRibbon() {
   return mesh
 }
 
-/** The discs share the ribbon's colour uniforms (the same objects, set once a throw). */
+/** The discs share the ribbon's colour uniforms (the same objects, set once a serve). */
 function createOrbs(uniforms) {
   const geometry = new PlaneGeometry(1, 1)
   geometry.setAttribute('aOrb', new InstancedBufferAttribute(new Float32Array(ORBS * 2), 2))
@@ -296,7 +296,7 @@ export function TireTrail() {
   const ribbonRef = useRef(null)
   const orbRef = useRef(null)
   const sparkleRef = useRef(null)
-  /** The throw (its startedAt) the trail was last reset for; sparkles owed; the next slot; its fx. */
+  /** The serve (its startedAt) the trail was last reset for; sparkles owed; the next slot; its fx. */
   const state = useRef({ kick: -1, owed: 0, next: 0, fx: 'none', fx2: null, colors: null, colors2: null, width: 1, boost: 1, flip: false })
   const gl = useThree((s) => s.gl)
   const camera = useThree((s) => s.camera)
@@ -307,7 +307,7 @@ export function TireTrail() {
     return { ribbon, orbs: createOrbs(ribbon.material.uniforms), sparkles: createSparkles() }
   }, [])
 
-  // Compiled now, while the field loads, rather than on the first throw (each mesh as
+  // Compiled now, while the field loads, rather than on the first serve (each mesh as
   // itself: the discs' and sparkles' programs are the instanced ones).
   useEffect(() => {
     // (Not in dev: StrictMode's remount disposes materials mid-compile - ShaderWarmup.)
@@ -339,13 +339,13 @@ export function TireTrail() {
     const st = state.current
     const flying = roll.active && roll.phase === 'ride' && !roll.crashed
 
-    // A new throw: forget the last one's path and set this sword's colours.
+    // A new serve: forget the last one's path and set this ball's colours.
     if (roll.active && st.kick !== roll.startedAt) {
       st.kick = roll.startedAt
       path.count = 0
-      // The sword's own trail (swordTrails.js): its ribbon, its width and what flies off
-      // it; an enchantment adds its own sparks as a second stream (its aura is SwordFlight's).
-      // A PERFECT throw streams wider and thicker.
+      // The ball's own trail (swordTrails.js): its ribbon, its width and what flies off
+      // it; an aura adds its own sparks as a second stream (its aura is SwordFlight's).
+      // A PERFECT serve streams wider and thicker.
       const look = swordTrailLook(roll.tireId)
       const enchant = trailLook(roll.ballId, roll.tireId).fx
       const perfect = roll.hit === 'perfect'
@@ -363,7 +363,7 @@ export function TireTrail() {
       st.boost = perfect ? 1.5 : 1
     }
 
-    // Where the sword is now, added to its path while it flies and bounces.
+    // Where the ball is now, added to its path while it flies and bounces.
     if (flying) {
       path.head = (path.head + 1) % SAMPLES
       roll.position.toArray(path.xyz, path.head * 3)
@@ -371,7 +371,7 @@ export function TireTrail() {
       path.count = Math.min(SAMPLES, path.count + 1)
     }
 
-    // --- The ribbon: from the sword back along its path, as far as TRAIL_TIME ago. ---
+    // --- The ribbon: from the ball back along its path, as far as TRAIL_TIME ago. ---
     let n = 0
     while (n < path.count && now - path.t[((path.head - n) % SAMPLES + SAMPLES) % SAMPLES] < TRAIL_TIME) n += 1
     if (n < 2) {
@@ -406,7 +406,7 @@ export function TireTrail() {
       ribbon.geometry.setDrawRange(0, (n - 1) * 6)
       ribbon.visible = true
 
-      // --- The discs: spread evenly down the same stretch, from just behind the sword. ---
+      // --- The discs: spread evenly down the same stretch, from just behind the ball. ---
       const orb = orbs.geometry.getAttribute('aOrb')
       const size = ORB_SIZE * (roll.size || TIRE_SIZE) * st.width
       for (let j = 0; j < ORBS; j += 1) {
@@ -430,7 +430,7 @@ export function TireTrail() {
       st.owed += delta * SPARKLE_RATE * (fxA.rate + (fxB ? fxB.rate * 0.7 : 0)) * st.boost
       while (st.owed >= 1) {
         st.owed -= 1
-        // Turn about: the sword's own, then (enchanted) its enchantment's.
+        // Turn about: the ball's own, then (enchanted) its aura's.
         st.flip = !st.flip
         const second = Boolean(fxB) && st.flip
         const fx = second ? fxB : fxA
@@ -465,7 +465,7 @@ export function TireTrail() {
       }
       alive = true
       s.vel.multiplyScalar(1 - delta * 2)
-      // The Void Aura's: dragged in after the sword.
+      // The Void Aura's: dragged in after the ball.
       if (s.pull && roll.active) s.vel.addScaledVector(_b.subVectors(roll.position, s.pos), s.pull * delta)
       s.pos.addScaledVector(s.vel, delta)
       const age = 1 - s.life / s.max

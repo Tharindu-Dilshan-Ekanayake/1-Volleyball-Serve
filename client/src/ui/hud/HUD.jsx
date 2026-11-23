@@ -43,10 +43,10 @@ function SpeedTunnel() {
 
 export function HUD() {
   const panelOpen = useGame((s) => s.panel !== null)
-  // While your sword flies the side menus clear out.
+  // While your ball flies the side menus clear out.
   const rolling = useGame((s) => Boolean(s.roll || s.rollResult))
-  // On a throw spot (the THROW button is up): everything else steps aside - the menus, top
-  // bar, goal banner, level bar and prompts - so you, the valley road and the one button
+  // On a serve spot (the SERVE button is up): everything else steps aside - the menus, top
+  // bar, goal banner, level bar and prompts - so you, the court and the one button
   // are all there is. (Display none, not unmounted: they come straight back.)
   const batting = useGame((s) => s.zone.atPlate && !s.roll && !s.rollResult)
   const hide = (on) => ({ display: on ? 'none' : 'contents' })

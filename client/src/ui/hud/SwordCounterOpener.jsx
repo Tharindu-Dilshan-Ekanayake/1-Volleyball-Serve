@@ -3,8 +3,8 @@ import { useEffect, useRef } from 'react'
 import { getGame, useGame } from '../../store/game'
 
 /**
- * Opens the Sword Shop panel when you step onto the Sword Counter (zone.swordCounter, from
- * the game ticker) - unless another panel is open or your sword's still flying (then as
+ * Opens the Ball Shop panel when you step onto the Ball Counter (zone.swordCounter, from
+ * the game ticker) - unless another panel is open or your ball's still flying (then as
  * soon as it sticks) - and closes it again if you step off with it still open. Once a
  * visit: close it while standing there and it stays closed until you step off and back on
  * (the counter's prompt opens it again meanwhile). Renders nothing. (As BallShopOpener

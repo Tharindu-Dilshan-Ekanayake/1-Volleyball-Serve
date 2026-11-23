@@ -29,29 +29,29 @@ import { roll } from './rollControl'
 import { LANE_STRIPE, STAGE_LOOKS, ZONE_THEMES } from './themes'
 
 /**
- * The royal road the sword flies down, going on forever: a cobbled road down the middle
+ * The royal road the ball flies down, going on forever: a cobbled road down the middle
  * of a long valley, kerb stones along both edges, its distance painted on it every 10
  * metres ("1,340 m"), a lantern on each kerb every 20 metres glowing in the stage's
  * colour, a pair of tall stone obelisks with glowing rune caps every 100 metres for the
- * sword to fly between, a stage marker at the start of every stage - a crenellated stone
+ * ball to fly between, a stage marker at the start of every stage - a crenellated stone
  * tower either side of the road with a beacon and a torch, and its name and length on a
  * carved board on a signpost beside the road ("Maple Woods - 106 M") - tall banner poles
  * flying the stage's colours, and trees, bushes, rocks and flower beds just past the
- * kerbs. Nothing stands over the road itself (|x| < 9): the sword's flight is never
+ * kerbs. Nothing stands over the road itself (|x| < 9): the ball's flight is never
  * hidden, and from the chase camera every board reads off to the side. Beyond,
  * the turf runs out to blocky hills in the stage's own look - grassy with trees,
  * sandstone with cacti, snowy with pines, candy with lollipops, glowing lava with
- * obsidian spikes, a neon city, crystals, clouds, moon rock... In Dragonfire Peaks (the
+ * obsidian spikes, a neon city, crystals, clouds, moon rock... In Christmas Village (the
  * lava venue) everything is basalt and obsidian: the kerbs are glowing lava channels in
  * the stage's colour, braziers burn where the lanterns stand, and obsidian spikes, dead
  * trees, lava rocks and torches stand out on the ash, with the lava sea to the east. Each
  * stage brings its own road, turf and stone (STAGE_LOOKS), its own sky (blended in as
- * the sword gets there: ZONE_THEMES) and a glowing line across the road where it starts.
+ * the ball gets there: ZONE_THEMES) and a glowing line across the road where it starts.
  *
  * Nothing is built per stretch of road. A fixed set of pieces - ground squares, road
  * rows, turf rows and kerb stones, hill slots, lanterns, obelisks, stage markers, banner
  * poles, roadside clutter, a pool of numerals and the markers' name boards - is moved along to
- * wherever you're looking (the sword in flight, the start from the lobby) and recoloured
+ * wherever you're looking (the ball in flight, the start from the lobby) and recoloured
  * for the stage it lands in. Every pool is a ring: a piece is only placed again when its
  * slot is handed to a new stretch, so racing down the road at hundreds of metres a second
  * touches a handful of pieces a frame. Six draw calls, the same at 60 m or 26 km, and
@@ -67,7 +67,7 @@ import { LANE_STRIPE, STAGE_LOOKS, ZONE_THEMES } from './themes'
 const STRIPE = LANE_STRIPE
 /** Rows drawn at once: an even number, so each row keeps its light/dark as it's reused. */
 const STRIPES = 128
-/** Width of the road (the sword flies within |x| <= 7 of its middle). */
+/** Width of the road (the ball flies within |x| <= 7 of its middle). */
 export const LANE_WIDTH = 16
 const ROAD_HALF = LANE_WIDTH / 2
 const FIELD_WIDTH = 280
@@ -181,7 +181,14 @@ const paintAt = (meter, lava) => {
 const lookAt = (meter) => STAGE_LOOKS[zones()[zoneIndexAt(meter)]?.theme] ?? STAGE_LOOKS.grassy
 
 /** Each stage's sky, parsed once per world. */
-const stageSkies = perWorld((zs) => zs.map((z) => skyLook(ZONE_THEMES[z.theme]?.sky ?? ZONE_THEMES.grassy.sky)))
+const stageSkies = perWorld((zs, world) =>
+  zs.map((z) => {
+    const sky = ZONE_THEMES[z.theme]?.sky ?? ZONE_THEMES.grassy.sky
+    // Christmas Village: every stage under a starry winter night, its horizon a cold glow of the stage's own tint.
+    if (world === 1) return skyLook({ top: '#03061c', horizon: new Color(sky.horizon).lerp(new Color('#22366a'), 0.8).getStyle(), sun: '#dfe8ff', glow: 0.4, clouds: 0.2, stars: Math.max(0.75, sky.stars ?? 0) })
+    return skyLook(sky)
+  }),
+)
 /** A stable pseudo-random 0-1 for piece `k` (and a salt): the same on every client. */
 function hash(k, salt) {
   let h = Math.imul(k ^ 0x9e3779b9, 0x85ebca6b) ^ Math.imul(salt + 1, 0xc2b2ae35)
@@ -214,14 +221,14 @@ const hide = (mesh, from, count) => {
 
 // --- Where the stages start: their markers, and what makes way for them ---------------------
 //
-// Nothing stands over the swords' flight corridor (|x| < CORRIDOR) higher than the kerbs:
+// Nothing stands over the balls' flight corridor (|x| < CORRIDOR) higher than the kerbs:
 // every stage marker, lantern, obelisk, pole and roadside piece keeps outside it.
 
-/** Half the width kept clear over the road: the swords fly within |x| <= 6.5. */
+/** Half the width kept clear over the road: the balls fly within |x| <= 6.5. */
 const CORRIDOR = 9
 /**
- * The first stage's marker stands this far down the road, past the lobby's THROW STAGE
- * (x within 18, up to metre 0), and further out to the sides than the rest: swords thrown
+ * The first stage's marker stands this far down the road, past the lobby's SERVE STAGE
+ * (x within 18, up to metre 0), and further out to the sides than the rest: balls served
  * from the stage's far ends are still easing in towards their lanes over the first metres.
  */
 const FIRST_MARKER = 18
@@ -366,7 +373,7 @@ function signX(index) {
   const inner = index === 0 ? FIRST_TOWER_X - TOWER_W / 2 : SIGN_IN
   return side * (inner + 0.25 + BANNER.width / 2)
 }
-/** The first stage's towers stand this far out (START_X and more, clear of the throw stage's swords). */
+/** The first stage's towers stand this far out (START_X and more, clear of the serve stage's balls). */
 const FIRST_TOWER_X = START_X + 2
 
 /**
@@ -644,7 +651,7 @@ function decorParts(look, x, h, k, s) {
   return _decor
 }
 
-/** Dragonfire Peaks' pieces beyond the road: basalt, and the lava sea east of SHORE_X. */
+/** Christmas Village's pieces beyond the road: basalt, and the lava sea east of SHORE_X. */
 const LAVA_LAND = { trunk: '#2a2020', obsidian: ['#1a1220', '#241a2c'], rock: '#ff5a14', flame: '#ff6a1e', core: '#ffd27a' }
 /** In the lava venue the ground stops here on the east (the lava sea runs on beyond: Ocean.jsx). */
 const SHORE_X = 50
@@ -1190,7 +1197,7 @@ export default function Lane() {
     if (!field || !stripes || !city || !glyphs || !marks || !banners) return
     const focus = roll.active ? Math.max(0, roll.meter) : 0
 
-    // The sky of the stage the sword is over, eased in. (Roll.jsx puts the lobby's back after.)
+    // The sky of the stage the ball is over, eased in. (Roll.jsx puts the lobby's back after.)
     if (roll.active) blendSky(stageSkies()[zoneIndexAt(focus)], 1 - Math.exp(-2.5 * Math.min(delta, 0.1)), scene.fog)
 
     let laid = laidFor.current
@@ -1241,7 +1248,7 @@ export default function Lane() {
         const cell = label[i]
         const advance = cell === COMMA ? ADVANCE.comma : ADVANCE.digit
         if (i === count) x += ADVANCE.space
-        // Just short of its metre (towards the throw zone), reading from behind you.
+        // Just short of its metre (towards the serve zone), reading from behind you.
         trackPoint(metre - 1.9, x + advance / 2, GLYPH_Y, _p)
         glyphs.setMatrixAt(n, _m.compose(_p, FLAT, _s.set(GLYPH_W, GLYPH_H, 1)))
         cells.setX(n, cell)

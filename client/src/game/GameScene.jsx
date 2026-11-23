@@ -32,6 +32,8 @@ import Player from './Player'
 import ShaderWarmup from './ShaderWarmup'
 import ChargeFX from './ChargeFX'
 import TrainingDummies from './TrainingDummies'
+import ServeNet from './world/ServeNet'
+import SnowScreen from './world/SnowScreen'
 import { FOG, SKY } from './sceneStyle'
 import Sky from './Sky'
 import World from './world/World'
@@ -44,7 +46,7 @@ const DevPerf = import.meta.env.DEV
   : null
 const showDevPerf = import.meta.env.DEV && new URLSearchParams(window.location.search).has('perf')
 
-// The valley road (and the sword's flight) is its own chunk, fetched once the lobby is on
+// The court (and the ball's flight) is its own chunk, fetched once the lobby is on
 // screen so it never delays time-to-playable.
 const Roll = lazy(() => import('./roll/Roll'))
 
@@ -89,15 +91,15 @@ function ViewDistance({ far }) {
 
 /**
  * The camera's vertical field of view for a screen `aspect` wide: 60 degrees on a
- * landscape screen; wider on one held upright, so the road, the dummies and your throw
+ * landscape screen; wider on one held upright, so the road, the courts and your serve
  * still fit across a phone in portrait instead of being cropped to a narrow slit.
  */
 const fovForAspect = (aspect) => (aspect >= 1 ? 60 : Math.min(84, 60 / Math.sqrt(Math.max(0.3, aspect))))
 
 /**
  * Keeps the field of view right for the screen's shape as the phone turns. Left alone
- * while the sword flies (Roll.jsx animates the lens then, from this as its base), and put
- * right again once the throw is over.
+ * while the ball flies (Roll.jsx animates the lens then, from this as its base), and put
+ * right again once the serve is over.
  */
 function AspectFov() {
   const get = useThree((s) => s.get)
@@ -168,7 +170,7 @@ export function GameScene({ onReady }) {
     // tap that beats it there still builds it (sfx.unlock). Before, both ran behind the
     // loading screen: ~0.9 s of a slow phone's start-up.
     queueAllPetIcons()
-    // The Sword Shop's portraits, a few seconds on (after the pets'), so the shop has them
+    // The Ball Shop's portraits, a few seconds on (after the pets'), so the shop has them
     // ready; opening it sooner asks for them straight away.
     setTimeout(queueAllSwordIcons, 4000)
     if ('requestIdleCallback' in window) requestIdleCallback(prepareAudio, { timeout: 1500 })
@@ -272,6 +274,9 @@ export function GameScene({ onReady }) {
         <RemoteAvatars />
         <Player />
         <TrainingDummies />
+        <ServeNet />
+        {/* Christmas Village's snow on LOW, where there are no particles (MEDIUM and up: roll/Weather.jsx). */}
+        {world === 1 && !settings.particles && <SnowScreen />}
         <ChargeFX />
         <BlobShadows />
         <GainFX />

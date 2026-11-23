@@ -69,7 +69,7 @@ export function LeftMenu() {
       <MenuTile icon="pets" label="Pets" alert={petAlert} onClick={() => togglePanel('pets')} />
       <MenuTile icon="items" label="Items" alert={itemAlert} onClick={() => togglePanel('items')} />
       <MenuTile icon="store" label="Store" alert onClick={() => togglePanel('store')} />
-      <MenuTile icon="ball" label="Enchant" alert={ballAlert} onClick={() => togglePanel('balls')} />
+      <MenuTile icon="ball" label="Auras" alert={ballAlert} onClick={() => togglePanel('balls')} />
       <MenuTile icon="quest" label="Quests" alert={questAlert} onClick={() => togglePanel('quests')} />
       <GiftTile />
     </div>

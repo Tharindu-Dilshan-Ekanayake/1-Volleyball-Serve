@@ -1,6 +1,6 @@
 import { CylinderGeometry, OctahedronGeometry } from 'three'
 
-import { STAGE_TOWERS, THROW_STAGE } from '@shared/world'
+import { SERVE_NET, SERVE_NET_Z, STAGE_TOWERS, THROW_STAGE } from '@shared/world'
 
 import { STYLE } from '../materials'
 import { venueOf } from '../sceneStyle'
@@ -11,7 +11,7 @@ const GEM = new OctahedronGeometry(1, 0)
 
 /** Where the stage's front steps start (the deck runs from the north edge to here). */
 export const STEPS_Z = THROW_STAGE.maxZ - 1.2
-/** The flag towers: shaft size and height, and their "THROW STAGE" boards (lettering: signs.js). */
+/** The flag towers: shaft size and height, and their "SERVE STAGE" boards (lettering: signs.js). */
 const TOWER = { size: 2.1, height: 12.6, plinth: 3.0 }
 export const TOWER_SIGN = { y: 7.2, width: 4.6, height: 1.4, out: TOWER.size / 2 + 0.12 }
 /** Each tower's sign's lettering face (south, towards spawn): where its quad goes. */
@@ -20,8 +20,8 @@ export const towerSignAt = (tower) => ({ x: tower.x, y: TOWER_SIGN.y, z: tower.z
 export const STAGE_DECAL = { x: 0, z: (THROW_STAGE.minZ + STEPS_Z) / 2, width: 15 }
 
 /**
- * The THROW STAGE at the valley's mouth (the template's launch pad): one wide raised stone
- * stage filling THROW_STAGE, its top at its height - stand anywhere on it and throw. A dark
+ * The SERVE STAGE at the court's mouth (the template's launch pad): one wide raised stone
+ * stage filling THROW_STAGE, its top at its height - stand anywhere on it and serve. A dark
  * plinth, a recessed body under a cornice, a pale deck with a border of darker stones round
  * its edge, a gold-lit band along its front over the road, and two steps up along its
  * south edge with gold nosings. The deck's arrow and runes are a decal (signs.js). Nothing
@@ -29,7 +29,7 @@ export const STAGE_DECAL = { x: 0, z: (THROW_STAGE.minZ + STEPS_Z) / 2, width: 1
  *
  * Off either end stands a flag tower (STAGE_TOWERS, inside its collider): a slim stone
  * shaft, a crenellated top, a tall pole with the academy's flag streaming away from the
- * stage, a THROW STAGE board on its south face (towards spawn), a banner down the face
+ * stage, a SERVE STAGE board on its south face (towards spawn), a banner down the face
  * turned to the stage, torches, and braziers on its plinth's stage-side corners.
  *
  * Boxes go into the world's block set and the round parts into its props, so it all rides
@@ -39,6 +39,7 @@ export const STAGE_DECAL = { x: 0, z: (THROW_STAGE.minZ + STEPS_Z) / 2, width: 1
  */
 export function buildRollZone(blocks, props, { detail = true, world = 0 } = {}) {
   const v = venueOf(world)
+  buildServeNet(blocks, world)
   const c = v.castle
   const s = THROW_STAGE
   const w = s.maxX - s.minX
@@ -83,7 +84,7 @@ export function buildRollZone(blocks, props, { detail = true, world = 0 } = {}) 
       blocks.add(x + out * 1.7, TOWER.height + 6.6, z, 3.2, 1.8, 0.06, i % 2 ? c.bannerAlt : c.banner, STYLE.SMOOTH)
       blocks.add(x + out * 1.7, TOWER.height + 6.6, z, 2.2, 0.22, 0.08, c.trim, STYLE.GLOW)
     }
-    // The THROW STAGE board on its south face, towards spawn (lettering: signs.js).
+    // The SERVE STAGE board on its south face, towards spawn (lettering: signs.js).
     const sz = z + TOWER_SIGN.out
     blocks.add(x, TOWER_SIGN.y, sz, TOWER_SIGN.width + 0.3, TOWER_SIGN.height + 0.3, 0.2, c.trim, STYLE.SMOOTH)
     blocks.add(x, TOWER_SIGN.y, sz + 0.07, TOWER_SIGN.width, TOWER_SIGN.height, 0.2, c.banner, STYLE.SMOOTH)
@@ -97,4 +98,33 @@ export function buildRollZone(blocks, props, { detail = true, world = 0 } = {}) 
     }
     localBox(blocks, x, TOWER.height * 0.42, z, out > 0 ? Math.PI / 2 : -Math.PI / 2, 0, 0, TOWER.size / 2 + 0.02, 0.28, 1.0, 0.06, c.window, STYLE.SMOOTH)
   })
+}
+
+/**
+ * The frame of the volleyball net across the court in front of the serve line
+ * (shared/world SERVE_NET): two padded posts just outside the court, the white top and
+ * bottom bands the netting hangs between, and the red-and-white antennas over the
+ * sidelines. The netting itself is ServeNet.jsx (one see-through quad).
+ */
+function buildServeNet(blocks, world) {
+  const { top, height, halfWidth } = SERVE_NET
+  const z = SERVE_NET_Z
+  const pad = world === 1 ? '#3a1a10' : '#2f5fd0'
+  const post = world === 1 ? '#5a4a4a' : '#e8ecf2'
+  for (const side of [-1, 1]) {
+    const x = side * (halfWidth + 0.45)
+    blocks.addOn(x, 0, z, 0.5, 0.12, 0.5, post, STYLE.SMOOTH)
+    blocks.addOn(x, 0, z, 0.2, top + 0.3, 0.2, post, STYLE.PLATE)
+    blocks.addOn(x, 0.12, z, 0.34, 1.7, 0.34, pad, STYLE.SMOOTH)
+    blocks.addOn(x, top + 0.3, z, 0.26, 0.1, 0.26, '#ffd21f', STYLE.GLOW)
+    // The cable from the post to the band's end.
+    blocks.add(side * (halfWidth + 0.2), top - 0.03, z, 0.5, 0.03, 0.03, '#2a2a30', STYLE.SMOOTH)
+    // The antenna over the sideline: red and white stripes, up through the band.
+    for (let k = 0; k < 18; k += 1) {
+      blocks.add(side * halfWidth, top - height + 0.05 + 0.1 * k, z, 0.045, 0.1, 0.045, k % 2 ? '#ffffff' : '#e0262f', STYLE.SMOOTH)
+    }
+  }
+  // The bands: a broad white one along the top, a narrow one along the bottom.
+  blocks.add(0, top - 0.035, z, halfWidth * 2, 0.07, 0.05, '#ffffff', STYLE.SMOOTH)
+  blocks.add(0, top - height + 0.025, z, halfWidth * 2, 0.05, 0.04, '#f2f2f2', STYLE.SMOOTH)
 }

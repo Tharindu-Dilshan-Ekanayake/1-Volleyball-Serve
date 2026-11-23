@@ -4,8 +4,8 @@ import { SWORD_ICON_SIZE, useSwordIcon } from '../game/swordIcons'
 import Icon from './Icon'
 
 /**
- * A sword's portrait, rendered from its 3D model (see swordIcons.js) and drawn onto a small
- * canvas - no image to encode or decode. A faint sword icon stands in for the frame or two
+ * A ball's portrait, rendered from its 3D model (see swordIcons.js) and drawn onto a small
+ * canvas - no image to encode or decode. A faint ball icon stands in for the frame or two
  * before the portrait is ready.
  *
  * @param {{ id: string, size: string|number, className?: string, style?: object }} props

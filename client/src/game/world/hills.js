@@ -9,10 +9,10 @@ import { SCOREBOARD } from './terrain'
  * in terraces the further they stand from the plaza - low grassy banks just past its edge,
  * cliffs 36 m high further out - each terrace a colour further along the venue's rock ramp.
  * At Sunblade Academy they're green-capped hills of brown earth (STYLE.HILL) with trees
- * and pines on the terraces, beyond the castle walls; in Dragonfire Peaks they're ash-capped basalt, some columns split by
+ * and pines on the terraces, beyond the castle walls; in Christmas Village they're ash-capped basalt, some columns split by
  * glowing lava (STYLE.LAVA), with obsidian spikes, dead trees, lava rocks and fire torches
  * - and a smoking volcano rises over the north-east ridge (buildVolcano). The field's
- * mouth is left open to the north (Lane.jsx carries the scenery on down the valley).
+ * mouth is left open to the north (Lane.jsx carries the scenery on down the court).
  *
  * The great banner board on the south hills is kept clear (underScoreboard).
  * Everything goes into the world's block set (the volcano's smoke into its props): no
@@ -28,6 +28,8 @@ const VALLEY_HALF = CANYON_HALF_WIDTH + 6
 const REACH = { x: 96, south: PLAZA.maxZ + 112, north: -104 }
 
 const TREE = { trunk: '#7a4f2a', leaves: ['#2f9e3a', '#3fb84a', '#4ccf54'], pine: ['#1f7a3a', '#25904a'] }
+const PALM = { trunk: ['#a87a4a', '#8e6438'], leaves: ['#2fae4a', '#3fc455'], coconut: '#6a4224', umbrella: ['#ff6f61', '#18b5b0', '#ffd21f', '#ff9a3a'] }
+const XMAS = { trunk: '#5a3a22', pine: ['#1f6a3a', '#257a44'], gifts: ['#d8203a', '#1f8a4a', '#2f6fd8', '#b03ad8', '#ffffff'] }
 const LAVA = { obsidian: ['#1a1220', '#241a2c'], dead: '#2a2020', rock: '#ff5a14', flame: '#ff6a1e', core: '#ffd27a' }
 
 /** Metres from (x, z) to the nearest open ground (the plaza, or the field's valley). */
@@ -45,11 +47,78 @@ const underScoreboard = (x, z) =>
 
 /**
  * Something on a terrace at (x, top, z). At the academy: a round leafy tree (a trunk and
- * two stacked leaf blocks) or a pine (three stepped tiers). In Dragonfire Peaks: a tilted obsidian
+ * two stacked leaf blocks) or a pine (three stepped tiers). In Christmas Village: a tilted obsidian
  * spike, a dead tree with two bare branches, a glowing lava rock, or a fire torch.
  */
 function addDecor(blocks, x, top, z, k, kind) {
   const r = hash2(k, 31)
+  if (kind === 'palm') {
+    if (r < 0.8) {
+      // A palm: a leaning trunk of rings, a crown of fronds drooping out all round, coconuts.
+      const h = 4.5 + hash2(k, 32) * 3
+      const lean = (hash2(k, 36) - 0.5) * 0.5
+      const turn = hash2(k, 37) * Math.PI * 2
+      const lx = Math.sin(turn) * lean
+      const lz = Math.cos(turn) * lean
+      const rings = 5
+      for (let i = 0; i < rings; i += 1) {
+        const f = i / rings
+        blocks.add(x + lx * h * f, top + (i + 0.5) * (h / rings), z + lz * h * f, 0.62 - f * 0.12, h / rings + 0.05, 0.62 - f * 0.12, i % 2 ? PALM.trunk[0] : PALM.trunk[1], STYLE.SMOOTH, turn)
+      }
+      const cx = x + lx * h
+      const cz = z + lz * h
+      const cy = top + h
+      for (let i = 0; i < 6; i += 1) {
+        const a = turn + (i / 6) * Math.PI * 2
+        blocks.add(cx + Math.sin(a) * 1.3, cy - 0.15, cz + Math.cos(a) * 1.3, 0.7, 0.16, 2.8, PALM.leaves[i % 2], STYLE.SMOOTH, a, 0.35)
+      }
+      blocks.add(cx, cy + 0.1, cz, 0.9, 0.5, 0.9, PALM.leaves[0], STYLE.SMOOTH, turn)
+      blocks.add(cx + 0.3, cy - 0.35, cz + 0.2, 0.34, 0.34, 0.34, PALM.coconut, STYLE.SMOOTH)
+      blocks.add(cx - 0.25, cy - 0.38, cz - 0.15, 0.32, 0.32, 0.32, PALM.coconut, STYLE.SMOOTH)
+    } else {
+      // A beach umbrella over a towel.
+      const c = PALM.umbrella[k % PALM.umbrella.length]
+      blocks.addOn(x, top, z, 0.12, 2.4, 0.12, '#ffffff', STYLE.SMOOTH)
+      blocks.addOn(x, top + 2.3, z, 2.8, 0.25, 2.8, c, STYLE.STRIPES, hash2(k, 36) * Math.PI)
+      blocks.addOn(x, top + 2.55, z, 1.4, 0.2, 1.4, c, STYLE.STRIPES, hash2(k, 36) * Math.PI + 0.4)
+      blocks.addOn(x + 0.9, top, z + 0.3, 1.0, 0.04, 2.0, PALM.umbrella[(k + 1) % PALM.umbrella.length], STYLE.STRIPES)
+    }
+    return
+  }
+  if (kind === 'xmas') {
+    if (r < 0.62) {
+      // A snowy pine: three tiers of dark green, each capped with snow.
+      const turn = hash2(k, 36) * Math.PI
+      const s = 0.9 + hash2(k, 32) * 0.5
+      blocks.addOn(x, top, z, 0.5 * s, 1.2 * s, 0.5 * s, XMAS.trunk, STYLE.SMOOTH)
+      for (const [y, w, hh] of [[1.0, 3.2, 1.8], [2.6, 2.3, 1.6], [4.0, 1.3, 1.4]]) {
+        blocks.addOn(x, top + y * s, z, w * s, hh * s, w * s, XMAS.pine[k % 2], STYLE.STUDS, turn + y * 0.3)
+        blocks.addOn(x, top + (y + hh * 0.82) * s, z, w * 0.82 * s, 0.3 * s, w * 0.82 * s, '#ffffff', STYLE.SMOOTH, turn + y * 0.3)
+      }
+      if (hash2(k, 38) < 0.5) blocks.addOn(x, top + 5.4 * s, z, 0.4 * s, 0.4 * s, 0.4 * s, '#ffd21f', STYLE.GLOW, Math.PI / 4)
+    } else if (r < 0.82) {
+      // A pile of presents, ribboned.
+      for (let i = 0; i < 3; i += 1) {
+        const w = 0.9 + hash2(k, 40 + i) * 0.7
+        const ox = (hash2(k, 50 + i) - 0.5) * 1.6
+        const oz = (hash2(k, 60 + i) - 0.5) * 1.6
+        const c = XMAS.gifts[(k + i) % XMAS.gifts.length]
+        blocks.addOn(x + ox, top, z + oz, w, w * 0.8, w, c, STYLE.SMOOTH, hash2(k, 70 + i))
+        blocks.addOn(x + ox, top, z + oz, w * 0.22, w * 0.82, w + 0.04, '#ffd21f', STYLE.SMOOTH, hash2(k, 70 + i))
+        blocks.addOn(x + ox, top, z + oz, w + 0.04, w * 0.82, w * 0.22, '#ffd21f', STYLE.SMOOTH, hash2(k, 70 + i))
+      }
+    } else {
+      // A snowman with a carrot nose and a red scarf.
+      blocks.addOn(x, top, z, 1.6, 1.4, 1.6, '#ffffff', STYLE.SMOOTH)
+      blocks.addOn(x, top + 1.4, z, 1.15, 1.0, 1.15, '#ffffff', STYLE.SMOOTH)
+      blocks.addOn(x, top + 1.3, z, 1.25, 0.22, 1.25, '#d8203a', STYLE.SMOOTH)
+      blocks.addOn(x, top + 2.4, z, 0.8, 0.75, 0.8, '#ffffff', STYLE.SMOOTH)
+      blocks.add(x, top + 2.75, z + 0.5, 0.12, 0.12, 0.4, '#ff8a1e', STYLE.SMOOTH)
+      blocks.addOn(x, top + 3.15, z, 0.7, 0.1, 0.7, '#1b1b1f', STYLE.SMOOTH)
+      blocks.addOn(x, top + 3.25, z, 0.46, 0.45, 0.46, '#1b1b1f', STYLE.SMOOTH)
+    }
+    return
+  }
   if (kind === 'lava') {
     if (r < 0.35) {
       const h = 3 + hash2(k, 32) * 4
@@ -111,7 +180,7 @@ export function buildHills(blocks, { density = 1, venue } = {}) {
       let h = 4 * step
       if (underScoreboard(x, z)) h = Math.min(h, 20)
       const rock = look.rock[Math.min(look.rock.length - 1, Math.floor((step - 1) / 2))]
-      // Now and then (Dragonfire Peaks) a column of lava rock: glowing seams through the basalt.
+      // Now and then (Christmas Village) a column of lava rock: glowing seams through the basalt.
       if (look.lava && hash2(k, 41) < look.lava.chance) blocks.addOn(x, 0, z, cell, h, cell, look.lava.color, STYLE.LAVA)
       else blocks.addOn(x, 0, z, cell, h, cell, rock, cap)
       columns += 1
@@ -125,43 +194,55 @@ export function buildHills(blocks, { density = 1, venue } = {}) {
   return { columns, trees }
 }
 
-/** Where Dragonfire Peaks' volcano stands: over the north-east ridge, seen from the plaza and the valley. */
+/** Where Christmas Village's giant tree stands: over the north-east ridge, seen from the plaza and the court. */
 export const VOLCANO = { x: 81, z: -71, height: 74 }
 
 /**
- * Dragonfire Peaks' volcano: a stepped cone of basalt tiers (ash-capped, glowing seams on every
- * other one), a crater rim with a pool of lava glowing in it, three lava streams running
- * down its face towards the plaza, and a column of smoke puffs drifting up from the crater
- * (static props, darker low, paler high). Boxes into `blocks`, the smoke into `props`.
+ * Christmas Village's giant Christmas tree over the north-east ridge: a trunk on a red
+ * stand, seven stepped tiers of dark pine (each a little turned, its edge snowed on and
+ * hung with glowing baubles in red, gold, blue and white), a garland of lights spiralling
+ * up it and a great golden star on top, with a few snow puffs drifting off it (static
+ * props). Boxes into `blocks`, the puffs into `props`. (The name of the spot is the
+ * template's: VOLCANO.)
  */
-export function buildVolcano(blocks, props, sphere) {
+export function buildChristmasTree(blocks, props, sphere) {
   const { x, z, height } = VOLCANO
+  blocks.addOn(x, 0, z, 26, 6, 26, '#c8102e', STYLE.SMOOTH)
+  blocks.addOn(x, 6, z, 22, 0.8, 22, '#ffd21f', STYLE.GLOW)
+  blocks.addOn(x, 6, z, 9, 12, 9, '#5a3a22', STYLE.SMOOTH)
   const tiers = 7
-  const tierH = height / tiers
+  const baubles = ['#e0102f', '#ffd21f', '#3fa8ff', '#ffffff', '#ff6ad0']
   for (let i = 0; i < tiers; i += 1) {
-    const w = 70 - i * 8.4
-    const y = i * tierH
-    blocks.addOn(x, y, z, w, tierH + 0.02, w, i % 2 ? '#2e2326' : '#382b2e', i % 3 === 2 ? STYLE.LAVA : STYLE.HILL, i * 0.12)
-  }
-  // The crater: a rim, the lava pool in it, and the glow over it.
-  const top = height
-  for (const [dx, dz, sx, sz] of [[0, 9, 20, 2.5], [0, -9, 20, 2.5], [9, 0, 2.5, 15.5], [-9, 0, 2.5, 15.5]]) {
-    blocks.addOn(x + dx, top, z + dz, sx, 3, sz, '#241c1f', STYLE.HILL)
-  }
-  blocks.addOn(x, top, z, 15.5, 1.4, 15.5, '#ff5a14', STYLE.LAVA)
-  blocks.addOn(x, top + 1.4, z, 9, 0.3, 9, '#ffb21a', STYLE.GLOW)
-  // Lava streams down the side facing the plaza (south-west), in steps with the tiers.
-  for (const [ox, oz] of [[-1, 1], [-1, 0.25], [-0.25, 1]]) {
-    for (let i = 0; i < tiers - 1; i += 1) {
-      const half = (70 - i * 8.4) / 2
-      blocks.addOn(x + ox * (half - 2), i * tierH, z + oz * (half - 2), 3.2, tierH + 0.6, 3.2, '#ff6a1e', STYLE.GLOW)
+    const w = 64 - i * 8.2
+    const h = (height - 14) / tiers + 2
+    const y = 14 + i * ((height - 14) / tiers)
+    const turn = i * 0.32
+    blocks.addOn(x, y, z, w, h, w, i % 2 ? '#1f6a3a' : '#237a42', STYLE.STUDS, turn)
+    // Snow along the tier's top edge.
+    blocks.addOn(x, y + h - 0.2, z, w * 0.86, 0.8, w * 0.86, '#ffffff', STYLE.SMOOTH, turn)
+    // Baubles round the tier's skirt.
+    const n = 10 - i
+    for (let b = 0; b < n; b += 1) {
+      const a = turn + (b / n) * Math.PI * 2
+      const r = w * 0.52
+      const s = 2.2 - i * 0.15
+      blocks.add(x + Math.sin(a) * r, y + h * 0.3, z + Math.cos(a) * r, s, s, s, baubles[(b + i) % baubles.length], STYLE.GLOW, a)
+    }
+    // A garland of lights wound round it.
+    for (let g = 0; g < 14; g += 1) {
+      const a = turn + (g / 14) * Math.PI * 2 + i * 0.9
+      const r = w * 0.5 * (1 - g / 28)
+      blocks.add(x + Math.sin(a) * r, y + (g / 14) * h, z + Math.cos(a) * r, 0.9, 0.9, 0.9, g % 2 ? '#fff1b0' : '#ffb347', STYLE.GLOW)
     }
   }
-  // Smoke puffs drifting up and away to the east.
-  for (let i = 0; i < 9; i += 1) {
-    const s = 6 + i * 1.6
-    const shade = Math.min(1, 0.32 + i * 0.07)
-    const grey = `rgb(${Math.round(70 * shade + 40)}, ${Math.round(58 * shade + 34)}, ${Math.round(58 * shade + 34)})`
-    props.add(sphere, { position: [x + i * 3.4 + Math.sin(i * 1.7) * 3, top + 6 + i * 6.5, z - i * 1.2], scale: [s, s * 0.75, s], color: grey })
+  // The star.
+  const top = height + 2
+  blocks.add(x, top + 4, z, 7, 7, 1.6, '#ffd21f', STYLE.GLOW, 0, 0, Math.PI / 4)
+  blocks.add(x, top + 4, z, 5, 9, 1.4, '#ffe98a', STYLE.GLOW)
+  blocks.add(x, top + 4, z, 9, 5, 1.4, '#ffe98a', STYLE.GLOW)
+  // A few snow puffs drifting off it to the east.
+  for (let i = 0; i < 6; i += 1) {
+    const s = 4 + i * 1.2
+    props.add(sphere, { position: [x + 20 + i * 6, top - 20 + i * 5, z - i * 2], scale: [s, s * 0.7, s], color: '#f4f8ff' })
   }
 }

@@ -11,10 +11,10 @@ import { runtime } from './runtime'
 import { swordTrailLook } from './swordTrails'
 
 /**
- * Winding up a throw: motes of light in your sword's own trail colours (swordTrails.js)
+ * Winding up a serve: motes of light in your ball's own trail colours (swordTrails.js)
  * streaming in from all round you and gathering on the blade drawn back behind your head -
  * faster and thicker as the meter fills, a steady blaze of them once it's full. Your own
- * throws only (other players' wind-ups are just the pose).
+ * serves only (other players' wind-ups are just the pose).
  *
  * One pool of camera-facing twinkles (the trail's own look), one draw call, drawn only
  * while you wind up; left out on presets without particles. Nothing allocated per frame.
@@ -30,7 +30,7 @@ const RATE_FULL = 70
 
 /**
  * Where the blade is gathered, from the player's feet in character space (facing +Z, left
- * +X): behind and above the right shoulder, the sword drawn back (playerPose THROW_KEYS[0]).
+ * +X): behind and above the right shoulder, the ball drawn back (playerPose THROW_KEYS[0]).
  */
 const FOCUS = new Vector3(-0.3, 1.95, -0.75)
 
@@ -155,7 +155,7 @@ export default function ChargeFX() {
       if (mote.life <= 0) continue
       mote.life -= delta
       if (mote.life <= 0 || !winding) {
-        // Let go (or stepped off): whatever's still flying in vanishes with the throw.
+        // Let go (or stepped off): whatever's still flying in vanishes with the serve.
         mote.life = 0
         m.setMatrixAt(i, ZERO)
         fades.setX(i, 0)

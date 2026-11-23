@@ -40,7 +40,7 @@ export function WorldLabels() {
         return next.build()
       })
       // Compile the label shader before the signs appear, so showing them can't stall
-      // a frame. (A batch thrown away mid-build - the view rebuilt for a new graphics
+      // a frame. (A batch served away mid-build - the view rebuilt for a new graphics
       // level - comes back empty: nothing to compile.)
       .then((meshes) => (!cancelled && meshes?.length && !import.meta.env.DEV ? gl.compileAsync(new Group().add(...meshes), camera, scene).catch(() => null) : null))
       .then(() => {

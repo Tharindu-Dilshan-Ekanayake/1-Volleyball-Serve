@@ -5,18 +5,18 @@ import { iconUrl } from './icons'
 import StrokeText from './StrokeText'
 
 const TIPS = [
-  'Stand at a training dummy to slash it and gain Power automatically!',
-  'More Power = your sword flies further down the valley, and every metre pays Wins!',
-  'HOLD THROW and let go when the meter is in the gold for a PERFECT throw: x1.5 distance, x1.6 Wins!',
+  'Stand on a training court to spike balls and gain Power automatically!',
+  'More Power = your serve flies further down the court, and every metre pays Wins!',
+  'HOLD SERVE and let go when the meter is in the gold for a PERFECT serve: x1.5 distance, x1.6 Wins!',
   'Rebirth at max level for x2, x3, x4... Power and a higher level cap.',
-  'The further your sword flies, the more each metre pays.',
-  'Spend Wins on bigger swords, pets and better training dummies.',
-  'Enchant your sword at the Enchant Altar: the Flame Aura flies further and leaves a trail of fire!',
+  'The further your ball flies, the more each metre pays.',
+  'Spend Wins on better volleyballs, pets and training courts.',
+  'Pick an aura at the Aura Shrine: the Flame Aura serves further and leaves a trail of fire!',
   'Pets multiply all the Power you gain.',
-  'You earn Power every second your sword flies!',
-  'Every sword is a different shape - wood, bamboo, bone, steel, gold, lava, diamond... collect all 36 - the 12 Legend swords pay extra Wins!',
-  'Sunblade Valley is 80 stages long - can you reach Legend Summit?',
-  'Rebirth 8 times to open the portal to Dragonfire Peaks: x3 Wins on every throw!',
+  'You earn Power every second your ball flies!',
+  'Collect all 36 volleyballs - leather, chrome, frost, gold, lava, diamond, galaxy... the 12 Legend balls pay extra Wins!',
+  'The court at Sunny Shores is 80 stages long - can you reach Legend Summit?',
+  'Rebirth 8 times to open the portal to Christmas Village: x3 Wins on every serve!',
 ]
 
 /**
@@ -72,11 +72,11 @@ export function LoadingScreen({ done }) {
         <img src={iconUrl('bat')} alt="" width="150" height="150" draggable={false} />
       </div>
 
-      {/* The game's name: SWORD TOSS over a big rainbow LEGENDS, tilted like a sticker. */}
+      {/* The game's name: VOLLEY SERVE over a big rainbow LEGENDS, tilted like a sticker. */}
       <h1 className="m-0 flex flex-col items-center text-center leading-none" style={{ transform: 'rotate(-3deg)' }}>
         <span style={{ fontSize: 'clamp(30px, 7vw, 72px)' }}>
           <StrokeText stroke="0.16em" gradient="linear-gradient(180deg, #ffffff 0%, #ffffff 55%, #ffe36b 56%, #ffb21e 100%)">
-            +1 Sword
+            Volley Serve
           </StrokeText>
         </span>
         <span style={{ fontSize: 'clamp(44px, 10vw, 118px)', marginTop: '-0.08em' }}>
@@ -84,11 +84,11 @@ export function LoadingScreen({ done }) {
             stroke="0.15em"
             gradient="linear-gradient(90deg, #ff4a4a 0%, #ff9a1e 18%, #ffe23a 36%, #4be05a 54%, #2fd0ff 72%, #b05cff 90%, #ff5fd2 100%)"
           >
-            Throwing
+            Legends
           </StrokeText>
         </span>
         <span className="text-base md:text-xl" style={{ marginTop: '0.4em' }}>
-          <StrokeText stroke={5}>TRAIN • THROW • EXPLORE • REBIRTH</StrokeText>
+          <StrokeText stroke={5}>TRAIN • SERVE • EXPLORE • REBIRTH</StrokeText>
         </span>
       </h1>
 

@@ -13,15 +13,15 @@ import { GRADIENTS, u } from '../hud/style'
 import Panel from './Panel'
 
 /**
- * The ENCHANT ALTAR: every enchantment in balance BALLS (the template's balls), bought one
- * after another and equipped from here. Each throws your sword further and pays more, and
+ * The ENCHANT ALTAR: every aura in balance BALLS (the template's balls), bought one
+ * after another and equipped from here. Each serves your ball further and pays more, and
  * wraps it in its own aura - the fancy ones burn, freeze or crackle all the way down the
  * valley. Opened from the left menu, or by walking up to the Enchant Altar
  * (BallShopOpener).
  *
- * Every enchantment is drawn as a glowing orb in plain CSS - gradients, a glow that
+ * Every aura is drawn as a glowing orb in plain CSS - gradients, a glow that
  * flickers like fire or pulses like plasma - from the same colours its aura and trail
- * take in the game (game/enchants.js), so the altar shows what you'll throw. No images to
+ * take in the game (game/enchants.js), so the altar shows what you'll serve. No images to
  * load.
  */
 
@@ -45,7 +45,7 @@ const RAINBOW_CONIC = `conic-gradient(from 20deg, ${RAINBOW_STOPS}, #ff3b5c)`
 const SHINE = 'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.9) 0 7%, rgba(255,255,255,0.25) 13%, transparent 22%)'
 const SHADE = 'radial-gradient(circle at 40% 36%, transparent 45%, rgba(0,0,0,0.35) 100%)'
 
-/** The orb's surface, as CSS backgrounds, for its enchantment. */
+/** The orb's surface, as CSS backgrounds, for its aura. */
 function surface(id, s) {
   if (s.rainbow) return RAINBOW_CONIC
   if (id === 'galaxy')
@@ -68,8 +68,8 @@ function surface(id, s) {
 }
 
 /**
- * A CSS orb for enchantment `id`, `size` reference pixels across (scaled like the rest of
- * the HUD: style.u). `trail` draws the comet tail it gives your sword streaming out to the
+ * A CSS orb for aura `id`, `size` reference pixels across (scaled like the rest of
+ * the HUD: style.u). `trail` draws the comet tail it gives your ball streaming out to the
  * left, in its trail colours.
  */
 export function BallSwatch({ id, size = 96, trail = false }) {
@@ -130,7 +130,7 @@ export function BallSwatch({ id, size = 96, trail = false }) {
 const pct = (reach) => Math.round((reach - 1) * 100)
 const winsText = (wins) => `x${Math.round(wins * 100) / 100}`
 
-/** An enchantment's numbers, as small chips. */
+/** An aura's numbers, as small chips. */
 function Stats({ ball, size = 22 }) {
   const chip = (icon, text, fill) => (
     <span className="inline-flex items-center" style={{ gap: u(4), padding: `${u(2)} ${u(10)} ${u(2)} ${u(4)}`, borderRadius: u(20), background: 'rgba(0,0,0,0.38)' }}>
@@ -166,7 +166,7 @@ function RarityTag({ rarity, size = 24 }) {
   )
 }
 
-/** The enchantment on your sword now, big, with its trail and numbers. */
+/** The aura on your ball now, big, with its trail and numbers. */
 function Equipped({ ball }) {
   return (
     <div
@@ -200,7 +200,7 @@ function Equipped({ ball }) {
 }
 
 /**
- * One enchantment's card: its orb, name, rarity, numbers and what you can do with it -
+ * One aura's card: its orb, name, rarity, numbers and what you can do with it -
  * EQUIPPED, EQUIP, BUY (the next one along) or LOCKED (buy the one before first).
  */
 function BallCard({ ball, index, state, wins, popped }) {
@@ -283,14 +283,14 @@ function BallCard({ ball, index, state, wins, popped }) {
 const GRID = { gridTemplateColumns: `repeat(auto-fill, minmax(${u(230)}, 1fr))`, gap: u(12) }
 
 export function BallsPanel() {
-  // As strings: the profile is a fresh object after every update (a slash, a throw...).
+  // As strings: the profile is a fresh object after every update (a spike, a serve...).
   const ownedKey = useGame((s) => (s.profile.ownedBalls || ['plain']).join(','))
   const equipped = useGame((s) => s.profile.equippedBall || 'plain')
   const wins = useGame((s) => s.profile.wins)
   const owned = ownedKey.split(',')
   const equippedBall = BALLS.find((b) => b.id === equipped) || BALLS[0]
 
-  // An enchantment just bought: its card pops.
+  // An aura just bought: its card pops.
   const [popped, setPopped] = useState(null)
   const count = useRef(owned.length)
   useEffect(() => {
@@ -312,13 +312,13 @@ export function BallsPanel() {
   }
 
   return (
-    <Panel title="ENCHANT ALTAR" icon="ball" width={1120}>
+    <Panel title="AURA SHRINE" icon="ball" width={1120}>
       <style>{SWATCH_CSS}</style>
       <div className="flex flex-col" style={{ gap: u(16) }}>
         <Equipped ball={equippedBall} />
         <p className="m-0 text-center" style={{ fontSize: u(24) }}>
           <StrokeText stroke={u(5)} style={{ whiteSpace: 'normal' }}>
-            Enchant your sword: it flies further and pays more Wins on every throw - and the fancy auras leave a trail of fire, frost or lightning!
+            Give your serve an aura: it flies further and pays more Wins on every serve - and the fancy auras leave a trail of fire, frost or lightning!
           </StrokeText>
         </p>
         <div className="grid" style={GRID}>

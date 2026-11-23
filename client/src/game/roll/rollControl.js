@@ -11,35 +11,35 @@ import { burst, fireBurst } from '../fx/fxQueue'
 import { spawnScattered } from '../fx/popups'
 import { consumePull, launch } from '../launch'
 import { runtime } from '../runtime'
-import { swordCenterY, swordLength } from '../swords'
+import { ballCenterY, ballLength } from '../volleyballs'
 import { zones } from '../worldLook'
 import { showHit } from './hudLink'
 import { CONTACT, CONTACT_METER, createRideState, flightPeak, KICK_HIT, kickTimeAt, leanFor, rideState, throwStart } from './path'
 
-/** How long the "+N Wins" result shows over the stuck sword before you're back. */
+/** How long the "+N Wins" result shows over the stuck ball before you're back. */
 const RESULT_HOLD_MS = 2600
-/** The whoosh of the plunge starts this long before the sword sticks. */
+/** The whoosh of the plunge starts this long before the ball sticks. */
 const PLUNGE_SOUND_LEAD = 0.5
 /** Let go this recently (ms), the flight is timed from your release, not the server's answer. */
 const RELEASE_SYNC_MS = 700
 
-/** The template's bounce counts: a sword never bounces. */
+/** The template's bounce counts: a ball never bounces. */
 export const bouncesFor = () => 0
 
 /**
- * The throw currently playing (the template's "roll"), read every frame by the camera,
- * the road, the sword, your avatar and the effects. Everything about it is known when it
+ * The serve currently playing (the template's "roll"), read every frame by the camera,
+ * the road, the ball, your avatar and the effects. Everything about it is known when it
  * starts (the authority already resolved the distance and the Wins), so the client just
  * plays it back: no per-frame network traffic.
  *
- * It's a ride state (see path.rideState: phase, meter, air, spin, the sword's middle...)
- * plus the throw's numbers. You stay where you stood on the stage (that's what the server checks);
- * only the sword and the camera go down the valley.
+ * It's a ride state (see path.rideState: phase, meter, air, spin, the ball's middle...)
+ * plus the serve's numbers. You stay where you stood on the stage (that's what the server checks);
+ * only the ball and the camera go down the court.
  */
 export const roll = {
   ...createRideState(),
   active: false,
-  /** True once the sword has stuck and the result is showing. */
+  /** True once the ball has stuck and the result is showing. */
   stopped: false,
   startedAt: 0,
   distance: 0,
@@ -47,46 +47,46 @@ export const roll = {
   wins: 0,
   prize: 0,
   discovered: [],
-  /** Template leftovers: nothing on the road stops the sword. */
+  /** Template leftovers: nothing on the road stops the ball. */
   blocked: -1,
   /** How many stages it flies into past the first. */
   broken: 0,
   best: false,
-  /** The sword thrown (TIRES id), its enchantment (BALLS id), and its shape (swords.js). */
+  /** The ball served (TIRES id), its aura (BALLS id), and its shape (balls.js). */
   tireId: 'bicycle',
   ballId: 'plain',
   len: 1.25,
   centerY: 0.46,
   lean: 0,
-  /** How well you timed the throw (HIT_GRADES id), or null for Auto Throw. */
+  /** How well you timed the serve (HIT_GRADES id), or null for Auto Serve. */
   hit: null,
   /** Where the flight starts: the release point's metre along the road, its x, height and z. */
   fromMeter: CONTACT_METER,
   startX: CONTACT.x,
   startY: CONTACT.y,
   startZ: CONTACT.z,
-  /** Its lane down the road (from where on the stage it was thrown). */
+  /** Its lane down the road (from where on the stage it was served). */
   lane: 0,
-  /** PERFECTs in a row with this throw (0: not a PERFECT), and its lucky gift or null. */
+  /** PERFECTs in a row with this serve (0: not a PERFECT), and its lucky gift or null. */
   combo: 0,
   gift: null,
-  /** performance.now() the sword stuck, left your hand, and of the last big jolt. */
+  /** performance.now() the ball stuck, left your hand, and of the last big jolt. */
   landedAt: 0,
   tookOffAt: 0,
   hitAt: 0,
-  /** performance.now() when the sword left your hand. */
+  /** performance.now() when the ball left your hand. */
   kickedAt: 0,
   /**
-   * A graded throw's punch: when it started (performance.now(), 0 if none this throw),
+   * A graded serve's punch: when it started (performance.now(), 0 if none this serve),
    * how long it lasts, how strong the camera's zoom, punch and shake are (0-1), and the
-   * throw clock's lag when it started (the freeze is measured from it).
+   * serve clock's lag when it started (the freeze is measured from it).
    */
   freezeAt: 0,
   freezeMs: 0,
   freezePower: 0,
   freezeLag: 0,
   /**
-   * The sword plunging into the road: when (performance.now()), where its tip went in, and
+   * The ball plunging into the road: when (performance.now()), where its tip went in, and
    * how high it fell from - what the crater, the cracks and the dust need.
    */
   impactAt: 0,
@@ -95,9 +95,9 @@ export const roll = {
   impactPeak: 0,
   frameKey: -1,
   /**
-   * Hit-stop: ms the throw's clock is behind real time. The sword sticking freezes it (and
+   * Hit-stop: ms the serve's clock is behind real time. The ball sticking freezes it (and
    * the camera on it) for a beat; the clock then catches up a little faster than real
-   * time, and is always caught up before the result, so the throw ends exactly when the
+   * time, and is always caught up before the result, so the serve ends exactly when the
    * authority said.
    */
   lag: 0,
@@ -107,7 +107,7 @@ export const roll = {
 /** How long the plunge's slow motion lasts, how slow, and how fast the clock catches up. */
 const SLOW_MS = 260
 const SLOW_RATE = 0.12
-/** How fast the throw's clock runs during a hit-stop: all but frozen. */
+/** How fast the serve's clock runs during a hit-stop: all but frozen. */
 const FREEZE_RATE = 0.06
 const CATCH_UP = 0.4
 
@@ -119,15 +119,15 @@ function clearTimers() {
 }
 
 /**
- * Moves the throw on to this frame. Idempotent per frame (keyed on the renderer's clock),
- * so the camera, the sword and the effects all see exactly the same state however many of
+ * Moves the serve on to this frame. Idempotent per frame (keyed on the renderer's clock),
+ * so the camera, the ball and the effects all see exactly the same state however many of
  * them ask.
  */
 export function advanceRoll(clockTime) {
   if (!roll.active || roll.frameKey === clockTime) return roll
   roll.frameKey = clockTime
   const now = performance.now()
-  const wasStuck = roll.stuck
+  const wasBounces = roll.bounces
   const wasWaiting = roll.phase === 'launch'
   const dt = roll.lastNow ? Math.min(now - roll.lastNow, 100) : 0
   roll.lastNow = now
@@ -146,12 +146,15 @@ export function advanceRoll(clockTime) {
     roll.tookOffAt = now
     blastOff(now)
   }
-  if (!wasStuck && roll.stuck) stick(now)
+  if (roll.bounces > wasBounces && roll.bounces <= 2) {
+    if (wasBounces === 0) touchdown(now)
+    else hop(now, roll.bounces)
+  }
   return roll
 }
 
 /**
- * How each grade of throw looks as the sword leaves your hand: its burst (FireBurst kind),
+ * How each grade of serve looks as the ball leaves your hand: its burst (FireBurst kind),
  * confetti, and how hard the camera reacts (0-1).
  */
 const HIT_FX = {
@@ -162,7 +165,7 @@ const HIT_FX = {
 }
 
 /**
- * The sword leaving your hand: the grade the throw meter gave it, straight away, so you see
+ * The ball leaving your hand: the grade the serve meter gave it, straight away, so you see
  * why it flies as far as it does. GOOD, GREAT and PERFECT each get their own moment,
  * bigger every step - a burst off your hand (sparkles, an electric-blue blast, a column of
  * fire), the grade's title slamming onto the screen (HitFlash.jsx), the lens punching
@@ -195,34 +198,41 @@ function blastOff(now) {
 }
 
 /**
- * The sword plunging point-first into the road: a THUNK, the camera jolting, a beat of
- * slow motion, and the crater, cracks and dust round it (Impact.jsx).
+ * The ball smashing into the court at the end of its arc: a BOOM, the camera jolting, a
+ * beat of slow motion, and the dust, chips and shockwave round it (Impact.jsx). It bounces
+ * on from there (hop) and rolls to a stop.
  */
-function stick(now) {
+function touchdown(now) {
   roll.landedAt = now
   roll.hitAt = now
   roll.impactAt = now
   roll.impact.copy(roll.tip)
-  roll.impactMeter = roll.distance
+  roll.impactMeter = roll.meter
   roll.impactPeak = flightPeak(roll.distance - roll.fromMeter, roll.hit)
-  // A hard freeze for a big throw: you see the blade bite.
+  // A hard freeze for a big serve: you feel it land.
   roll.freezeAt = now
-  roll.freezeMs = 70 + Math.min(110, roll.impactPeak * 2.5)
+  roll.freezeMs = 60 + Math.min(100, roll.impactPeak * 2.2)
   roll.freezePower = Math.max(roll.freezePower, 0.35)
   roll.freezeLag = roll.lag
   sfx.swordStick(Math.min(1, roll.impactPeak / 40))
 }
 
+/** One of the smaller bounces after it lands (`n` 2, 3): a puff of dust and a thud. */
+function hop(now, n) {
+  roll.landedAt = now
+  sfx.bounce(n)
+}
+
 /**
- * Starts a throw the authority already resolved, from your release: your arm whips over,
- * the sword leaves your hand and spins away down the valley.
+ * Starts a serve the authority already resolved, from your release: your arm whips over,
+ * the ball leaves your hand and spins away down the court.
  */
 export function beginRoll(result) {
   clearTimers()
   const game = getGame()
   const now = performance.now()
-  // The flight is timed from your release, so the sword leaves your hand just as your arm
-  // comes over - however long the answer took. (Auto Throw, or a release the server
+  // The flight is timed from your release, so the ball leaves your hand just as your arm
+  // comes over - however long the answer took. (Auto Serve, or a release the server
   // answered very late: timed from now.)
   const sinceRelease = now - launch.swungAt
   const synced = launch.swungAt > 0 && sinceRelease < RELEASE_SYNC_MS
@@ -244,8 +254,8 @@ export function beginRoll(result) {
     best: result.best,
     tireId,
     ballId,
-    len: swordLength(tireId),
-    centerY: swordCenterY(tireId),
+    len: ballLength(tireId),
+    centerY: ballCenterY(tireId),
     lean: leanFor(result.distance),
     hit: result.hit ?? null,
     // From where you stood on the stage when you let go.
@@ -271,7 +281,7 @@ export function beginRoll(result) {
   runtime.player.yaw = BATTER_YAW
   runtime.camera.mode = 'roll'
   // The HUD's switch to the flight (a React update and a restyle) in a task of its own,
-  // not the frame the throw starts in: together they made that one frame stick on slow
+  // not the frame the serve starts in: together they made that one frame stick on slow
   // phones. The flight itself is already under way from the runtime state above.
   const started = {
     distance: result.distance,
@@ -300,7 +310,7 @@ function showResult() {
   roll.stopped = true
   const game = getGame()
   sfx.wins()
-  const f = roll.tip
+  const f = roll.position
   burst({ x: f.x, y: f.y + 2.2, z: f.z, count: 50, palette: 'gold', speed: 9 })
   game.endRoll()
   // A stage reached for the first time ever: its name and the prize, once.
@@ -308,7 +318,7 @@ function showResult() {
   for (const zi of roll.discovered) {
     game.showToast(`NEW STAGE: ${stages[zi].name}! +${formatNumber(stages[zi].discover)} Wins`)
   }
-  // A lucky gift: a present bursting open over the sword, and what was in it.
+  // A lucky gift: a present bursting open over the ball, and what was in it.
   const gift = roll.gift
   if (gift) {
     timers.push(
@@ -327,8 +337,8 @@ function showResult() {
 }
 
 /**
- * Back on the stage, camera behind you, your sword back in your hand: still where you
- * stood, so you can wind up the next throw straight away (walk off the stage to leave).
+ * Back on the stage, camera behind you, your ball back in your hand: still where you
+ * stood, so you can wind up the next serve straight away (walk off the stage to leave).
  */
 export function finishRoll() {
   clearTimers()

@@ -9,7 +9,7 @@ import { u } from './style'
 
 const gradeOf = (id) => HIT_GRADES.find((g) => g.id === id)
 const bonusOf = (id) => gradeOf(id).bonus
-/** "+20% DISTANCE": how much further than a plain throw a grade's best throw flies. */
+/** "+20% DISTANCE": how much further than a plain serve a grade's best serve flies. */
 const extraDistance = (id) => `+${Math.round((gradeOf(id).reach[1] - 1) * 100)}% DISTANCE`
 
 /**
@@ -24,7 +24,7 @@ const CARDS = [
     gradient: 'linear-gradient(180deg, #ffffff 0%, #fffbe0 40%, #ffe27a 70%, #ffb21e 100%)',
     rays: null,
     stars: 4,
-    badges: [['NICE THROW!', 'linear-gradient(180deg, #ffffff 0%, #ffe27a 100%)']],
+    badges: [['NICE SERVE!', 'linear-gradient(180deg, #ffffff 0%, #ffe27a 100%)']],
   },
   {
     id: 'great',

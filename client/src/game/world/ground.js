@@ -37,21 +37,21 @@ import { APRON, COURTYARD, FLOWER_BEDS, PATHS, PLAZA_DISC, SPOKES } from './pitc
 /**
  * The courtyard floor: one big plane whose colours come from a "ground map" texture
  * painted in world units (a few texels to the metre). The lawn; the round flagstone
- * courtyard round the spawn; the cobbled avenue from there straight up to the throw
+ * courtyard round the spawn; the cobbled avenue from there straight up to the serve
  * stage's steps, through the open flagstone plaza in the middle, with spokes west to the
- * training circle and east to the Sword Wall; the training circle's sand (sweeping round
- * its arc) and the Sword Wall's marble apron, the counter's gold square on it; the
+ * training circle and east to the Ball Wall; the training circle's sand (sweeping round
+ * its arc) and the Ball Wall's marble apron, the counter's gold square on it; the
  * flagstones round the stage, under the two egg rows, the leaderboards, the free reward
  * and the Sphinx; the Enchant Altar's rune circle; the portal's rings and the flower beds
  * are painted into it, so the whole floor is a single draw call however many regions it
- * has. In Dragonfire Peaks the lawn is ash and basalt, split by glowing lava cracks.
+ * has. In Christmas Village the lawn is ash and basalt, split by glowing lava cracks.
  */
 
 const MAP = { minX: -64, maxX: 64, minZ: -44, maxZ: PLAZA.maxZ + 12 }
 const MAP_W = MAP.maxX - MAP.minX
 const MAP_H = MAP.maxZ - MAP.minZ
 
-/** Where the ground plane ends to the north: the valley's own floor takes over there. */
+/** Where the ground plane ends to the north: the court's own floor takes over there. */
 export const GROUND_NORTH_EDGE = TRACK_START_Z
 
 /** A canvas drawn on in world metres: x east, z south (the map's +v is north). */
@@ -219,9 +219,9 @@ function paintTraining(ctx, _paint, G) {
 }
 
 /**
- * The Sword Wall's apron (pitch.js APRON): pale marble flagstones from the wall's face out
+ * The Ball Wall's apron (pitch.js APRON): pale marble flagstones from the wall's face out
  * into the courtyard, edged; a gold line along the wall's foot with a short tick under
- * every column, and the Sword Counter's dais framed in a gold square with a rune ring in
+ * every column, and the Ball Counter's dais framed in a gold square with a rune ring in
  * front of it - the one place to stand to buy.
  */
 function paintApron(ctx, { rect, ring, line }, G) {
@@ -275,7 +275,7 @@ function paintPaths(ctx, { rect, disc, ring, line }, G) {
 }
 
 /**
- * The flagstones round the throw stage (in front of its steps and either side of it, to
+ * The flagstones round the serve stage (in front of its steps and either side of it, to
  * its flag towers), under the eggs, the leaderboards, the free reward and the Sphinx; the
  * Enchant Altar's rune circle; the portal's rings.
  */
@@ -355,7 +355,7 @@ function paintBeds(ctx, { rect }, G) {
 }
 
 /**
- * Dragonfire Peaks' cracks: jagged glowing seams wandering across the ash, from a seed
+ * Christmas Village's cracks: jagged glowing seams wandering across the ash, from a seed
  * (the same on every client), each a dark scorched edge round a bright core.
  */
 function paintCracks(ctx, color) {
@@ -386,16 +386,16 @@ function paintCracks(ctx, color) {
   }
 }
 
-/** How far the ground runs out in Dragonfire Peaks before the lava sea (Ocean.jsx) takes over. */
+/** How far the ground runs out before the sea (Ocean.jsx) takes over. */
 export const SEA_EDGE = 118
 
 /**
  * The ground plane, with UVs computed from world position so the map lands exactly
  * on the world grid. Outside the map, clamp-to-edge repeats the lawn's colour. In
- * Dragonfire Peaks it stops at SEA_EDGE, and the lava sea runs on from there.
+ * Christmas Village it stops at SEA_EDGE, and the lava sea runs on from there.
  */
 export function createGroundGeometry(world = 0) {
-  const reach = venueOf(world).lava ? SEA_EDGE : 280
+  const reach = venueOf(world).sea ? SEA_EDGE : 280
   const minX = -reach
   const maxX = reach
   const minZ = GROUND_NORTH_EDGE

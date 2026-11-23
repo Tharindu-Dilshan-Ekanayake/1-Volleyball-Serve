@@ -38,7 +38,7 @@ export function TouchControls() {
   const baseRef = useRef(null)
   const knobRef = useRef(null)
   const active = useRef({ id: null, x: 0, y: 0 })
-  // The slash button: gone at a throw spot (THROW is there), while a sword flies, and
+  // The spike button: gone at a serve spot (SERVE is there), while a ball flies, and
   // under a panel.
   const batVisible = useGame((s) => !s.zone.atPlate && !s.roll && !s.rollResult && !s.panel)
   // Under a panel the whole set steps aside (display: none, not unmounted), so no stick or
@@ -166,7 +166,7 @@ export function TouchControls() {
             e.preventDefault()
             tapSwing()
             stopHold()
-            // Held: keeps slashing (tapSwing paces itself).
+            // Held: keeps spiking (tapSwing paces itself).
             holdTimer.current = setInterval(() => tapSwing(), 120)
           }}
           onPointerUp={stopHold}

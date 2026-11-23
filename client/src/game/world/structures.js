@@ -23,15 +23,15 @@ import { crossedSwords, localBox } from './heraldry'
 /**
  * Static lobby structures, added to the world's shared BlockSet and prop builder so they
  * render in the same few draw calls as everything else: the training circle's pads, the
- * Sword Wall's crown sign, and the Enchant Altar. (The dummies themselves, which wobble as
- * they're struck, are drawn by TrainingDummies; the Sword Wall itself, its swords and the
+ * Ball Wall's crown sign, and the Enchant Altar. (The courts themselves, which wobble as
+ * they're struck, are drawn by TrainingDummies; the Ball Wall itself, its balls and the
  * counter by TireShop.)
  */
 
 /**
  * Per-pad look, in pad order (matches PADS in shared/balance.js): the mat's stone base and
  * top (its `style`), the glowing rune ring, the board's frame and the colour of its
- * labels. `lava` ones (Dragonfire Peaks' two) have a glowing cracked mat and flames on
+ * labels. `lava` ones (Christmas Village's two) have a glowing cracked mat and flames on
  * their board.
  */
 export const PAD_THEMES = [
@@ -42,12 +42,12 @@ export const PAD_THEMES = [
   { base: '#5a3a9a', top: '#d0b8ff', ring: '#c69bff', frame: '#7a4cff', text: '#c69bff' },
   { base: '#1a8ab8', top: '#7fe8ff', ring: '#ffffff', frame: '#14a3c9', text: '#9fe8ff', style: STYLE.GLOW },
   { base: '#1b2266', top: '#2a1450', ring: '#c35cff', frame: '#2a1450', text: '#d39bff', style: STYLE.GALAXY },
-  // Dragonfire Peaks' pads: a magma mat, then an inferno one.
-  { base: '#3a1a14', top: '#ff6a1e', ring: '#ffd27a', frame: '#5a2418', text: '#ff9a4a', style: STYLE.LAVA, lava: true },
-  { base: '#2a0c0c', top: '#ff3b0a', ring: '#ffb21a', frame: '#3a0c0c', text: '#ff6a3a', style: STYLE.LAVA, lava: true },
+  // Christmas Village's pads: a candy-cane mat, then an ice palace one.
+  { base: '#c8102e', top: '#ffffff', ring: '#ffd21f', frame: '#c8102e', text: '#ff8a9a', style: STYLE.STRIPES },
+  { base: '#2f6fb0', top: '#bff4ff', ring: '#ffffff', frame: '#4fb8ff', text: '#bff4ff', style: STYLE.GLOW },
 ]
 
-/** The multiplier board, high behind the dummy. Labels centre on it (lobbyLabels). */
+/** The multiplier board, high behind the court. Labels centre on it (lobbyLabels). */
 export const BOARD_BOTTOM = 4.6
 export const BOARD_HEIGHT = 3.6
 /** The board's width, and its two posts' spread (inside the board's collider, shared/world padBoard). */
@@ -80,8 +80,8 @@ function buildMat(blocks, props, x, z, theme) {
 }
 
 /**
- * The dummy's platform at dummySpot (inside its collider): a round stone base with a
- * wooden top, its top exactly DUMMY_BASE up (the dummy stands on it), a glowing ring
+ * The court's platform at dummySpot (inside its collider): a round stone base with a
+ * wooden top, its top exactly DUMMY_BASE up (the court stands on it), a glowing ring
  * round its foot.
  */
 function buildPlatform(props, index, theme) {
@@ -92,10 +92,10 @@ function buildPlatform(props, index, theme) {
 }
 
 /**
- * The board behind the dummy (padBoard: turned to face back in at the pad), high enough
- * that the camera behind you sees it over the dummy: two stone posts, the board in the
+ * The board behind the court (padBoard: turned to face back in at the pad), high enough
+ * that the camera behind you sees it over the court: two stone posts, the board in the
  * pad's colour with a dark face and a glowing edge, and on top a small crest of crossed
- * swords (flames on a lava pad). A rack of practice swords stands between the posts. All
+ * balls (flames on a lava pad). A rack of practice balls stands between the posts. All
  * of it on the ground is inside the board's collider.
  */
 function buildBoard(blocks, index, theme, c) {
@@ -122,7 +122,7 @@ function buildBoard(blocks, index, theme, c) {
   } else {
     crossedSwords(blocks, x, by + bh + 1.15, z, yaw, 0, 0, 0, 2.3, { blade: c.blade, trim: theme.ring, grip: WOOD_DARK })
   }
-  // The rack of practice swords between the posts, on the pad's side of them.
+  // The rack of practice balls between the posts, on the pad's side of them.
   for (const s of [-1, 1]) box(s * 0.42, 0.65, 0.42, 0.1, 1.3, 0.1, WOOD_DARK, STYLE.SMOOTH)
   box(0, 1.2, 0.42, 0.94, 0.1, 0.1, WOOD_DARK, STYLE.SMOOTH)
   for (let k = -1; k <= 1; k += 1) {
@@ -133,9 +133,9 @@ function buildBoard(blocks, index, theme, c) {
 
 /**
  * The training circle: round rune mats in the pads' colours round their arc (two-tier
- * stone, a glowing ring and runes round its top), each dummy's platform just out beyond
+ * stone, a glowing ring and runes round its top), each court's platform just out beyond
  * its mat (dummySpot), and the multiplier board out behind it (padBoard) with a rack of
- * practice swords. The rounded parts go into the world's props, the rest into its blocks:
+ * practice balls. The rounded parts go into the world's props, the rest into its blocks:
  * no draw calls of their own.
  */
 export function buildPads(blocks, props, { world = 0 } = {}) {
@@ -156,13 +156,13 @@ export function padLabelAt(index) {
 }
 
 /**
- * The SWORD SHOP sign's board, crowning the Sword Wall (over SWORD_WALL_TOP, under
+ * The BALL SHOP sign's board, crowning the Ball Wall (over SWORD_WALL_TOP, under
  * SHOP_SIGN.top): its lettering is painted on it (signs.js) centred at `midY`.
  */
 export const SHOP_BOARD = { bottom: SWORD_WALL_TOP + 0.25, top: SHOP_SIGN.top, midY: (SWORD_WALL_TOP + 0.25 + SHOP_SIGN.top) / 2 }
 
 /**
- * The SWORD SHOP sign crowning the Sword Wall (on its top, behind the cornice), its face to
+ * The BALL SHOP sign crowning the Ball Wall (on its top, behind the cornice), its face to
  * the courtyard (`f`): a board between two stone pillars standing on the wall, a gold cap,
  * the crest on top. `detail` (off on LOW) adds the bulbs and the crest.
  */
@@ -205,14 +205,14 @@ export const ALTAR_SIGN = { x: BALL_SHOP.body.maxX - 0.75, y: 6.9, z: BALL_SHOP.
 /** The template's name for it. */
 export const BALL_SHOP_SIGN = ALTAR_SIGN
 
-/** The enchantments' glows, round the dais: fire, frost, storm, gold, galaxy, void. */
+/** The auras' glows, round the dais: fire, frost, storm, gold, galaxy, void. */
 const ENCHANT_GLOWS = ['#ff6a1e', '#9ff4ff', '#fff27a', '#ffcc1f', '#a46bff', '#e36bff']
 
 /**
  * The ENCHANT ALTAR (BALL_SHOP; its solid body BALL_SHOP.body): a two-step stone dais, the
  * altar table on it with a gold-lit edge, a big crystal floating over it inside a glowing
  * rune ring, four rune stones at the dais's corners, six little pedestals round it each
- * with an orb glowing in one enchantment's colour, and behind it all a stone arch with the
+ * with an orb glowing in one aura's colour, and behind it all a stone arch with the
  * ENCHANTS board high on it facing the plaza. Blocks and props: no draw calls of its own.
  */
 export function buildEnchantAltar(blocks, props, { world = 0 } = {}) {
@@ -247,7 +247,7 @@ export function buildEnchantAltar(blocks, props, { world = 0 } = {}) {
     for (const y of [0.5, 1.1, 1.9]) blocks.add(x - 0.31, deck + y, z, 0.04, 0.22, 0.14, a.rune, STYLE.GLOW)
     blocks.addOn(x, deck + 2.5, z, 0.26, 0.26, 0.26, a.rune, STYLE.GLOW, Math.PI / 4)
   }
-  // Six pedestals along the dais's sides, each with an enchantment's orb.
+  // Six pedestals along the dais's sides, each with an aura's orb.
   ENCHANT_GLOWS.forEach((glow, i) => {
     const side = i % 2 ? 1 : -1
     const x = minX + 0.9 + Math.floor(i / 2) * 0.9

@@ -7,16 +7,16 @@ import { ROLL_RECOVERY } from '@shared/balance'
 import { getQuality } from '../../store/quality'
 import { enchantAura } from '../enchants'
 import { runtime } from '../runtime'
-import { createSwordMesh, getSwordGeometry } from '../swords'
+import { createBallMesh, getBallGeometry } from '../volleyballs'
 import { swordScale } from '../playerPose'
 import { createRideState, KICK_HIT, laneFor, rideState, SWORD_SCALE } from './path'
 import { advanceRoll, roll } from './rollControl'
 
-/** Your sword and up to eight other players'. */
+/** Your ball and up to eight other players'. */
 const MAX_SWORDS = 9
-/** Seconds after leaving your hand the sword takes to grow to its full flying size. */
+/** Seconds after leaving your hand the ball takes to grow to its full flying size. */
 const GROW_S = 0.3
-/** The aura shell round an enchanted sword: this much bigger, pulsing between these opacities. */
+/** The aura shell round an enchanted ball: this much bigger, pulsing between these opacities. */
 const AURA_GROW = 1.07
 const AURA_MIN = 0.22
 const AURA_MAX = 0.5
@@ -28,14 +28,14 @@ const _ax = new Vector3(1, 0, 0)
 const _az = new Vector3(0, 0, 1)
 
 /**
- * Places one sword (and its aura) from a ride state: turned end over end by its spin about
+ * Places one ball (and its aura) from a ride state: turned end over end by its spin about
  * the sideways axis and leaned by its roll, its middle (`centerY` up the blade) on the
  * state's position - growing from its size in your hand to SWORD_SCALE as it leaves (`flown`
- * seconds ago), so the flying blade is huge and reads from far down the valley.
+ * seconds ago), so the flying blade is huge and reads from far down the court.
  */
 function placeSword(slot, st, id, ballId, centerY, now, auraOn, len, flown) {
   const { sword, aura } = slot
-  sword.setSword(id)
+  sword.setBall(id)
   _qr.setFromAxisAngle(_az, st.roll || 0)
   _q.setFromAxisAngle(_ax, st.spin).premultiply(_qr)
   const g = Math.min(1, Math.max(0, flown / GROW_S))
@@ -63,19 +63,19 @@ function placeSword(slot, st, id, ballId, centerY, now, auraOn, len, flown) {
 }
 
 /**
- * Every sword out on the road: yours (the throw playing in rollControl) and other
- * players', replayed from their throws' numbers down their own lines (runtime.ghostRolls)
+ * Every ball out on the road: yours (the serve playing in rollControl) and other
+ * players', replayed from their serves' numbers down their own lines (runtime.ghostRolls)
  * - spinning end over end as they fly, then stuck point-first in the road, quivering, until
- * the throw is over. Each drawn as the sword it is (swords.js: one shared material), an
+ * the serve is over. Each drawn as the ball it is (balls.js: one shared material), an
  * enchanted one wrapped in its aura's glow (an inverted shell, additive). Nothing is drawn
- * while no sword is out; nothing is allocated while they fly. Your sword casts a blob
+ * while no ball is out; nothing is allocated while they fly. Your ball casts a blob
  * shadow on presets without realtime ones.
  */
 export default function SwordFlight() {
   const groupRef = useRef(null)
-  /** Ride states for other players' swords, by session id. */
+  /** Ride states for other players' balls, by session id. */
   const ghosts = useRef(new Map())
-  /** Spare ride states, made up front: a new player's throw never allocates mid-frame. */
+  /** Spare ride states, made up front: a new player's serve never allocates mid-frame. */
   const spare = useRef(Array.from({ length: MAX_SWORDS }, () => createRideState()))
   const shadowRef = useRef(null)
   const gl = useThree((s) => s.gl)
@@ -85,10 +85,10 @@ export default function SwordFlight() {
   const slots = useMemo(() => {
     const group = new Group()
     const list = Array.from({ length: MAX_SWORDS }, () => {
-      const sword = createSwordMesh()
+      const sword = createBallMesh()
       sword.visible = false
       const aura = new Mesh(
-        getSwordGeometry('bicycle'),
+        getBallGeometry('bicycle'),
         new MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: AURA_MIN, blending: AdditiveBlending, depthWrite: false, side: BackSide }),
       )
       aura.visible = false
@@ -103,7 +103,7 @@ export default function SwordFlight() {
   }, [])
 
   // The aura's shader compiled now, while the road loads, not on the first enchanted
-  // throw: shown just long enough to be gathered (compile only takes what's visible).
+  // serve: shown just long enough to be gathered (compile only takes what's visible).
   useEffect(() => {
     const group = groupRef.current
     if (import.meta.env.DEV || !group) return
@@ -120,7 +120,7 @@ export default function SwordFlight() {
     runtime.shadowCasters.add(shadow)
     return () => {
       runtime.shadowCasters.delete(shadow)
-      // The swords' geometry and material are shared (swords.js); the auras' materials are ours.
+      // The balls' geometry and material are shared (balls.js); the auras' materials are ours.
       for (const { aura } of slots.list) aura.material.dispose()
     }
   }, [slots])

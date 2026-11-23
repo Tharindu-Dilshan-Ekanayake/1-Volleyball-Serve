@@ -18,14 +18,14 @@ export const TEXT = {
   white: ['#ffffff', '#ffffff', '#dfe7f0'],
   red: ['#ffb0a8', '#ff4a3b', '#d4142a'],
   blue: ['#e0faff', '#7fe2ff', '#2fa8ff'],
-  lava: ['#ffe0a0', '#ff8a1e', '#e2240c'],
+  lava: ['#ffffff', '#ff6a7a', '#d4142a'],
 }
 
 const tint = (hex) => ['#ffffff', hex, hex]
 
 /**
- * "x4 POWER / Stone Dummy / LOCKED: 2 Rebirths", "x1 POWER / Straw Dummy / FREE",
- * "x40 POWER / VERY OP! / 150K Wins"... (over each training dummy's board). The names come
+ * "x4 POWER / Stone Court / LOCKED: 2 Rebirths", "x1 POWER / Straw Court / FREE",
+ * "x40 POWER / VERY OP! / 150K Wins"... (over each training court's board). The names come
  * from shared/balance.js PADS.
  */
 export function padLabelSpec(index, unlocked, world = 0) {
@@ -68,7 +68,7 @@ const padReserve = (index) => {
 export function padLabels(profile) {
   return PADS.map((pad, i) => ({
     id: `pad-${i}`,
-    // Well in front of the pad's board (structures.js padLabelAt), over the dummy: the
+    // Well in front of the pad's board (structures.js padLabelAt), over the court: the
     // label turns to face the camera and is wider than the board, so any nearer and its far
     // half swings behind the board seen from an angle.
     position: padLabelAt(i),
@@ -78,7 +78,7 @@ export function padLabels(profile) {
   }))
 }
 
-/** Ownership state of each sword stand: 'equipped' | 'owned' | 'buy' | 'locked'. */
+/** Ownership state of each ball stand: 'equipped' | 'owned' | 'buy' | 'locked'. */
 export function standState(profile, index) {
   const tire = TIRES[index]
   if (profile.equippedTire === tire.id) return 'equipped'
@@ -88,14 +88,14 @@ export function standState(profile, index) {
 }
 
 /**
- * The Sword Wall's name plates (world/swordWall.js): canvas pixels per metre, and the
+ * The Ball Wall's name plates (world/swordWall.js): canvas pixels per metre, and the
  * widest a line may be before it's drawn smaller (so every plate's text fits its 3.7 m
  * block - a long name like "Abyssal Trident Blade" shrinks, the plate doesn't widen).
  */
 const PLATE_PX = 108
 const PLATE_LINE_MAX = 375
 
-/** "+5.7B Power", and a Legend sword's Wins bonus beside it: "+5.7B Power  +10% Wins". */
+/** "+5.7B Power", and a Legend ball's Wins bonus beside it: "+5.7B Power  +10% Wins". */
 const statsText = (tire) => {
   const power = `+${formatNumber(tire.power)} Power`
   return tire.wins > 1 ? `${power}  +${Math.round((tire.wins - 1) * 100)}% Wins` : power
@@ -112,8 +112,8 @@ const stateLine = (tire, state) => {
 }
 
 /**
- * A sword's name plate on the Sword Wall, under its niche: its name (biggest), its Power
- * (and a Legend sword's Wins bonus), then EQUIPPED / OWNED or its price. Flat on the wall,
+ * A ball's name plate on the Ball Wall, under its niche: its name (biggest), its Power
+ * (and a Legend ball's Wins bonus), then EQUIPPED / OWNED or its price. Flat on the wall,
  * so it reads from right across the courtyard. (Its rarity shows in its niche's glow.)
  */
 export function standLabelSpec(index, state) {
@@ -145,7 +145,7 @@ const standReserve = (index) => {
 export function standLabels(profile) {
   return TIRE_STANDS.map((stand) => ({
     id: `stand-${stand.index}`,
-    // On the plate under the niche's sword (TireShop.jsx), flat on the wall facing the courtyard.
+    // On the plate under the niche's ball (TireShop.jsx), flat on the wall facing the courtyard.
     position: [PLATE_LABEL_X, stand.plateY, stand.z],
     facing: stand.yaw,
     spec: standLabelSpec(stand.index, standState(profile, stand.index)),
@@ -154,15 +154,15 @@ export function standLabels(profile) {
   }))
 }
 
-/** On the Sword Counter's sign board, flat, facing the courtyard: where to buy. */
+/** On the Ball Counter's sign board, flat, facing the courtyard: where to buy. */
 const counterLabel = () => ({
   id: 'sword-counter',
   position: COUNTER_LABEL,
   facing: -Math.PI / 2,
   spec: {
     lines: [
-      { text: 'SWORD COUNTER', size: 56, gradient: TEXT.gold },
-      { text: 'Stand here to buy your next sword!', size: 26, gradient: TEXT.white },
+      { text: 'BALL COUNTER', size: 56, gradient: TEXT.gold },
+      { text: 'Stand here to buy your next ball!', size: 26, gradient: TEXT.white },
     ],
     pxPerUnit: 125,
     maxWidth: 420,
@@ -229,8 +229,8 @@ const scoreboardLabel = () => ({
   position: [SCOREBOARD.x, SCOREBOARD.y + 0.8 + SCOREBOARD.height / 2, SCOREBOARD.z - 1.5],
   spec: {
     lines: [
-      { text: 'SWORD TOSS LEGENDS', size: 100, gradient: TEXT.gold },
-      { text: 'TRAIN - THROW - REBIRTH', size: 44, gradient: TEXT.white },
+      { text: 'VOLLEY SERVE LEGENDS', size: 100, gradient: TEXT.gold },
+      { text: 'TRAIN - SERVE - REBIRTH', size: 44, gradient: TEXT.white },
     ],
     pxPerUnit: 34,
   },
@@ -245,7 +245,7 @@ const freeRewardLabel = () => ({
 })
 
 /**
- * Where the portal goes: Dragonfire Peaks (and what opens it - rebirths and Wins - until
+ * Where the portal goes: Christmas Village (and what opens it - rebirths and Wins - until
  * it's open), or home. (Names from shared/balance.js WORLDS.)
  */
 const portalLabel = (profile) => (portal) => {
@@ -279,9 +279,9 @@ const portalLabel = (profile) => (portal) => {
 }
 
 /**
- * On the throw stage's two flag towers, facing spawn: what the stage is for. Each hangs
+ * On the serve stage's two flag towers, facing spawn: what the stage is for. Each hangs
  * just in front of its tower's south face and a little out past its far side, so it never
- * reaches over the stage - nor between a player on it and the road (the throw camera
+ * reaches over the stage - nor between a player on it and the road (the serve camera
  * looks north from behind and above you).
  */
 const stageLabels = () =>
@@ -292,9 +292,9 @@ const stageLabels = () =>
       position: [t.x + out * 1.2, 10.6, t.z + 1.6],
       spec: {
         lines: [
-          { text: 'THROW STAGE', size: 56, gradient: TEXT.gold },
+          { text: 'SERVE LINE', size: 56, gradient: TEXT.gold },
           { text: 'Stand anywhere on the stage -', size: 32, gradient: TEXT.white },
-          { text: 'hold THROW, let go!', size: 32, gradient: TEXT.white },
+          { text: 'hold SERVE, let go!', size: 32, gradient: TEXT.white },
         ],
         pxPerUnit: 66,
       },
@@ -308,8 +308,8 @@ const enchantLabel = () => ({
   position: [BALL_SHOP.x + 3.6, 10.3, BALL_SHOP.z],
   spec: {
     lines: [
-      { text: 'ENCHANTS', size: 62, gradient: ['#ffffff', '#e2c8ff', '#b07aff'] },
-      { text: 'Power up your sword!', size: 42, gradient: TEXT.white },
+      { text: 'AURAS', size: 62, gradient: ['#ffffff', '#e2c8ff', '#b07aff'] },
+      { text: 'Power up your serve!', size: 42, gradient: TEXT.white },
     ],
     pxPerUnit: 52,
   },

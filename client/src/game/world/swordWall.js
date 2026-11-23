@@ -1,7 +1,7 @@
 import { counterRect, PLATE_UP, SWORD_COLUMN_PITCH, SWORD_COUNTER, SWORD_TIER_HEIGHT, SWORD_TIERS, SWORD_WALL_TOP, SWORD_WALL } from '@shared/world'
 
 /**
- * The Sword Wall's look, front (west, the courtyard) to back - shared by the wall itself
+ * The Ball Wall's look, front (west, the courtyard) to back - shared by the wall itself
  * (TireShop.jsx) and its name plates' text (lobbyLabels.js). The wall's footprint, its
  * niches and the counter's dais are gameplay layout (shared/world.js); this is just how
  * they're dressed.
@@ -12,7 +12,7 @@ import { counterRect, PLATE_UP, SWORD_COLUMN_PITCH, SWORD_COUNTER, SWORD_TIER_HE
  *   x 40.55  PANEL_FRONT  a niche's glowing back panel
  *   x 40.65  NICHE_BACK   the wall's body: every niche is recessed to here
  *
- * The swords hang SWORD_OUT (1.2) in front of the face, over their plates.
+ * The balls hang SWORD_OUT (1.2) in front of the face, over their plates.
  */
 export const WALL_FACE = SWORD_WALL.x
 export const NICHE_BACK = WALL_FACE + 0.65
@@ -33,12 +33,12 @@ export const PLATE = { width: 3.7, height: 1.36 }
 
 /** Top of niche `stand`'s inside: under the next tier's ledge, or under the cornice. */
 export const nicheCeiling = (stand) => (stand.tier < SWORD_TIERS - 1 ? stand.floor + SWORD_TIER_HEIGHT - LEDGE : SWORD_WALL_TOP - CORNICE)
-/** The glowing frame round a niche's sword: from just over its plate to just under its ceiling. */
+/** The glowing frame round a niche's ball: from just over its plate to just under its ceiling. */
 export const frameBottom = (stand) => stand.floor + PLATE_UP + PLATE.height / 2 + 0.12
 export const frameTop = (stand) => nicheCeiling(stand) - 0.08
 
 /**
- * The SWORD COUNTER's sign board: low (no higher than 1.2 m, so from the courtyard it never
+ * The BALL COUNTER's sign board: low (no higher than 1.2 m, so from the courtyard it never
  * hides a name plate) along the dais's east edge, facing west - its lettering a flat label
  * just in front (`label`).
  */

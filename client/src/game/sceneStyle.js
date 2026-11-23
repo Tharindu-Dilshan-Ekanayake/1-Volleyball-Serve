@@ -1,17 +1,17 @@
 /**
- * The scene's whole look in one place: Sunblade Academy - a sword school's courtyard on a
- * bright fantasy day: a clear blue sky with puffy white clouds and a high sun, pale stone
- * flagstones and cobbled paths through lush lawns and flower beds, toy-castle walls with
- * blue roofs and gold-trimmed heraldic banners (an original crossed-swords crest) all
- * round, and green hills with trees beyond (hills.js), the long valley road running off
- * between them (Lane.jsx). World 2, Dragonfire Peaks, has a venue of its own (VENUES[1]).
+ * The scene's whole look in one place: Sunny Shores - a beach volleyball arena at sunset:
+ * an orange-to-violet evening sky with a low golden sun over the far end of the court,
+ * warm sand underfoot, white-washed resort walls with turquoise and coral roofs, sunset
+ * flags and palm trees on the dunes round it (hills.js), the blue sea beyond (Ocean.jsx)
+ * and the long court running off between the dunes (Lane.jsx). World 2, Christmas
+ * Village, has a venue of its own (VENUES[1]): snow, red and green, a starry night.
  *
  * Colours are sRGB hex, exactly as you would pick them in an image editor.
  *
  * Light intensities are three.js physical units: a light of intensity PI (~3.14)
  * lights a surface facing it to its full texture colour. The cool sky fill plus the warm
- * sun add up to just over that on the ground, which keeps the lawn vivid; shadowed ground
- * only gets the cool fill, so shadows read blue and the lit side warm.
+ * sun add up to just over that on the ground; shadowed ground only gets the fill, so
+ * shadows read cool and the lit side warm.
  */
 
 /** Style ids from materials.js STYLE (numbers here so this file stays import-free). */
@@ -22,26 +22,26 @@ const STYLE_HILL = 14
  * (Keys kept from the template: everything that reads TEAM still finds them.)
  */
 export const TEAM = {
-  blue: '#2350c8',
-  navy: '#14234a',
-  red: '#c8233a',
-  white: '#f4f7fb',
+  blue: '#1aa6c8',
+  navy: '#163a5a',
+  red: '#ff6f61',
+  white: '#fffaf0',
   gold: '#ffc21a',
 }
 
 export const SKY = {
-  /** Straight up: a deep summer blue. */
-  top: '#2a74e0',
-  /** At eye level: pale haze. Fog uses the same colour so distant ground melts into the sky. */
-  horizon: '#d2ecff',
+  /** Straight up: the evening's deep violet-blue. */
+  top: '#3a3f96',
+  /** At eye level: a warm sunset peach. Fog uses the same colour so distant ground melts into the sky. */
+  horizon: '#ffb98a',
   /** Lower = the deep colour reaches further down towards the horizon. */
-  exponent: 0.6,
-  /** The sun's glow round its direction, and how strong it is. */
-  sun: '#fffaf0',
-  glow: 0.5,
-  /** High clouds (0 none, 1 plenty), and stars (night stages only). */
-  clouds: 0.85,
-  stars: 0,
+  exponent: 0.55,
+  /** The low sun's golden glow round its direction, and how strong it is. */
+  sun: '#ffcf7a',
+  glow: 1.05,
+  /** Evening clouds (0 none, 1 plenty), and the first stars coming out. */
+  clouds: 0.7,
+  stars: 0.08,
 }
 
 export const FOG = {
@@ -50,7 +50,7 @@ export const FOG = {
 
 /** Every surface colour in the lobby. */
 export const PALETTE = {
-  /** The sword shop's yard: pale marble flagstones. */
+  /** The ball shop's yard: pale marble flagstones. */
   shopFloor: '#e4dfd3',
   /** Rings painted round the portal. */
   apron: TEAM.navy,
@@ -60,8 +60,8 @@ export const PALETTE = {
   seats: [TEAM.blue, TEAM.red, TEAM.white],
   standBase: '#8c93a1',
   rail: '#ffffff',
-  /** Lawn, light and dark: the lobby lawn and the valley's verges. */
-  turf: ['#46bd3c', '#52c947'],
+  /** Sand, light and dark: the beach round the lobby and the court's verges. */
+  turf: ['#f0d6a0', '#ead09a'],
   /** Banners and pennants: the academy's blue and gold, a red one now and then. */
   crowd: [TEAM.blue, '#ffffff', TEAM.gold, '#3a6ee8', TEAM.red, '#ffe27a', '#e8eef8', TEAM.navy],
   /** Flags along the walls. */
@@ -77,183 +77,193 @@ export const PALETTE = {
 }
 
 /**
- * Each world's venue: the colours everything built for it uses, and whether it's the lava
- * world. World 1 is Sunblade Academy (pale stone, royal blue and gold, green hills and
- * trees round it); World 2 is Dragonfire Peaks (basalt, ash and glowing orange: the
- * academy's fortress on a volcano by a sea of lava, Ocean.jsx). The lobby (World.jsx) and
- * the valley (Lane.jsx) are built from the one for the world you're in, and rebuilt when
- * you step through the portal.
+ * Each world's venue: the colours everything built for it uses. World 1 is Sunny Shores
+ * (white-washed walls, turquoise and coral, sand, dunes with palms, the sea); World 2 is
+ * Christmas Village (snow, red and green and gold, snowy pines, a frozen sea and a giant
+ * Christmas tree over the north-east ridge). The lobby (World.jsx) and the court
+ * (Lane.jsx) are built from the one for the world you're in, and rebuilt when you step
+ * through the portal.
  *
- *   ground   the lobby floor's paint (ground.js): lawn, flagstones, cobbles, sand, beds...
+ *   ground   the lobby floor's paint (ground.js)
  *   castle   the walls, towers, banners and braziers round the courtyard (terrain.js)
  *   hills    the ridges round the lobby: rock by terrace (low to high), their cap style,
- *            the cap colour (materials GRASS_COLOR), glowing lava columns, what grows on them
- *   field    the valley's own extras (Lane.jsx): its edging, lamps
+ *            the cap colour (materials GRASS_COLOR), what grows on them
+ *   sea      the sea beyond the ground (Ocean.jsx); landmark: the giant tree (hills.js)
+ *   field    the court's own extras (Lane.jsx): its edging, lamps
  *
  * The template's stadium fields (concrete, vip, glass, crowd, wall...) are kept: other
- * modules still read them.
+ * modules still read them. (`lava` stays false: the template's lava venue is gone.)
  */
 export const VENUES = [
   {
     lava: false,
+    snow: false,
+    /** The sea round the lobby beyond the ground (Ocean.jsx): 'water', 'ice', or null. */
+    sea: 'water',
+    /** The landmark over the north-east ridge (hills.js): 'tree' (a giant Christmas tree) or null. */
+    landmark: null,
     primary: TEAM.blue,
-    dark: '#14234a',
+    dark: '#163a5a',
     light: TEAM.white,
     accent: TEAM.gold,
-    concrete: PALETTE.concrete,
-    wall: '#c4c9d2',
-    vip: '#d5dae1',
-    glass: '#1c2b46',
-    crowd: PALETTE.crowd,
-    flags: PALETTE.flags,
-    surround: '#3fb23f',
+    concrete: ['#f2ebdc', '#f2ebdc', '#e2d8c4'],
+    wall: '#efe7d6',
+    vip: '#f6f0e2',
+    glass: '#1c3a52',
+    crowd: [TEAM.blue, '#ffffff', TEAM.gold, '#ff9a3a', TEAM.red, '#ffe27a', '#5fe0d0', TEAM.navy],
+    flags: [TEAM.blue, '#ff9a3a', TEAM.red],
+    surround: '#ecd29c',
     strip: PALETTE.turf,
-    shopFloor: PALETTE.shopFloor,
+    shopFloor: '#f4ead6',
     ground: {
-      grass: ['#46bd3c', '#4fc645'],
-      /** Flagstones: three shades, and the grout between them. */
-      flag: ['#d9d3c5', '#cdc6b6', '#e3ddd0'],
-      grout: '#9a9282',
-      /** Cobbles on the paths. */
-      path: ['#c7bfae', '#b7ae9c'],
-      /** Path and bed edging. */
-      edge: '#7f786b',
-      /** The training yard's sand. */
-      sand: ['#e8cd96', '#dcc086'],
-      /** The THROW ZONE's runway slabs, and the gold lane lines on them. */
-      runway: ['#a9b0c0', '#9aa2b4'],
+      /** Beach sand: the lobby floor's main paint. */
+      grass: ['#f2dca8', '#eed6a0'],
+      /** Sun-bleached deck boards: three shades, and the gaps between them. */
+      flag: ['#f4ead6', '#ece0c8', '#fbf3e2'],
+      grout: '#c8b48e',
+      /** Sandy paths. */
+      path: ['#e8c88e', '#dcbb80'],
+      /** Path and bed edging: driftwood. */
+      edge: '#b08850',
+      /** The training courts' sand. */
+      sand: ['#f7d892', '#edcc82'],
+      /** The SERVE ZONE's deck, and the gold lane lines on it. */
+      runway: ['#e6dcc6', '#d9cdb4'],
       chalk: '#ffd84a',
-      /** Flower beds: soil and blooms. */
-      soil: '#6b4a2c',
-      flowers: ['#ff5f8a', '#ffd21f', '#b77bff', '#ffffff', '#ff8a3a', '#5fd6ff'],
+      /** Flower beds: soil and tropical blooms. */
+      soil: '#c8a060',
+      flowers: ['#ff5f8a', '#ffd21f', '#ff8a3a', '#5fd6ff', '#ffffff', '#b77bff'],
       ring: TEAM.gold,
       portal: '#7a4cff',
       rune: '#8a5cff',
-      yard: PALETTE.shopFloor,
+      yard: '#f4ead6',
       // Template names, still read by older code.
-      dirt: '#c9a46a',
-      dirtDark: '#b88f58',
-      infield: ['#a9b0c0', '#9aa2b4'],
-      cages: '#e8cd96',
+      dirt: '#e2c487',
+      dirtDark: '#d4b478',
+      infield: ['#e6dcc6', '#d9cdb4'],
+      cages: '#f7d892',
       cracks: null,
     },
-    logo: { rim: TEAM.gold, ring: TEAM.blue, inner: '#14234a', top: 'SWORD TOSS', bottom: 'LEGENDS' },
+    logo: { rim: TEAM.gold, ring: '#ff7a3a', inner: '#163a5a', top: 'VOLLEY SERVE', bottom: 'LEGENDS' },
     castle: {
-      stone: ['#cfd2d9', '#c2c6cf', '#b5bac4'],
-      dark: '#8a909e',
-      cap: '#dde0e6',
-      roof: '#2f58cc',
-      roofAlt: '#c8233a',
-      banner: TEAM.blue,
-      bannerAlt: TEAM.red,
+      stone: ['#f6f1e6', '#ece5d6', '#e0d8c6'],
+      dark: '#b8a888',
+      cap: '#fffaf0',
+      roof: '#18b5b0',
+      roofAlt: '#ff6f61',
+      banner: '#18a6c8',
+      bannerAlt: '#ff7a3a',
       trim: TEAM.gold,
-      emblem: '#ffe066',
-      blade: '#eef2f8',
+      emblem: '#fff27a',
+      blade: '#ffffff',
       flame: '#ffb347',
       core: '#fff1b0',
       glow: '#fff1b0',
-      wood: '#9a6436',
-      window: '#2a3a5a',
+      wood: '#b07840',
+      window: '#2a5a7a',
     },
-    hills: { rock: ['#9a6a3a', '#8d6036', '#805632', '#734d2d', '#664428'], cap: STYLE_HILL, grass: '#4fc93a', lava: null, trees: 'tree' },
-    field: { wall: '#8a909e', cap: TEAM.gold, track: '#b7ae9c', lights: '#fff1b0' },
-    /** The great banner board's face (on the south hills). */
-    board: '#14234a',
-    endNorth: 'THROW FAR!',
-    /** The THROW ZONE's arch: stone towers, the beam, its glow and the crest. */
-    arch: { pillar: '#c2c6cf', base: '#8a909e', glow: '#fff1b0', crest: TEAM.gold, beam: TEAM.blue },
-    /** The sword shop's stages and sign. */
-    shop: { band: TEAM.blue, strip: '#ffe27a', post: '#b5bac4', panel: '#14234a', top: '#e4dfd3' },
-    /** The Enchant Altar: its stone, the runes' glow, the crystal and the sign board. */
-    stall: { awning: [TEAM.blue, '#ffffff'], wood: '#9a6436', counter: '#14234a', trim: TEAM.gold },
-    altar: { stone: '#9aa0b0', dark: '#6a7086', rune: '#a77bff', crystal: '#c9a0ff', core: '#ffffff', board: '#1f1640', trim: '#ffc21a' },
+    hills: { rock: ['#ecd29a', '#e4c68a', '#dab97c', '#cfac70', '#c39f64'], cap: STYLE_HILL, grass: '#f4dfae', lava: null, trees: 'palm' },
+    field: { wall: '#b8a888', cap: TEAM.gold, track: '#e2c487', lights: '#fff1b0' },
+    /** The great banner board's face (on the south dunes). */
+    board: '#163a5a',
+    endNorth: 'SERVE FAR!',
+    /** The SERVE ZONE's arch: towers, the beam, its glow and the crest. */
+    arch: { pillar: '#ece5d6', base: '#b8a888', glow: '#fff1b0', crest: TEAM.gold, beam: TEAM.blue },
+    /** The ball shop's stages and sign. */
+    shop: { band: TEAM.blue, strip: '#ffe27a', post: '#e0d8c6', panel: '#163a5a', top: '#f4ead6' },
+    /** The Aura Shrine: its stone, the runes' glow, the crystal and the sign board. */
+    stall: { awning: [TEAM.blue, '#ffffff'], wood: '#b07840', counter: '#163a5a', trim: TEAM.gold },
+    altar: { stone: '#d8ccb4', dark: '#a8987c', rune: '#a77bff', crystal: '#c9a0ff', core: '#ffffff', board: '#1f1640', trim: '#ffc21a' },
   },
   {
-    lava: true,
-    primary: '#ff5a14',
-    dark: '#2a1214',
-    light: '#ffd9a8',
-    accent: '#ffb21a',
-    concrete: ['#4a3a3a', '#4a3a3a', '#3d3030'],
-    wall: '#3a2c2c',
-    vip: '#4a3838',
-    glass: '#1a0c0c',
-    crowd: ['#ff5a14', '#ffd21f', '#2a1214', '#ff8a3a', '#ffffff', '#c8102e', '#ffb21a', '#5a3a3a'],
-    flags: ['#ff5a14', '#2a1214', '#ffb21a'],
-    surround: '#2c2426',
-    strip: ['#3a3034', '#332a2e'],
-    shopFloor: '#3a3034',
+    lava: false,
+    snow: true,
+    sea: 'ice',
+    landmark: 'tree',
+    primary: '#d8203a',
+    dark: '#123a24',
+    light: '#ffffff',
+    accent: '#ffd21f',
+    concrete: ['#e8eef6', '#e8eef6', '#d6dee8'],
+    wall: '#e4eaf2',
+    vip: '#f0f4fa',
+    glass: '#14243a',
+    crowd: ['#d8203a', '#ffffff', '#1f8a4a', '#ffd21f', '#e8f4ff', '#a8101e', '#2fb060', '#ffe27a'],
+    flags: ['#d8203a', '#1f8a4a', '#ffd21f'],
+    surround: '#eef4fb',
+    strip: ['#f4f8fd', '#eaf0f8'],
+    shopFloor: '#e6edf5',
     ground: {
-      grass: ['#4a3d40', '#433639'],
-      flag: ['#3d3236', '#362c30', '#43383c'],
-      grout: '#1c1517',
-      path: ['#2c2326', '#262022'],
-      edge: '#ff6a1e',
-      sand: ['#5a3024', '#4e291f'],
-      runway: ['#3a3034', '#332a2e'],
-      chalk: '#ffb21a',
-      soil: '#1e1517',
-      flowers: ['#ff5a14', '#ffb21a', '#ff3b0a', '#ffd27a'],
-      ring: '#ff8a1e',
-      portal: '#ff3b0a',
-      rune: '#ff6a1e',
-      yard: '#2e2629',
-      dirt: '#7a3620',
-      dirtDark: '#64291a',
-      infield: ['#3a3033', '#342b2e'],
-      cages: '#4e291f',
-      cracks: '#ff5a14',
+      /** Fresh snow. */
+      grass: ['#f6f9fd', '#eef3fa'],
+      /** Frosted flagstones, and the snow between them. */
+      flag: ['#d8e2ee', '#ccd8e6', '#e4ecf5'],
+      grout: '#ffffff',
+      /** Trodden paths through the snow. */
+      path: ['#c8d6e6', '#bccbdd'],
+      /** Edging: red, like a candy cane's stripe. */
+      edge: '#d8203a',
+      /** The training courts: packed snow. */
+      sand: ['#e2ebf5', '#d6e1ee'],
+      runway: ['#d0dae8', '#c4cfde'],
+      chalk: '#ffd21f',
+      /** Beds: evergreen, dotted with baubles. */
+      soil: '#1f6a3a',
+      flowers: ['#d8203a', '#ffd21f', '#ffffff', '#2f8ff2', '#ff6a8a'],
+      ring: '#ffd21f',
+      portal: '#3fd8ff',
+      rune: '#7fe6ff',
+      yard: '#e6edf5',
+      dirt: '#c8d6e6',
+      dirtDark: '#b4c4d8',
+      infield: ['#d0dae8', '#c4cfde'],
+      cages: '#e2ebf5',
+      cracks: null,
     },
-    logo: { rim: '#ffb21a', ring: '#2a1214', inner: '#ff5a14', top: 'DRAGONFIRE', bottom: 'PEAKS' },
+    logo: { rim: '#ffd21f', ring: '#d8203a', inner: '#123a24', top: 'CHRISTMAS', bottom: 'VILLAGE' },
     castle: {
-      stone: ['#45373b', '#3e3034', '#372a2e'],
-      dark: '#241c1f',
-      cap: '#4e4044',
-      roof: '#2a1214',
-      roofAlt: '#ff5a14',
-      banner: '#2a1214',
-      bannerAlt: '#8a1a0c',
-      trim: '#ff8a1e',
-      emblem: '#ffb21a',
-      blade: '#ffd9a8',
-      flame: '#ff6a1e',
-      core: '#ffd27a',
-      glow: '#ffd27a',
-      wood: '#3a2626',
-      window: '#ff6a1e',
+      stone: ['#eef2f8', '#e2e8f1', '#d4dce8'],
+      dark: '#9aa8bc',
+      cap: '#ffffff',
+      roof: '#c8102e',
+      roofAlt: '#1f8a4a',
+      banner: '#c8102e',
+      bannerAlt: '#1f8a4a',
+      trim: '#ffd21f',
+      emblem: '#ffe27a',
+      blade: '#ffffff',
+      flame: '#ffb347',
+      core: '#fff1b0',
+      glow: '#fff1b0',
+      wood: '#7a4a2a',
+      window: '#ffcf6a',
     },
-    hills: {
-      rock: ['#3e3034', '#372a2e', '#302528', '#2a2023', '#241c1f'],
-      cap: STYLE_HILL,
-      grass: '#4a3c3c',
-      lava: { color: '#ff5a14', chance: 0.14 },
-      trees: 'lava',
-    },
-    field: { wall: '#2a1c1c', cap: '#ff6a1e', track: '#4a2a22', lights: '#ffb06a' },
-    board: '#1a0a0a',
-    endNorth: 'DRAGONFIRE',
-    arch: { pillar: '#4a3a3e', base: '#2a1214', glow: '#ffd27a', crest: '#ff8a1e', beam: '#2a1214' },
-    shop: { band: '#ff5a14', strip: '#ffd27a', post: '#3e3034', panel: '#2a1214', top: '#3a3034' },
-    stall: { awning: ['#ff5a14', '#2a1214'], wood: '#4a3030', counter: '#2a1214', trim: '#ffb21a' },
-    altar: { stone: '#3e3034', dark: '#241c1f', rune: '#ff6a1e', crystal: '#ff8a3a', core: '#ffe2a0', board: '#1a0a0a', trim: '#ffb21a' },
+    hills: { rock: ['#dfe7f1', '#d3ddea', '#c6d2e2', '#b9c7da', '#acbcd2'], cap: STYLE_HILL, grass: '#ffffff', lava: null, trees: 'xmas' },
+    field: { wall: '#9aa8bc', cap: '#d8203a', track: '#c8d6e6', lights: '#ffcf6a' },
+    board: '#123a24',
+    endNorth: 'HO HO HO!',
+    arch: { pillar: '#e2e8f1', base: '#9aa8bc', glow: '#fff1b0', crest: '#ffd21f', beam: '#c8102e' },
+    shop: { band: '#c8102e', strip: '#ffd21f', post: '#d4dce8', panel: '#123a24', top: '#e6edf5' },
+    stall: { awning: ['#c8102e', '#ffffff'], wood: '#7a4a2a', counter: '#123a24', trim: '#ffd21f' },
+    altar: { stone: '#c6d2e2', dark: '#8a9ab0', rune: '#7fe6ff', crystal: '#bff4ff', core: '#ffffff', board: '#123a24', trim: '#ffd21f' },
   },
 ]
 export const venueOf = (world) => VENUES[world] ?? VENUES[0]
 
 export const LIGHTS = {
-  /** A cool blue fill from the sky, a green bounce off the lawn. */
-  hemiSky: '#d6e8ff',
-  hemiGround: '#b0d898',
+  /** A warm pink fill from the evening sky, a golden bounce off the sand. */
+  hemiSky: '#ffd2c0',
+  hemiGround: '#e0c08a',
   hemiIntensity: 2.0,
 
-  /** A bright, high midday sun. */
-  sunColor: '#fff6e6',
-  sunIntensity: 1.9,
+  /** A low golden sunset sun. */
+  sunColor: '#ffc88a',
+  sunIntensity: 1.75,
   /**
-   * Direction *towards* the sun: high in the north-west, beyond the far end of the valley
-   * (the sky's glow sits there too), so shadows fall short and back towards you.
+   * Direction *towards* the sun: low in the north-west, beyond the far end of the court
+   * (the sky's glow sits there too), so long shadows fall back towards you.
    */
-  sunDirection: [-0.4, 0.78, -0.48],
+  sunDirection: [-0.42, 0.42, -0.8],
   /** 1 = shadows get no sunlight at all; lower = lighter shadows. */
   shadowIntensity: 0.6,
   /** Blur radius of shadow edges, in shadow-map texels. */
@@ -261,11 +271,11 @@ export const LIGHTS = {
 }
 
 /**
- * Each world's light (Lighting.jsx): Sunblade Academy's bright day, and Dragonfire Peaks' -
- * a red-orange glow from below off the lava and a hot, low dusk sun.
+ * Each world's light (Lighting.jsx): Sunny Shores' golden sunset, and Christmas Village's
+ * moonlit night - a cool blue sky fill, a bright bounce off the snow and a pale moon.
  */
 export const WORLD_LIGHTS = [
   LIGHTS,
-  { ...LIGHTS, hemiSky: '#ffb08a', hemiGround: '#7a2a14', hemiIntensity: 1.95, sunColor: '#ffbc80', sunIntensity: 1.7 },
+  { ...LIGHTS, hemiSky: '#8aa4ee', hemiGround: '#c8d8f4', hemiIntensity: 1.65, sunColor: '#c4d6ff', sunIntensity: 1.05 },
 ]
 export const lightsOf = (world) => WORLD_LIGHTS[world] ?? LIGHTS

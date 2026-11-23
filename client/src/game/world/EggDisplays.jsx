@@ -28,8 +28,8 @@ const EGG_LOOKS = {
   sunset: { pattern: 2, glow: '#ffb347' },
   unicorn: { pattern: 3, glow: '#ffb0f0' },
   volcano: { pattern: 4, glow: '#ff6a14' },
-  // Dragonfire Peaks' Lava Egg: black obsidian, waves of molten orange rolling round it, golden sparks.
-  beach: { pattern: 5, glow: '#ff5a14', base: '#2a1a1c', spot: '#ff6a14', dark: '#ffd21f' },
+  // Christmas Village's Gift Egg: wrapped in red, white polka dots, a green ribbon round it, a golden glow.
+  beach: { pattern: 0, glow: '#ffd21f', base: '#d8203a', spot: '#ffffff', dark: '#1f8a4a' },
 }
 
 const vertexHead = /* glsl */ `

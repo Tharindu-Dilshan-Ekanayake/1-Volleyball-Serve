@@ -740,110 +740,131 @@ export const sfx = {
 }
 
 // The template's names, kept as aliases while callers move over to the tire ones.
-// --- Swords -------------------------------------------------------------------------
+// --- Volleyball ---------------------------------------------------------------------
 
-/** A blade's ring: two detuned metallic partials over a hiss of steel, decaying. */
-function shing({ at = 0, volume = 0.06, pitch = 1 } = {}) {
-  noise({ at, duration: 0.18, volume: volume * 0.8, from: 5200 * pitch, to: 7800 * pitch, q: 2.2 })
-  bell(2490 * pitch, { at, volume: volume * 0.55, decay: 0.45 })
-  bell(3730 * pitch, { at: at + 0.005, volume: volume * 0.35, decay: 0.35 })
+/** A hand smacking a volleyball: a sharp slap over a hollow rubbery pop. `power` 0-1. */
+function smack({ at = 0, volume = 0.1, power = 0.6 } = {}) {
+  const p = Math.min(1, Math.max(0.2, power))
+  noise({ at, duration: 0.04, volume: volume * (1.1 + 0.6 * p), from: 2600, to: 1100, q: 0.9 })
+  tone(260 + 60 * p, { at, duration: 0.09, volume: volume * 0.9, slideTo: 130 })
+  tone(720, { at, type: 'triangle', duration: 0.04, volume: volume * 0.35, slideTo: 420 })
+  if (p > 0.75) tone(80, { at, duration: 0.25, volume: volume * 1.2 * p, slideTo: 45 })
 }
 
-/** Stepping onto a throw spot: boots on stone and the sword sliding off your back. */
+/** A ball bouncing once on the court: a soft rubbery thump. */
+function dribble({ at = 0, volume = 0.06 } = {}) {
+  tone(170, { at, duration: 0.08, volume, slideTo: 90 })
+  noise({ at, duration: 0.03, volume: volume * 0.6, from: 1400, to: 600, q: 0.8 })
+}
+
+/** A sneaker squeaking on the court. */
+function squeak({ at = 0, volume = 0.03 } = {}) {
+  tone(1900 + Math.random() * 300, { at, type: 'sawtooth', duration: 0.07, volume, slideTo: 2500 })
+}
+
+/** Stepping onto the serve line: a squeak of sneakers and two bounces of the ball. */
 sfx.stepIn = function stepIn() {
   if (!ready('stepIn', 600)) return
-  noise({ duration: 0.1, volume: 0.05, from: 900, to: 300, q: 0.7 })
-  shing({ at: 0.08, volume: 0.05, pitch: 0.9 })
+  squeak({ volume: 0.025 })
+  dribble({ at: 0.1, volume: 0.06 })
+  dribble({ at: 0.42, volume: 0.05 })
 }
 
-/** Holding THROW: the sword drawn back, a rising hum of strain under it. */
+/** Holding SERVE: a last bounce of the ball, a rising hum of focus under it. */
 sfx.chargeStart = function chargeStart() {
   if (!ready('chargeStart', 150)) return
-  shing({ volume: 0.04, pitch: 1.1 })
-  tone(180, { type: 'sawtooth', duration: 0.85, volume: 0.035, slideTo: 520, attack: 0.08 })
-  noise({ duration: 0.85, volume: 0.04, from: 300, to: 1600, q: 0.9 })
+  dribble({ volume: 0.05 })
+  tone(180, { type: 'sawtooth', duration: 0.85, volume: 0.03, slideTo: 520, attack: 0.08 })
+  noise({ duration: 0.85, volume: 0.035, from: 300, to: 1600, q: 0.9 })
 }
 
-/** Letting go of a wind-up without throwing: the hum sinking away. */
+/** Letting go of a load-up without serving: the hum sinking away. */
 sfx.chargeCancel = function chargeCancel() {
   if (ready('chargeCancel', 200)) tone(360, { type: 'triangle', duration: 0.18, volume: 0.05, slideTo: 160 })
 }
 
-/** The throw: a grunt of effort and the blade whooshing away - bigger the better it was timed. */
+/**
+ * The serve: the toss whooshing up and a squeak as you leap (the SMACK comes as your hand
+ * meets the ball: rollStart, bigger the better it was timed).
+ */
 sfx.throwRelease = function throwRelease(meter = 0.7) {
   if (!ready('throwRelease', 250)) return
   const p = Math.min(1, Math.max(0.2, meter))
-  tone(150, { duration: 0.16, volume: 0.12 * p + 0.04, slideTo: 70 })
-  noise({ duration: 0.34, volume: 0.1 + 0.1 * p, from: 380, to: 2600, q: 1.1 })
-  noise({ at: 0.1, duration: 0.5, volume: 0.06 * p, from: 1800, to: 700, q: 0.9 })
+  noise({ duration: 0.22, volume: 0.05, from: 500, to: 2200, q: 1.2 })
+  squeak({ at: 0.12, volume: 0.03 })
+  serveMeter = p
 }
 
-/** A click slash winding up: the blade sweeping through the air. */
+/** Your hand meeting the ball at the top of the jump serve: the SMACK, and the ball whooshing away. */
+let serveMeter = 0.7
+sfx.rollStart = function rollStart() {
+  if (!ready('rollStart')) return
+  const p = serveMeter
+  smack({ volume: 0.12 + 0.06 * p, power: p })
+  noise({ at: 0.02, duration: 0.45, volume: 0.05 + 0.05 * p, from: 1800, to: 600, q: 0.9 })
+  tone(220, { type: 'triangle', at: 0.05, duration: 0.3, volume: 0.06, slideTo: 660 })
+}
+
+/** A click spike starting: the ball tossed up. */
 sfx.swordWhoosh = function swordWhoosh() {
-  if (ready('swordWhoosh', 140)) noise({ at: 0.12, duration: 0.14, volume: 0.08, from: 700, to: 3000, q: 1.4 })
+  if (ready('swordWhoosh', 140)) noise({ duration: 0.16, volume: 0.05, from: 500, to: 2000, q: 1.2 })
 }
 
-/** A click slash cutting through: a bright swish and a faint ring of steel. */
+/** A click spike landing: the smack, and the ball thudding into the ground. */
 sfx.slashAir = function slashAir() {
   if (!ready('slashAir', 120)) return
-  noise({ duration: 0.08, volume: 0.07, from: 3200, to: 1400, q: 1.6 })
-  shing({ at: 0.01, volume: 0.025, pitch: 1.2 + Math.random() * 0.1 })
+  smack({ volume: 0.08, power: 0.5 })
+  dribble({ at: 0.2, volume: 0.06 })
 }
 
 /**
- * A slash landing on a training dummy (`pad`: which one): a soft thump into straw, a
- * knock on wood, a crunch of stone, a clang on iron, a glassy chime off crystal and
- * diamond, a magic shimmer off the galaxy titan, a sizzle off the fiery ones.
+ * A spiked ball hitting a training target (`pad`: which court): the smack off your hand,
+ * then the ball punching into the target - a net's soft whump on the early courts, a ring
+ * of metal on the silver and gold ones, a glassy chime off crystal and diamond, a magic
+ * shimmer off the galaxy court, a sizzle off the volcanic ones.
  */
 sfx.slashHit = function slashHit(pad = 0) {
   if (!ready('slashHit', 90)) return
   const v = 0.9 + Math.random() * 0.2
-  if (pad <= 0) {
-    noise({ duration: 0.09, volume: 0.13, from: 900, to: 300, q: 0.6 })
-    tone(120 * v, { duration: 0.08, volume: 0.1, slideTo: 70 })
-  } else if (pad === 1) {
-    noise({ duration: 0.04, volume: 0.13, from: 2600, to: 1200, q: 1.2 })
-    tone(520 * v, { type: 'triangle', duration: 0.09, volume: 0.09, slideTo: 300 })
-  } else if (pad === 2) {
-    noise({ duration: 0.12, volume: 0.15, from: 1500, to: 400, q: 0.5 })
-    tone(90 * v, { duration: 0.1, volume: 0.12, slideTo: 50 })
-  } else if (pad === 3) {
-    noise({ duration: 0.03, volume: 0.12, from: 6000, to: 3000, q: 1.5 })
-    bell(820 * v, { volume: 0.08, decay: 0.5 })
-    bell(1290 * v, { volume: 0.05, decay: 0.4 })
+  smack({ volume: 0.07, power: 0.5 })
+  const at = 0.12
+  if (pad <= 1) {
+    noise({ at, duration: 0.12, volume: 0.09, from: 900, to: 300, q: 0.6 })
+    tone(140 * v, { at, duration: 0.09, volume: 0.07, slideTo: 80 })
+  } else if (pad <= 3) {
+    noise({ at, duration: 0.05, volume: 0.07, from: 4000, to: 2000, q: 1.2 })
+    bell(820 * v, { at, volume: 0.05, decay: 0.4 })
+    bell(1290 * v, { at, volume: 0.03, decay: 0.3 })
   } else if (pad <= 5) {
-    bell(1760 * v, { volume: 0.07, decay: 0.5 })
-    bell(2640 * v, { at: 0.02, volume: 0.05, decay: 0.45 })
-    noise({ duration: 0.05, volume: 0.06, from: 7000, to: 4000, q: 1.8 })
+    bell(1760 * v, { at, volume: 0.05, decay: 0.45 })
+    bell(2640 * v, { at: at + 0.02, volume: 0.035, decay: 0.4 })
   } else if (pad === 6) {
-    ;[1047, 1319, 1568].forEach((f, i) => bell(f * v, { at: i * 0.03, volume: 0.05, decay: 0.5 }))
-    noise({ duration: 0.2, volume: 0.04, from: 4000, to: 8000, q: 1.2 })
+    ;[1047, 1319, 1568].forEach((f, i) => bell(f * v, { at: at + i * 0.03, volume: 0.04, decay: 0.45 }))
   } else {
-    noise({ duration: 0.3, volume: 0.09, from: 2400, to: 5200, q: 0.7 })
-    tone(110 * v, { duration: 0.12, volume: 0.12, slideTo: 55 })
+    noise({ at, duration: 0.3, volume: 0.07, from: 2400, to: 5200, q: 0.7 })
+    tone(110 * v, { at, duration: 0.12, volume: 0.09, slideTo: 55 })
   }
 }
 
 /**
- * The sword plunging into the road: a deep THUNK, stone cracking, and the blade quivering
- * where it stands - a ring of steel that wobbles as it dies. `power` (0-1) is how far it
- * fell: a big throw booms.
+ * The served ball slamming into the court at the end of its arc: a deep BOOM, a rubbery
+ * bounce and a spray of sand - and the crowd roaring for a big one. `power` (0-1) is how
+ * high it fell.
  */
 sfx.swordStick = function swordStick(power = 0.5) {
   if (!ready('swordStick', 300)) return
   const p = Math.min(1, Math.max(0.25, power))
-  tone(95, { duration: 0.3, volume: 0.22 * p + 0.06, slideTo: 38 })
-  noise({ duration: 0.05, volume: 0.25 * p + 0.08, from: 3400, to: 1200, q: 1 })
-  noise({ at: 0.02, duration: 0.35, volume: 0.1 * p, from: 1200, to: 260, q: 0.6 })
-  // The quiver: the same ring struck again and again, fading, a little lower each time.
-  for (let i = 0; i < 6; i += 1) bell(540 - i * 6, { at: 0.04 + i * 0.07, volume: 0.06 * Math.pow(0.7, i) * (0.6 + 0.4 * p), decay: 0.18 })
+  tone(110, { duration: 0.3, volume: 0.22 * p + 0.06, slideTo: 42 })
+  tone(330, { type: 'triangle', duration: 0.12, volume: 0.08 * p + 0.03, slideTo: 160 })
+  noise({ duration: 0.05, volume: 0.18 * p + 0.06, from: 2200, to: 800, q: 0.9 })
+  noise({ at: 0.03, duration: 0.4, volume: 0.08 * p, from: 1600, to: 400, q: 0.6 })
   if (p > 0.7) {
     tone(48, { at: 0.03, duration: 0.6, volume: 0.14 * p, slideTo: 30 })
     liveCrowd()?.roar(p)
   }
 }
 
-sfx.slideStart = sfx.rollStart
+sfx.slideStart = (...a) => sfx.rollStart(...a)
 sfx.slideStop = sfx.rollStop
 sfx.boardPop = sfx.tirePop
 sfx.boardLand = sfx.tireLand

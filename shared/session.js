@@ -181,9 +181,9 @@ export class PlayerSession {
     },
 
     /**
-     * A click slash: you slash the air with your sword, for one gain. Not at a dummy (it
-     * slashes for you), not while a throw is out (on a throw spot your click winds up a
-     * throw instead - that's the client's to send as a throw); at most one every
+     * A click spike: you spike the air with your ball, for one gain. Not at a court (it
+     * spikes for you), not while a serve is out (on a serve spot your click winds up a
+     * serve instead - that's the client's to send as a serve); at most one every
      * CLICK_INTERVAL (a little slack for network jitter, never enough for an autoclicker
      * to beat it).
      */
@@ -214,8 +214,8 @@ export class PlayerSession {
     },
 
     /**
-     * Throws your sword: only from the THROW ZONE, and not while one is still flying.
-     * `accuracy` (0-1) is where the throw meter stood; absent for Auto Throw.
+     * Serves your ball: only from the SERVE ZONE, and not while one is still flying.
+     * `accuracy` (0-1) is where the serve meter stood; absent for Auto Serve.
      */
     roll(payload, now) {
       if (now < this.busyUntil) return
@@ -281,7 +281,7 @@ export class PlayerSession {
       if (result.ok) this.dirty = true
     },
 
-    /** Buys (in order) or equips an enchantment; the Enchant Altar's panel sends it from anywhere. */
+    /** Buys (in order) or equips an aura; the Enchant Altar's panel sends it from anywhere. */
     buyBall({ id }) {
       const result = buyBall(this.profile, String(id))
       if (!result.ok) return
@@ -351,7 +351,7 @@ export class PlayerSession {
       this.afterReward(result)
     },
 
-    /** Picks up Dragonfire Peaks' Secret Star: only standing at it, in Dragonfire Peaks, once. */
+    /** Picks up Christmas Village's Secret Star: only standing at it, in Christmas Village, once. */
     findStar() {
       const p = this.getPosition()
       if (Math.hypot(p.x - STAR.x, p.z - STAR.z) > STAR.radius + 1) return
@@ -459,7 +459,7 @@ export class PlayerSession {
   // --- Simulation ------------------------------------------------------------------
 
   /**
-   * Whether the player stands on (or right by) the Sword Counter, where every sword is
+   * Whether the player stands on (or right by) the Ball Counter, where every ball is
    * bought (in order: logic.js buyTire refuses any but the next).
    */
   atCounter() {
@@ -474,7 +474,7 @@ export class PlayerSession {
     return onPad(this.pad, p.x, p.z, PAD_SLACK)
   }
 
-  /** Advances training and the throw's Power ticks. Call at a steady rate (the room's simulation interval). */
+  /** Advances training and the serve's Power ticks. Call at a steady rate (the room's simulation interval). */
   tick(dt, now) {
     if (now < this.rollingUntil) {
       // Health trickles in all the way along the track.
