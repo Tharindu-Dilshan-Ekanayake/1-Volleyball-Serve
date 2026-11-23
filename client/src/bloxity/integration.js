@@ -22,7 +22,7 @@ import { getBloxityState, useBloxityStore } from './store'
 export const LEADERBOARDS = [
   { id: 'rebirths', label: 'Rebirths', order: 'desc', mode: 'best', format: 'number', reset: 'none' },
   { id: 'wins', label: 'Total Wins', order: 'desc', mode: 'best', format: 'compact', reset: 'none' },
-  { id: 'distance', label: 'Longest Throw (m)', order: 'desc', mode: 'best', format: 'compact', reset: 'none' },
+  { id: 'distance', label: 'Longest Serve (m)', order: 'desc', mode: 'best', format: 'compact', reset: 'none' },
   { id: 'playtime', label: 'Minutes Played', order: 'desc', mode: 'best', format: 'number', reset: 'none' },
 ]
 
@@ -278,7 +278,7 @@ function installOfflineLeaderboards(sdk) {
 
 // --- Install --------------------------------------------------------------------------
 
-/** Wires the SDK into the game; returns the teardown. Never throws. */
+/** Wires the SDK into the game; returns the teardown. Never serves. */
 export function installIntegration(sdk) {
   const teardown = []
   const guard = (label, install) => {

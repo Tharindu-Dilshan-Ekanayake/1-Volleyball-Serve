@@ -4,7 +4,7 @@ import { STYLE } from '../materials'
 
 /**
  * Egg stands: a stone pedestal on a band of the academy's blue, ringed in light, plus the big Volcano Egg's
- * rocky plinth (with its lava pool and glowing vents), the big Lava Egg's obsidian one
+ * rocky plinth (with its lava pool and glowing vents), the big Gift Egg's candy-cane one
  * and the Sphinx showcase. Blocks and merged props,
  * riding along in the world's existing draw calls; the eggs themselves float above in
  * EggDisplays.
@@ -17,24 +17,23 @@ const RING = { basic: '#7fe2ff', meadow: '#5cff6a', sunset: '#ffb347', unicorn: 
 export const eggHeight = (stand) => (stand.big ? 3.4 : 2.6)
 
 /**
- * The Lava Egg's plinth (its twin across the plaza from the Volcano's): stepped obsidian
- * round a ring of glowing magma, black glass spikes leaning out at its corners tipped with
- * fire, and four fire bowls. Every layer 4 cm or more proud of the last.
+ * The Gift Egg's plinth: a snowy stepped base round a glowing gold ring, a red-and-white
+ * candy cane at each corner, and wrapped presents round its foot. Every layer 4 cm or
+ * more proud of the last.
  */
 function buildLavaStand(blocks, { x, z }) {
-  blocks.addOn(x, 0, z, 4.2, 0.6, 4.2, '#1e161c')
-  blocks.addOn(x, 0.6, z, 3.6, 0.3, 3.6, '#ff5a14', STYLE.LAVA)
-  blocks.addOn(x, 0.9, z, 3, 0.3, 3, '#2a1e26')
-  // Obsidian spikes leaning out from the corners, each with a flame on its tip.
+  blocks.addOn(x, 0, z, 4.2, 0.6, 4.2, '#eef4fb')
+  blocks.addOn(x, 0.6, z, 3.6, 0.3, 3.6, '#ffd21f', STYLE.GLOW)
+  blocks.addOn(x, 0.9, z, 3, 0.3, 3, '#c8102e')
+  // Candy canes at the corners: striped posts with a hooked top.
   for (const [dx, dz] of [[-1.9, -1.9], [1.9, -1.9], [-1.9, 1.9], [1.9, 1.9]]) {
-    const lean = 0.28
-    blocks.add(x + dx, 1.4, z + dz, 0.55, 2.8, 0.55, '#160f18', STYLE.SMOOTH, Math.PI / 4, -Math.sign(dz) * lean, Math.sign(dx) * lean)
-    blocks.add(x + dx * 1.16, 2.95, z + dz * 1.16, 0.34, 0.5, 0.34, '#ff6a1e', STYLE.GLOW)
+    for (let k = 0; k < 6; k += 1) blocks.addOn(x + dx, k * 0.45, z + dz, 0.36, 0.45, 0.36, k % 2 ? '#ffffff' : '#e0102f', STYLE.SMOOTH)
+    blocks.add(x + dx * 0.92, 2.85, z + dz * 0.92, 0.36, 0.36, 0.7, '#ffffff', STYLE.SMOOTH, Math.atan2(dx, dz))
   }
-  // Fire bowls on the step between the spikes.
-  for (const [dx, dz] of [[0, -1.95], [0, 1.95], [-1.95, 0], [1.95, 0]]) {
-    blocks.addOn(x + dx, 0.6, z + dz, 0.5, 0.18, 0.5, '#3a2a2a', STYLE.SMOOTH)
-    blocks.addOn(x + dx, 0.78, z + dz, 0.3, 0.32, 0.3, '#ffb21a', STYLE.GLOW)
+  // Presents round the foot.
+  for (const [dx, dz, c] of [[0, -2.3, '#1f8a4a'], [0, 2.3, '#2f6fd8'], [-2.3, 0, '#b03ad8'], [2.3, 0, '#1f8a4a']]) {
+    blocks.addOn(x + dx, 0, z + dz, 0.8, 0.6, 0.8, c, STYLE.SMOOTH, 0.3)
+    blocks.addOn(x + dx, 0, z + dz, 0.18, 0.62, 0.84, '#ffd21f', STYLE.SMOOTH, 0.3)
   }
 }
 

@@ -1,7 +1,7 @@
 import { Component } from 'react'
 
 /**
- * Renders `fallback` instead of crashing when a child throws - most importantly when a
+ * Renders `fallback` instead of crashing when a child serves - most importantly when a
  * remote asset (the Bloxity avatar CDN) is unreachable, which would otherwise take the
  * whole canvas down with it.
  */

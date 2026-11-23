@@ -127,9 +127,9 @@ function arcText(ctx, text, cx, cy, r, size, top) {
 /**
  * The academy's round crest at the spawn: a gold rim, a ring in the academy's blue with
  * the venue's name over the top and under the bottom between two gold stars, and in the
- * middle a heater shield in front of two crossed swords, points up - in the venue's
- * colours and words (`logo`: SWORD TOSS / LEGENDS, or DRAGONFIRE / PEAKS in basalt and
- * orange). An original crest: no borrowed symbol.
+ * middle a volleyball flying in on speed lines - in the venue's colours and words
+ * (`logo`: VOLLEY SERVE / LEGENDS, or VOLCANO / ISLAND in basalt and orange). An
+ * original crest: no borrowed symbol.
  */
 function paintLogo(ctx, [rx, ry, size], logo) {
   const c = size / 2
@@ -163,80 +163,66 @@ function paintLogo(ctx, [rx, ry, size], logo) {
     ctx.fill()
     ctx.restore()
   }
-  // The emblem, in a 100-unit box: two crossed swords, points up, a shield over where they cross.
+  // The emblem, in a 100-unit box: a volleyball flying in from the left, speed lines behind
+  // it, its panels swirling out from the middle in the venue's colours.
   ctx.save()
   const k = (size * 0.5) / 100
   ctx.translate(cx, cy)
   ctx.scale(k, k)
   ctx.lineJoin = 'round'
-  for (const angle of [-0.62, 0.62]) {
-    ctx.save()
-    ctx.rotate(angle)
-    // The blade from the guard up to its point, a fuller down it.
-    const blade = new Path2D()
-    blade.moveTo(-5, 22)
-    blade.lineTo(-5, -34)
-    blade.lineTo(0, -44)
-    blade.lineTo(5, -34)
-    blade.lineTo(5, 22)
-    blade.closePath()
-    ctx.lineWidth = 4
+  ctx.lineCap = 'round'
+  // Speed lines.
+  for (const [y, len, w] of [
+    [-20, 34, 5],
+    [-4, 46, 6],
+    [12, 34, 5],
+  ]) {
     ctx.strokeStyle = '#1b1b1f'
-    ctx.stroke(blade)
-    const steel = ctx.createLinearGradient(-5, 0, 5, 0)
-    steel.addColorStop(0, '#ffffff')
-    steel.addColorStop(0.5, '#d6dee9')
-    steel.addColorStop(1, '#9aa7ba')
-    ctx.fillStyle = steel
-    ctx.fill(blade)
-    ctx.strokeStyle = '#8a97ab'
-    ctx.lineWidth = 1.6
+    ctx.lineWidth = w + 4
     ctx.beginPath()
-    ctx.moveTo(0, 18)
-    ctx.lineTo(0, -32)
+    ctx.moveTo(-30 - len, y)
+    ctx.lineTo(-30, y)
     ctx.stroke()
-    // Guard, grip and pommel in gold and leather.
-    ctx.lineWidth = 3.5
+    ctx.strokeStyle = logo.rim
+    ctx.lineWidth = w
+    ctx.stroke()
+  }
+  const BR = 30
+  const ball = new Path2D()
+  ball.arc(4, -4, BR, 0, Math.PI * 2)
+  ctx.save()
+  ctx.clip(ball)
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(-40, -40, 90, 90)
+  // Three panels swirling out from the middle, every other one coloured.
+  ctx.translate(4, -4)
+  for (let p = 0; p < 3; p += 1) {
+    ctx.save()
+    ctx.rotate((p * Math.PI * 2) / 3)
+    const panel = new Path2D()
+    panel.moveTo(0, 0)
+    panel.quadraticCurveTo(BR * 0.55, -BR * 0.15, BR * 1.1, BR * 0.35)
+    panel.lineTo(BR * 1.1, BR * 1.1)
+    panel.quadraticCurveTo(BR * 0.25, BR * 0.55, 0, 0)
+    ctx.fillStyle = p === 1 ? logo.ring : logo.rim
+    ctx.fill(panel)
     ctx.strokeStyle = '#1b1b1f'
-    ctx.fillStyle = logo.rim
-    ctx.fillRect(-15, 21, 30, 6)
-    ctx.strokeRect(-15, 21, 30, 6)
-    ctx.fillStyle = '#7a4a2a'
-    ctx.fillRect(-3.5, 27, 7, 13)
-    ctx.strokeRect(-3.5, 27, 7, 13)
-    ctx.fillStyle = logo.rim
+    ctx.lineWidth = 3
     ctx.beginPath()
-    ctx.arc(0, 43, 4.6, 0, Math.PI * 2)
-    ctx.fill()
+    ctx.moveTo(0, 0)
+    ctx.quadraticCurveTo(BR * 0.55, -BR * 0.15, BR * 1.1, BR * 0.35)
     ctx.stroke()
     ctx.restore()
   }
-  // The shield: a heater shape in the ring's colour, a gold border, a gold chevron.
-  const shield = new Path2D()
-  shield.moveTo(-17, -6)
-  shield.lineTo(17, -6)
-  shield.lineTo(17, 8)
-  shield.quadraticCurveTo(15, 24, 0, 32)
-  shield.quadraticCurveTo(-15, 24, -17, 8)
-  shield.closePath()
-  ctx.lineWidth = 9
-  ctx.strokeStyle = '#1b1b1f'
-  ctx.stroke(shield)
-  ctx.lineWidth = 5
-  ctx.strokeStyle = logo.rim
-  ctx.stroke(shield)
-  ctx.fillStyle = logo.ring
-  ctx.fill(shield)
+  // A shine on the top left.
+  ctx.fillStyle = 'rgba(255,255,255,0.55)'
   ctx.beginPath()
-  ctx.moveTo(-11, 14)
-  ctx.lineTo(0, 4)
-  ctx.lineTo(11, 14)
-  ctx.lineTo(11, 20)
-  ctx.lineTo(0, 10)
-  ctx.lineTo(-11, 20)
-  ctx.closePath()
-  ctx.fillStyle = logo.rim
+  ctx.ellipse(-BR * 0.4, -BR * 0.45, BR * 0.28, BR * 0.14, -0.6, 0, Math.PI * 2)
   ctx.fill()
+  ctx.restore()
+  ctx.lineWidth = 5
+  ctx.strokeStyle = '#1b1b1f'
+  ctx.stroke(ball)
   ctx.restore()
 }
 
@@ -249,7 +235,7 @@ const _at = new Vector3()
 const ROUND_SIDES = 32
 
 /**
- * The throw stage's deck painting, seen from above: an oval rune ring in gold round a big
+ * The serve stage's deck painting, seen from above: an oval rune ring in gold round a big
  * arrow pointing up the cell (north, down the road), runes ticked round the ring between
  * two lines. Transparent everywhere else, so the stage's stones show through.
  */
@@ -327,11 +313,11 @@ function paintStageArrow(ctx, [rx, ry, rw, rh], gold, rune) {
  */
 const cellsFor = (v) => ({
   logo: { rect: [0, 0, 0.5, 0.5], paint: (ctx, r) => paintLogo(ctx, r, v.logo) },
-  arch: { rect: [0.5, 0, 0.5, 0.14], paint: (ctx, r) => paintText(ctx, r, 'THROW STAGE', { fill: GOLD, edge: '#c2410c', slant: 0.14 }) },
-  shop: { rect: [0.5, 0.14, 0.5, 0.12], paint: (ctx, r) => paintText(ctx, r, 'SWORD SHOP', { fill: GOLD, edge: '#c2410c', slant: 0.14 }) },
+  arch: { rect: [0.5, 0, 0.5, 0.14], paint: (ctx, r) => paintText(ctx, r, 'SERVE LINE', { fill: GOLD, edge: '#c2410c', slant: 0.14 }) },
+  shop: { rect: [0.5, 0.14, 0.5, 0.12], paint: (ctx, r) => paintText(ctx, r, 'BALL SHOP', { fill: GOLD, edge: '#c2410c', slant: 0.14 }) },
   zone: { rect: [0.5, 0.26, 0.5, 0.12], paint: (ctx, r) => paintText(ctx, r, 'STAND ON THE STAGE', { fill: WHITE, edge: '#9fb0c8', slant: 0.08 }) },
   stage: { rect: [0.5, 0.74, 0.5, 0.26], paint: (ctx, r) => paintStageArrow(ctx, r, '#ffd84a', v.altar?.rune ?? '#a77bff') },
-  ballShop: { rect: [0.5, 0.38, 0.5, 0.12], paint: (ctx, r) => paintText(ctx, r, 'ENCHANTS', { fill: PURPLE, edge: '#4a1a8a', slant: 0.14 }) },
+  ballShop: { rect: [0.5, 0.38, 0.5, 0.12], paint: (ctx, r) => paintText(ctx, r, 'AURAS', { fill: PURPLE, edge: '#4a1a8a', slant: 0.14 }) },
   ...Object.fromEntries(
     DIRECTIONS.map((d, i) => [
       'dir' + i,
@@ -348,7 +334,7 @@ const cellsFor = (v) => ({
  */
 function quadList() {
   return [
-    // THROW STAGE on each flag tower's board, facing spawn (south).
+    // SERVE STAGE on each flag tower's board, facing spawn (south).
     ...STAGE_TOWERS.map((t) => {
       const at = towerSignAt(t)
       return { cell: 'arch', width: TOWER_SIGN.width - 0.3, at: [at.x, at.y, at.z], yaw: 0, flat: false }
@@ -357,7 +343,7 @@ function quadList() {
     { cell: 'stage', width: STAGE_DECAL.width, at: [STAGE_DECAL.x, THROW_STAGE.height + 0.03, STAGE_DECAL.z], yaw: 0, flat: true },
     {
       cell: 'shop',
-      // On the board crowning the Sword Wall (its face 0.4 plaza-side of its centre line),
+      // On the board crowning the Ball Wall (its face 0.4 plaza-side of its centre line),
       // turned to the plaza, as tall as the board's panel allows.
       width: Math.min(SHOP_SIGN.maxZ - SHOP_SIGN.minZ - 3, 15),
       at: [SHOP_SIGN.x + 0.44 * SHOP_SIGN_FACING, SHOP_BOARD.midY, (SHOP_SIGN.minZ + SHOP_SIGN.maxZ) / 2],
@@ -375,8 +361,8 @@ function quadList() {
 }
 
 /**
- * The painted signs, drawn once the font has loaded: "THROW STAGE" on the flag towers'
- * boards, "SWORD SHOP" on the Sword Wall's crown, "ENCHANTS" on the Enchant Altar's board, the
+ * The painted signs, drawn once the font has loaded: "SERVE STAGE" on the flag towers'
+ * boards, "BALL SHOP" on the Ball Wall's crown, "ENCHANTS" on the Enchant Altar's board, the
  * arrow and runes on the stage's deck, and on the ground "STAND ON THE STAGE" before its
  * steps, the academy's crest at the spawn and the direction stencils. All of them share ONE square atlas
  * texture (at most the preset's texture size) and are merged into ONE mesh: a single draw

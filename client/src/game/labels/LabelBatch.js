@@ -22,13 +22,13 @@ import { iconUrl } from '../../ui/icons'
  * A label spec is `{ lines: [{ text, size, fill?, gradient?, rainbow?, icon? }],
  * pxPerUnit?, maxWidth? }`: sizes are canvas pixels at full quality, `pxPerUnit` is how
  * many of those pixels make one world unit, and a line wider than `maxWidth` (canvas
- * pixels at full quality) is drawn smaller to fit it - so a long sword name shrinks to
+ * pixels at full quality) is drawn smaller to fit it - so a long ball name shrinks to
  * fit its plate instead of widening it.
  *
  * Most labels turn to face the camera. A label added with `facing` (a yaw: 0 faces +Z)
  * is flat instead - a plate fixed in the world, facing that way - and it's never shrunk
  * near the camera, nor capped by the preset's label distance (its own fade only): the
- * Sword Wall's name plates, all on one face so none ever hides another, read from right
+ * Ball Wall's name plates, all on one face so none ever hides another, read from right
  * across the courtyard.
  */
 

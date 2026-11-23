@@ -10,7 +10,7 @@ import { emoteFromAnim } from '../../bloxity/emotes'
 import { CLICK_POSE_S } from '../clickSwing'
 import { RUN_CADENCE } from '../kick'
 import { BloxityAvatar } from '../PlayerAvatar'
-import { swordLength } from '../swords'
+import { ballLength } from '../volleyballs'
 
 /** How often the set of fully drawn players is reconsidered. */
 const PICK_MS = 500
@@ -19,11 +19,11 @@ const MAX_SPEED = 10.875
 const _up = new Vector3(0, 1, 0)
 
 /**
- * One other player as their real Bloxity avatar, dressed as they are and carrying the sword
+ * One other player as their real Bloxity avatar, dressed as they are and carrying the ball
  * they've equipped - posed by the same playerPose as yours, from what the network says
- * they're doing: walking pace, slashing a training dummy, a click slash, jumping, ready on
- * a throw spot. Their throws play here too: the arm whipping over and the celebration,
- * while their sword spins down its own line of the road (roll/SwordFlight).
+ * they're doing: walking pace, spiking a training court, a click spike, jumping, ready on
+ * a serve spot. Their serves play here too: the arm whipping over and the celebration,
+ * while their ball spins down its own line of the road (roll/SwordFlight).
  */
 function RemoteAvatar({ sessionId, look }) {
   const groupRef = useRef(null)
@@ -45,11 +45,11 @@ function RemoteAvatar({ sessionId, look }) {
     m.emote = null
     m.coil = 0
     m.strain = 0
-    m.swordLen = swordLength(r.tireId || 'bicycle')
+    m.swordLen = ballLength(r.tireId || 'bicycle')
     group.position.copy(r.position)
 
     if (r.hitting || r.pulling) {
-      // On a throw spot: their throw (the arm whipping over, then watching it fly and
+      // On a serve spot: their serve (the arm whipping over, then watching it fly and
       // celebrating), or ready - winding up now and then: you can't see their button.
       group.quaternion.setFromAxisAngle(_up, BATTER_YAW)
       if (r.hitting) {
@@ -66,8 +66,8 @@ function RemoteAvatar({ sessionId, look }) {
     }
     const running = r.anim === 'run'
     if (r.anim === 'swing') {
-      // Click slashing, again and again, the way they face: you can't see their clicks,
-      // only that they're slashing.
+      // Click spiking, again and again, the way they face: you can't see their clicks,
+      // only that they're spiking.
       group.quaternion.setFromAxisAngle(_up, r.yaw)
       m.bat = 'slash'
       m.swingT = m.time % (CLICK_POSE_S + 0.08)
@@ -76,7 +76,7 @@ function RemoteAvatar({ sessionId, look }) {
       return
     }
     group.quaternion.setFromAxisAngle(_up, running ? PAD_YAWS[Math.max(0, padAt(r.position.x, r.position.z, 0.8))] : r.yaw)
-    // At a dummy: a slash every TRAIN_INTERVAL, as yours does.
+    // At a court: a spike every TRAIN_INTERVAL, as yours does.
     m.run = running ? 1 : 0
 
     const speed = running ? 0 : r.speed

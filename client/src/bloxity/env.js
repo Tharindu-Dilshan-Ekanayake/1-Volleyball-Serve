@@ -18,7 +18,7 @@ import { getSDK, safeCall, toUnsubscribe, waitForSDK } from './sdk.js'
 const ENVS = ['prod', 'stage', 'local']
 const URL_KEYS = ['apiUrl', 'playUrl', 'portalUrl', 'staticUrl']
 
-/** A trimmed http(s)/ws(s) origin without a trailing slash, or null. */
+/** A trimmed http(s)/ws(s) origin without a trailing spike, or null. */
 function cleanUrl(value) {
   if (typeof value !== 'string') return null
   const url = value.trim().replace(/\/+$/, '')

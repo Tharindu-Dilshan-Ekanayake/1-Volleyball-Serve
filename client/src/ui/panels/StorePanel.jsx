@@ -16,7 +16,7 @@ import Panel from './Panel'
 
 const SECTIONS = [
   { title: 'Passes', items: ['healthX2', 'winsX2', 'autoRoll'] },
-  { title: 'Training Dummies', items: ['padVeryOp', 'padBest'] },
+  { title: 'Training Courts', items: ['padVeryOp', 'padBest'] },
   { title: 'Specials', items: ['sphinx'] },
 ]
 
@@ -30,10 +30,10 @@ const ICONS = {
 
 const BLURBS = {
   healthX2: 'Double every Power gain, forever',
-  winsX2: 'Double the Wins from every throw, forever',
-  autoRoll: 'Winds up and throws your sword for you, throw after throw',
-  padVeryOp: 'Unlocks the x40 Diamond Golem dummy',
-  padBest: 'Unlocks the x100 Galaxy Titan dummy',
+  winsX2: 'Double the Wins from every serve, forever',
+  autoRoll: 'Loads up and serves for you, serve after serve',
+  padVeryOp: 'Unlocks the x40 Diamond Court',
+  padBest: 'Unlocks the x100 Galaxy Court',
   sphinx: `Limited: x${formatNumber(PETS.sphinx.mult)} Power pet`,
 }
 
@@ -158,7 +158,7 @@ function FreeSection() {
   )
 }
 
-/** Everything Wins can buy besides swords, enchantments, eggs and Power packs, grouped, plus Gems and free rewards. */
+/** Everything Wins can buy besides balls, auras, eggs and Power packs, grouped, plus Gems and free rewards. */
 export function StorePanel() {
   const passes = useGame((s) => s.profile.passes)
   const wins = useGame((s) => s.profile.wins)

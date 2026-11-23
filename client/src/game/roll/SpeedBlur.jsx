@@ -50,8 +50,8 @@ const fragmentShader = /* glsl */ `
 
 /**
  * The blur's material (one per sample count) and its screen triangle, kept for the whole
- * session: a material disposed after each throw took its compiled shader with it, and the
- * next throw compiled it again. Tiny; only the screen copy is let go between throws.
+ * session: a material disposed after each serve took its compiled shader with it, and the
+ * next serve compiled it again. Tiny; only the screen copy is let go between serves.
  */
 const MATERIALS = new Map()
 let triangle = null
@@ -97,16 +97,16 @@ function createPass(samples) {
 }
 
 /**
- * Motion blur down the sides of the screen while your sword flies fast: the scene is drawn
+ * Motion blur down the sides of the screen while your ball flies fast: the scene is drawn
  * to the screen as usual, copied, and the copy drawn back over it through a zoom blur that
- * leaves the middle (the sword) sharp and smears the edges away from the road's vanishing
+ * leaves the middle (the ball) sharp and smears the edges away from the road's vanishing
  * point, more the faster you go. Below BLUR_FROM it's just the usual render, so a slow
- * throw costs nothing extra.
+ * serve costs nothing extra.
  *
  * Drawing the scene to the screen (not into a render target) matters: three builds every
  * material a second shader for a render target (linear output, no tone mapping), and
- * whatever was first seen through the blur - the portal, the Sword Wall - compiled that
- * mid-throw, a frame of a second or more on some GPUs. A screen copy is also a quarter of
+ * whatever was first seen through the blur - the portal, the Ball Wall - compiled that
+ * mid-serve, a frame of a second or more on some GPUs. A screen copy is also a quarter of
  * an antialiased target's memory.
  *
  * Post-processing, so MEDIUM and HIGH only (`motionBlur` samples). Mounted only while
@@ -128,7 +128,7 @@ export function SpeedBlur({ samples }) {
     const pass = createPass(samples)
     passRef.current = pass
     // Compiled now, during the push-off, not mid-ride when the blur first kicks in (once a
-    // session: the material is kept, so after the first throw this is already done).
+    // session: the material is kept, so after the first serve this is already done).
     gl.compileAsync(pass.scene, pass.camera).catch(() => {})
     return () => {
       passRef.current = null

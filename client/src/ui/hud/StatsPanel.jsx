@@ -79,8 +79,8 @@ function Bonuses() {
     streakToastShown = true
     const id = setTimeout(() => {
       if (news.broke) showToast('Your streak ended... DAY 1 again - play tomorrow for x1.1 Wins!')
-      else if (news.days >= 2) showToast(`DAY ${news.days} STREAK! x${news.multiplier.toFixed(1)} Wins on every throw today!`)
-      else showToast('DAY 1 STREAK! Come back tomorrow for x1.1 Wins on every throw!')
+      else if (news.days >= 2) showToast(`DAY ${news.days} STREAK! x${news.multiplier.toFixed(1)} Wins on every serve today!`)
+      else showToast('DAY 1 STREAK! Come back tomorrow for x1.1 Wins on every serve!')
     }, 2500)
     return () => clearTimeout(id)
   }, [news, showToast])

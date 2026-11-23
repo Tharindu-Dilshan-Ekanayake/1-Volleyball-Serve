@@ -11,7 +11,7 @@ import { getBloxityState, useBloxityStore } from './store'
  * ads and the portal's leaderboards. Plain functions - call them from anywhere.
  *
  * Every call is safe without the SDK (offline, outside Boxity, script blocked): it
- * reports "not available" instead of throwing. Async ones never reject.
+ * reports "not available" instead of serving. Async ones never reject.
  *
  * Grants are never decided here. Online, the game server verifies Boxity's word (the
  * rewarded-ad token, the Gems webhook). Offline there is no server, so the offline

@@ -15,13 +15,11 @@ import { roll } from './rollControl'
 import { STAGE_LOOKS } from './themes'
 
 /**
- * The sword plunging point-first into the road at the end of its flight (rollControl's
- * `impact`): where the tip bites, the stones are punched into a crater with a raised lip,
- * jagged cracks race out across the road glowing in the sword's own colour, a white
- * shockwave ring and a ring of the sword's light sweep out over everything, and chips of
- * stone and grit fly up, bounce once and vanish, with a chunk of the road flipping
- * through the air. The sword stands quivering in the crater (path.rideState). The higher
- * it fell (PERFECT high, WEAK low), the bigger all of it.
+ * The served ball slamming into the court at the end of its arc (rollControl's `impact`):
+ * the surface is pressed into a dent with a raised lip, a white shockwave ring and a ring
+ * of the ball's light sweep out over everything, and sand and grit fly up, bounce once
+ * and vanish. The ball bounces on from there (path.rideState). The higher it fell
+ * (PERFECT high, WEAK low), the bigger all of it.
  *
  * The crater, cracks and rings are one procedural quad (no texture); the chips, grit and
  * chunk are one pool of boxes, one draw call - fewer of them on presets without
@@ -41,8 +39,8 @@ const GRAVITY = 26
 const VANISH = 0.35
 /** Whatever happens, every piece is gone by then. */
 const MAX_LIFE = 2.6
-/** The crater's radius on the road: bigger the higher the sword fell. */
-const dentRadius = (peak) => 2.2 + peak * 0.15
+/** The crater's radius on the road: bigger the higher the ball fell. */
+const dentRadius = (peak) => 1.3 + peak * 0.07
 
 const SOIL = new Color('#6b5a4a')
 const SOIL_DARK = new Color('#3e342c')
@@ -82,7 +80,7 @@ const splashFragment = /* glsl */ `
     float lip = (1.0 - smoothstep(0.0, 0.05, abs(r - dentR - 0.03))) * press;
     vec3 lipCol = mix(uTurf * 1.25, vec3(1.0), 0.15) * (0.9 + 0.15 * lit);
 
-    // Cracks racing out from the crater across the road, glowing in the sword's colour
+    // Cracks racing out from the crater across the road, glowing in the ball's colour
     // and cooling as they spread: jagged radial lines, each its own length.
     float ang = atan(p.y, p.x);
     float spread = clamp(uAge / 0.18, 0.0, 1.0);
@@ -93,7 +91,7 @@ const splashFragment = /* glsl */ `
     float hot = 1.0 - smoothstep(0.2, 1.6, uAge);
 
     // Two rings racing out over the road: a sharp white shockwave, and a softer ring of
-    // light in the sword's own colour just behind it.
+    // light in the ball's own colour just behind it.
     float r1 = uAge * 2.6;
     float r2 = uAge * 1.8;
     float ring1 = (1.0 - smoothstep(0.0, 0.04, abs(r - r1))) * (1.0 - smoothstep(0.05, 0.45, uAge));
@@ -101,8 +99,8 @@ const splashFragment = /* glsl */ `
 
     vec3 col = lipCol;
     float alpha = lip * 0.8;
-    col = mix(col, uTurf * 0.35 + uGlow * hot * 1.4, crack);
-    alpha = max(alpha, crack * 0.9);
+    // (No cracks: a volleyball dents the court, it doesn't split it.)
+    crack *= hot * 0.0;
     col = mix(col, dentCol, dent);
     alpha = max(alpha, dent * 0.85);
     col = mix(col, uGlow * 1.2 + vec3(0.15), ring2);
@@ -143,8 +141,8 @@ function createSplash() {
   mesh.quaternion.copy(FLAT)
   mesh.renderOrder = 2
   // Never hidden, only shrunk to nothing between impacts: a hidden mesh isn't compiled
-  // with the rest of the throw (Roll.jsx), and compiling its shader at the moment the
-  // sword sticks would freeze a weak GPU right then. Shrunk, it costs one empty draw call.
+  // with the rest of the serve (Roll.jsx), and compiling its shader at the moment the
+  // ball sticks would freeze a weak GPU right then. Shrunk, it costs one empty draw call.
   mesh.scale.setScalar(0)
   mesh.frustumCulled = false
   return mesh
@@ -165,7 +163,7 @@ const pieces = Array.from({ length: POOL }, () => ({
   restAt: -1,
 }))
 
-/** Throws piece `c` up out of the impact at `at`, `a` its direction across the road (radians). */
+/** Serves piece `c` up out of the impact at `at`, `a` its direction across the road (radians). */
 function launch(c, at, a, speedOut, speedUp) {
   c.on = true
   c.restAt = -1
@@ -212,10 +210,10 @@ export default function Impact() {
 
     if (st.at !== roll.impactAt) {
       // A new impact: punch the crater in where the tip went in, in this stage's road
-      // colours, crack it, and throw the chips.
+      // colours, crack it, and serve the chips.
       st.at = roll.impactAt
       st.sprayAt = now
-      // A PERFECT throw bites hardest, a WEAK one barely chips the stones.
+      // A PERFECT serve bites hardest, a WEAK one barely chips the stones.
       const grade = roll.hit === 'perfect' ? 1.3 : roll.hit === 'great' ? 1.12 : roll.hit === 'weak' ? 0.7 : 1
       const size = dentRadius(roll.impactPeak) * grade
       const power = Math.min(1, (roll.impactPeak / 32) * grade)
@@ -256,8 +254,8 @@ export default function Impact() {
         c.size.set(k, k * 0.8, k)
         spray.setColorAt(i, j % 2 ? SOIL : SOIL_DARK)
       }
-      // A chunk of the road thrown up, flipping over once, landing upside down a little
-      // way back towards the thrower.
+      // A chunk of the road served up, flipping over once, landing upside down a little
+      // way back towards the server.
       const d = pieces[DIVOT]
       launch(d, _at.set(at.x + 0.3, at.y + 0.15, at.z + 0.6), Math.PI / 2 + (Math.random() - 0.5) * 0.6, 2.2 + power * 1.5, 7 + power * 3)
       d.axis.set(1, 0, 0)
@@ -266,6 +264,8 @@ export default function Impact() {
       d.bounces = 0
       d.size.set(0.8 + power * 0.3, 0.12, 0.55 + power * 0.2)
       spray.setColorAt(DIVOT, _turfDark)
+      // A ball serves up no chunk of the court.
+      d.on = false
       for (let i = 0; i < POOL; i += 1) if (!pieces[i].on) spray.setMatrixAt(i, ZERO)
       spray.instanceColor.needsUpdate = true
       // A puff of dust where it bit.

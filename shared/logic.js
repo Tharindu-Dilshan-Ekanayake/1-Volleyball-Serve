@@ -72,7 +72,7 @@ export function createProfile(id, name) {
     level: 1,
     equippedTire: 'bicycle',
     ownedTires: ['bicycle'],
-    /** Your sword's enchantment (BALLS id: the template's balls), and every one you've bought. */
+    /** Your ball's aura (BALLS id: the template's balls), and every one you've bought. */
     equippedBall: 'plain',
     ownedBalls: ['plain'],
     pets: [],
@@ -113,7 +113,7 @@ export function createProfile(id, name) {
   }
 }
 
-/** Fills in anything missing from an older or partial save. Never throws. */
+/** Fills in anything missing from an older or partial save. Never serves. */
 export function normalizeProfile(raw, id, name) {
   const base = createProfile(id, name)
   if (!raw || typeof raw !== 'object') return base
@@ -260,7 +260,7 @@ export function winsMultiplier(profile, now) {
   return (profile.passes.winsX2 ? 2 : 1) * (isBoostActive(profile, 'wins', now) ? 2 : 1) * streakMultiplier(streakDays(profile, now))
 }
 
-/** Dragonfire Peaks' Secret Star, once found: x2 Power for good, in every world. */
+/** Christmas Village's Secret Star, once found: x2 Power for good, in every world. */
 export const starMultiplier = (profile) => (profile.secretStars?.world2 ? SECRET_STAR.power : 1)
 
 /** Everything that multiplies a Health gain except the tire and where you earn it. */
@@ -304,12 +304,12 @@ export function applyTrain(profile, index, now) {
   return { ok: true, ...addHealth(profile, padGain(profile, index, now)) }
 }
 
-/** One tick of Power while your sword flies. */
+/** One tick of Power while your ball flies. */
 export function applyRollTick(profile, now) {
   return { ok: true, ...addHealth(profile, baseGain(profile, now)) }
 }
 
-/** One click slash with your sword: the same gain as a throw's tick. */
+/** One click spike with your ball: the same gain as a serve's tick. */
 export const applyClickSwing = applyRollTick
 
 /** Rebirth: +1 rebirth; Health and levels reset (Wins, tires and pets stay). */
@@ -356,7 +356,7 @@ export function zoneIndexAt(meter) {
 }
 
 /**
- * Where a throw with `health` (Power) lands: its full reach - nothing on the road stops
+ * Where a serve with `health` (Power) lands: its full reach - nothing on the road stops
  * it. `broken` is how many stages it flew into past the first (the name stayed from the
  * template's walls); `blocked` is always -1.
  */
@@ -378,7 +378,7 @@ export function trophiesWithin(distance) {
 export const trophyValue = (meter, world = 0) => Math.max(1, Math.round(zonesOf(world)[zoneIndexAt(meter)].winsPerMeter * TROPHY_METERS))
 
 /**
- * Wins for a throw in `world` before multipliers: every metre flown, at its stage's rate
+ * Wins for a serve in `world` before multipliers: every metre flown, at its stage's rate
  * (further out pays more per metre), plus the trophies passed. (All worlds' stages start
  * at the same metres; only what they pay differs.)
  */
@@ -399,16 +399,16 @@ export function baseRollWins(distance, world = 0) {
 export const rollWinsAt = (health, world = 0) => baseRollWins(rollOutcome(health).distance, world)
 
 /**
- * A throw from a throw spot. Power is not consumed. Returns everything the client needs
+ * A serve from a serve spot. Power is not consumed. Returns everything the client needs
  * to replay it locally: distance, duration, the Wins earned (trophy positions follow from
- * the distance) and any stage reached for the first time. `accuracy` is where the throw
- * meter stood when you let go (0-1, see HIT_GRADES): its grade decides how far the sword
- * flies (hitReach: half as far for a WEAK throw, half as far again for a PERFECT one) and
- * multiplies the Wins (`bonus`). Your enchantment (BALLS) throws further and pays more on
- * top. The Wins are what the throw's Power is worth - the metres a plain throw would fly -
+ * the distance) and any stage reached for the first time. `accuracy` is where the serve
+ * meter stood when you let go (0-1, see HIT_GRADES): its grade decides how far the ball
+ * flies (hitReach: half as far for a WEAK serve, half as far again for a PERFECT one) and
+ * multiplies the Wins (`bonus`). Your aura (BALLS) serves further and pays more on
+ * top. The Wins are what the serve's Power is worth - the metres a plain serve would fly -
  * times those bonuses, never the extra metres themselves: further out every metre pays
- * more, so paying for them would multiply a PERFECT throw's Wins dozens of times over late
- * in the game. Without the meter (Auto Throw) the throw is a plain x1 throw.
+ * more, so paying for them would multiply a PERFECT serve's Wins dozens of times over late
+ * in the game. Without the meter (Auto Serve) the serve is a plain x1 serve.
  */
 export function applyRoll(profile, now, accuracy = null, bonus = 1) {
   const ball = ballById(profile.equippedBall)
@@ -416,7 +416,7 @@ export function applyRoll(profile, now, accuracy = null, bonus = 1) {
   const distance = Math.round(outcome.distance * 10) / 10
   const grade = hitGrade(accuracy)
   // `bonus`: the session's own multipliers (a PERFECT combo, friends in the server).
-  // A Legend sword pays more on every throw too (swordWins).
+  // A Legend ball pays more on every serve too (swordWins).
   const multiplier = winsMultiplier(profile, now) * (grade ? grade.bonus : 1) * Math.max(1, Number(bonus) || 1) * ball.wins * swordWins(profile.equippedTire)
   const world = profile.world
   const worth = Math.round(rollReach(profile.health) * 10) / 10
@@ -532,7 +532,7 @@ export function skipRebirth(profile) {
 // --- Worlds -------------------------------------------------------------------------
 
 /**
- * Steps through the world portal: from World 1 into Dragonfire Peaks (opening it for good the
+ * Steps through the world portal: from World 1 into Christmas Village (opening it for good the
  * first time you have the rebirths and hold the Wins - they aren't spent), or from Lava
  * Land back home.
  */
@@ -554,7 +554,7 @@ export function usePortal(profile) {
 
 export function buyTire(profile, tireId) {
   const tire = TIRES.find((t) => t.id === tireId)
-  if (!tire) return { ok: false, error: 'Unknown sword' }
+  if (!tire) return { ok: false, error: 'Unknown volleyball' }
   if (profile.ownedTires.includes(tireId)) return equipTire(profile, tireId)
   const previous = TIRES[tireIndex(tireId) - 1]
   if (previous && !profile.ownedTires.includes(previous.id)) {
@@ -568,7 +568,7 @@ export function buyTire(profile, tireId) {
 }
 
 export function equipTire(profile, tireId) {
-  if (!profile.ownedTires.includes(tireId)) return { ok: false, error: 'You don’t own that sword' }
+  if (!profile.ownedTires.includes(tireId)) return { ok: false, error: 'You don’t own that volleyball' }
   profile.equippedTire = tireId
   return { ok: true, equipped: true, tireId }
 }
@@ -580,10 +580,10 @@ export function nextTire(profile) {
 
 // --- Balls --------------------------------------------------------------------------
 
-/** Buys enchantment `ballId` (in order: the one before it first) and equips it; equips one you own. */
+/** Buys aura `ballId` (in order: the one before it first) and equips it; equips one you own. */
 export function buyBall(profile, ballId) {
   const ball = BALLS.find((b) => b.id === ballId)
-  if (!ball) return { ok: false, error: 'Unknown enchantment' }
+  if (!ball) return { ok: false, error: 'Unknown aura' }
   if (profile.ownedBalls.includes(ballId)) return equipBall(profile, ballId)
   const previous = BALLS[ballIndex(ballId) - 1]
   if (previous && !profile.ownedBalls.includes(previous.id)) return { ok: false, error: `Buy the ${previous.name} first!` }
@@ -595,12 +595,12 @@ export function buyBall(profile, ballId) {
 }
 
 export function equipBall(profile, ballId) {
-  if (!profile.ownedBalls.includes(ballId)) return { ok: false, error: 'You don’t own that enchantment' }
+  if (!profile.ownedBalls.includes(ballId)) return { ok: false, error: 'You don’t own that aura' }
   profile.equippedBall = ballId
   return { ok: true, equipped: true, ballId }
 }
 
-/** The next enchantment at the Enchant Altar you don't have yet, or null. */
+/** The next aura at the Enchant Altar you don't have yet, or null. */
 export function nextBall(profile) {
   return BALLS.find((b) => !profile.ownedBalls.includes(b.id)) || null
 }
@@ -871,7 +871,7 @@ export function advanceTutorial(profile, event) {
 
 /** Awards a badge once. Returns the badge if newly awarded. */
 /**
- * Finds Dragonfire Peaks' Secret Star (the caller checks the player is at it, in Dragonfire Peaks).
+ * Finds Christmas Village's Secret Star (the caller checks the player is at it, in Christmas Village).
  * Once only; false if it was already found.
  */
 export function claimSecretStar(profile) {

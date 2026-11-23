@@ -19,7 +19,7 @@ const GRAVITY = 16
 const DOWN_TRACK = new Vector3(0, -SIN, -COS)
 const SLOPE_NORMAL = new Vector3(0, COS, -SIN)
 const WHITE = new Color('#ffffff')
-/** What the tire throws up in each zone: its floor, lightened. */
+/** What the tire serves up in each zone: its floor, lightened. */
 const sprayColors = perWorld((zs) => zs.map((z) => new Color(ZONE_THEMES[z.theme].floor).lerp(WHITE, 0.55)))
 
 const _m = new Matrix4()
@@ -30,7 +30,7 @@ const _side = new Vector3()
 const spray = Array.from({ length: SPRAY }, () => ({ life: 0, max: 1, size: 0.2, pos: new Vector3(), vel: new Vector3() }))
 
 /**
- * Throws `count` dust pieces up from where the tire touches the floor: `spread`
+ * Serves `count` dust pieces up from where the tire touches the floor: `spread`
  * sideways, `lift` upwards, `back` behind it (so they're left behind). `st.next` is the
  * pool's write head.
  */

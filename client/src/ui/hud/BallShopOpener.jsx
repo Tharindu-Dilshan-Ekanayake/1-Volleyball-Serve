@@ -4,7 +4,7 @@ import { getGame, useGame } from '../../store/game'
 
 /**
  * Opens the Enchant Altar's panel when you walk up to it (zone.ballShop, from the game
- * ticker) - unless another panel is open or your sword's still flying (then as soon as it
+ * ticker) - unless another panel is open or your ball's still flying (then as soon as it
  * sticks) - and closes it again if you walk away with it still open. Once a visit: close
  * it while standing there and it stays closed until you leave and come back. Renders
  * nothing.

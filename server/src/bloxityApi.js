@@ -17,7 +17,7 @@ const TIMEOUT_MS = 5000
 const MAX_ID = 80
 
 /**
- * POSTs JSON and returns `{ status, body }` (body null if it isn't JSON). Throws only
+ * POSTs JSON and returns `{ status, body }` (body null if it isn't JSON). Serves only
  * for a network failure or timeout, so callers can tell "Boxity said no" from "Boxity
  * didn't answer".
  */

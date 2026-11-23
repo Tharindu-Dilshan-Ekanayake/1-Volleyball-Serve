@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { Color, Euler, Matrix4, Quaternion, Vector3 } from 'three'
 
 import { getGame } from '../store/game'
-import { createSwordMesh, disposeSwordMesh } from './swords'
+import { createBallMesh, disposeBallMesh } from './volleyballs'
 import { createBoxInstances, disposeBlocks } from './blocks'
 import { sharedMaterials, STYLE } from './materials'
 import { computePose } from './playerPose'
@@ -40,7 +40,7 @@ const _s = new Vector3()
  * it if it can't load), so the player is never invisible. Six boxes in one instanced
  * draw call through the shared toy material - no extra shader program. Posed by the
  * same playerPose as the real avatar (its limbs have no elbows or knees), and carrying
- * your sword where the pose puts it.
+ * your ball where the pose puts it.
  *
  * @param {{ motionRef: React.MutableRefObject<object>, handRef?: React.MutableRefObject<object>, onReady?: () => void }} props
  */
@@ -55,8 +55,8 @@ export function FallbackAvatar({ motionRef, handRef, onReady }) {
   }, [])
 
   useEffect(() => () => disposeBlocks(mesh), [mesh])
-  const bat = useMemo(() => createSwordMesh(), [])
-  useEffect(() => () => disposeSwordMesh(bat), [bat])
+  const bat = useMemo(() => createBallMesh(), [])
+  useEffect(() => () => disposeBallMesh(bat), [bat])
   const batRef = useRef(null)
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export function FallbackAvatar({ motionRef, handRef, onReady }) {
     const held = batRef.current
     if (held) {
       held.visible = pose.bat.mode !== 'none'
-      held.setSword(getGame().profile.equippedTire)
+      held.setBall(getGame().profile.equippedTire)
       held.position.copy(pose.bat.pos)
       held.quaternion.copy(pose.bat.quat)
       held.scale.setScalar(pose.bat.scale)
@@ -80,7 +80,7 @@ export function FallbackAvatar({ motionRef, handRef, onReady }) {
       _pivot.makeTranslation(part.x, part.y + pose.lift, 0)
       _q.setFromEuler(joint ? _e.set(joint.swing, joint.twist, joint.sway) : _e.set(0, 0, 0))
       _rot.makeRotationFromQuaternion(_q)
-      // Arms reaching for the sword's grip: a touch longer or shorter.
+      // Arms reaching for the ball's grip: a touch longer or shorter.
       const stretch = part.joint === 'ArmL1' ? pose.stretchL : part.joint === 'ArmR1' ? pose.stretchR : 1
       const thin = Math.min(1.15, Math.max(0.5, 1 / Math.sqrt(Math.max(0.3, stretch))))
       const h = part.h * stretch

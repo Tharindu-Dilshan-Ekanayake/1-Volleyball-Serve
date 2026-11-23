@@ -47,7 +47,7 @@ import Weather from './Weather'
 
 const MAX_TROPHIES = 16
 const STREAKS = 36
-/** Trophies float this high over the sword's line. */
+/** Trophies float this high over the ball's line. */
 const TROPHY_HEIGHT = 3.4
 /**
  * Frame-loop priority: before every other system, so the chase camera has moved before
@@ -83,8 +83,8 @@ const TROPHY_POPUP = { iconUrl: TROPHY_ICON, scale: 1.2 }
 
 /**
  * Speed-line streaks, made once: alternately down the left and right of the view (well
- * clear of the sword and the distance counter), each a little thicker or longer than the
- * next, and every third tinted with your enchantment's (or your sword's) colour.
+ * clear of the ball and the distance counter), each a little thicker or longer than the
+ * next, and every third tinted with your aura's (or your ball's) colour.
  */
 const streakState = (() => {
   const r = mulberry32(5)
@@ -155,15 +155,15 @@ const zoneNameGradients = perWorld((zs) =>
     return `linear-gradient(180deg, ${a} 0%, ${b} 45%, ${c} 100%)`
   }),
 )
-/** Sideways, in metres, the camera starts for the throw (and swings in from), over your shoulder. */
+/** Sideways, in metres, the camera starts for the serve (and swings in from), over your shoulder. */
 const KICK_CAM_SIDE = 1.4
-/** Seconds the camera holds on the throw view as the sword leaves your hand. */
+/** Seconds the camera holds on the serve view as the ball leaves your hand. */
 const CONTACT_HOLD = KICK_HIT + 0.12
-/** The throw camera's start: behind the sword, up, and the height it looks at. */
+/** The serve camera's start: behind the ball, up, and the height it looks at. */
 const KICK_CAM_BEHIND = 5.6
 const KICK_CAM_HEIGHT = 3
 const KICK_LOOK_HEIGHT = 1.4
-/** The chase camera once it's off: behind the sword and above it. */
+/** The chase camera once it's off: behind the ball and above it. */
 const CHASE_BEHIND = 8.2
 const CHASE_HEIGHT = 3.6
 const smoothstep = (a, b, x) => {
@@ -183,9 +183,9 @@ function createTrophyGeometry() {
 }
 
 /**
- * Lazily loaded: the valley road and its trophies, the swords in flight (SwordFlight),
- * the speed lines and the chase camera that follows your sword down the road. While nobody
- * is throwing it still streams the first stretch, which is the road you see from the lobby.
+ * Lazily loaded: the court and its trophies, the balls in flight (SwordFlight),
+ * the speed lines and the chase camera that follows your ball down the road. While nobody
+ * is serving it still streams the first stretch, which is the road you see from the lobby.
  */
 export default function Roll() {
   const camera = useThree((s) => s.camera)
@@ -293,7 +293,7 @@ export default function Roll() {
       writeDistance(Math.max(0, roll.meter))
       const zi = zoneIndexAt(Math.max(0, roll.meter))
       if (zi !== zoneShown.current) {
-        // Into a new stage (not the one you start in): confetti round the sword and a
+        // Into a new stage (not the one you start in): confetti round the ball and a
         // cheerful jingle.
         if (zoneShown.current >= 0 && zi > zoneShown.current) {
           sfx.stageUp()
@@ -315,7 +315,7 @@ export default function Roll() {
         // On the launch's own clock, so the camera freezes with you in slow motion.
         const elapsed = (now - roll.startedAt - roll.lag) / 1000
         if (roll.phase === 'stopped' || roll.crashed) {
-          // Stuck: swing round to the side and down, onto the sword standing in the road.
+          // Stuck: swing round to the side and down, onto the ball standing in the road.
           const k = smoothstep(0, 1.4, elapsed - roll.duration + (roll.crashed ? 0.5 : 0))
           const angle = (Math.floor(roll.distance) % 2 === 0 ? 1 : -1) * 0.8 * k
           const dist = 9 - 3.4 * k
@@ -324,14 +324,14 @@ export default function Roll() {
           camBase.lerp(_cam, 1 - Math.exp(-4 * delta))
           _look.copy(p).y += 0.2
         } else {
-          // Chase camera: behind and above the sword, looking down the road. Locked to it
+          // Chase camera: behind and above the ball, looking down the road. Locked to it
           // along the road (at hundreds of m/s any lag leaves it far behind); eased
-          // sideways so the drift stays smooth, and eased in from the throw view - close
-          // on the sword leaving your hand, pulling back once it's off.
+          // sideways so the drift stays smooth, and eased in from the serve view - close
+          // on the ball leaving your hand, pulling back once it's off.
           const off = smoothstep(0.55, 1.5, elapsed)
           const behind = KICK_CAM_BEHIND + (CHASE_BEHIND - KICK_CAM_BEHIND) * off + Math.min(speed, 300) * 0.006
           trackPoint(roll.meter - behind, 0, KICK_CAM_HEIGHT + (CHASE_HEIGHT - KICK_CAM_HEIGHT) * off + roll.air, _cam)
-          // A beat on the throw view first, so you see the sword leave your hand - then it
+          // A beat on the serve view first, so you see the ball leave your hand - then it
           // whips round after it.
           const held = elapsed < CONTACT_HOLD
           const easingIn = elapsed < 1.1
@@ -343,7 +343,7 @@ export default function Roll() {
             camBase.z + (_cam.z - camBase.z) * kIn,
           )
           trackPoint(roll.meter - 0.6 + 12.6 * off, p.x * 0.85, KICK_LOOK_HEIGHT + (1.6 - KICK_LOOK_HEIGHT) * off + roll.air * 0.8, _look)
-          // From your hand to the sword as it goes.
+          // From your hand to the ball as it goes.
           _v.set(roll.startX, roll.startY, roll.startZ)
           _look.lerpVectors(_v, _look, smoothstep(CONTACT_HOLD - 0.1, CONTACT_HOLD + 0.35, elapsed))
         }
@@ -439,7 +439,7 @@ export default function Roll() {
         lines.count = 0
       } else {
         if (streakTintedFor.current !== roll.startedAt) {
-          // Once a throw: the tinted ones take your enchantment's (or sword's) colour,
+          // Once a serve: the tinted ones take your aura's (or ball's) colour,
           // softened towards white.
           streakTintedFor.current = roll.startedAt
           _tint.copy(throwTint(roll.ballId, roll.tireId)).lerp(WHITE, 0.35)

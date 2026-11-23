@@ -64,7 +64,7 @@ async function findDevServer() {
   for (const port of DEV_PORTS) candidates.push(`${window.location.protocol}//${window.location.hostname}:${port}`)
   for (const url of new Set(candidates)) {
     const health = await healthOf(url)
-    if (health?.ok && health.game === '1-sword-throwing') return url
+    if (health?.ok && health.game === '1-volleyball-serve') return url
   }
   return null
 }
@@ -93,7 +93,7 @@ export function shareLook(equipped, proportions) {
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms))
 
-/** Calls `Legion.SDK.game[method](...args)` if the SDK is there; never throws. */
+/** Calls `Legion.SDK.game[method](...args)` if the SDK is there; never serves. */
 function sdkGame(method, ...args) {
   const game = getSDK()?.game
   return safeCall(game?.[method]?.bind(game), ...args)
@@ -235,8 +235,8 @@ function attachRoom(room, identity, Callbacks, endpoint, gen) {
         getGame().setLeaderboards(payload)
         break
       case 'ghostRoll':
-        // Never your own throw (yours is flying already), and only throws down your world's
-        // field. Their avatar plays the throw (remote/) and their sword flies down its own
+        // Never your own serve (yours is flying already), and only serves down your world's
+        // field. Their avatar plays the serve (remote/) and their ball flies down its own
         // line of the field (roll/SwordFlight).
         if (payload.sid === room.sessionId) break
         if ((payload.world || 0) !== (getGame().profile.world || 0)) break

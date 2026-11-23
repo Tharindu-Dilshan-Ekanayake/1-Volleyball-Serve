@@ -13,7 +13,7 @@ import { configureAvatarTexture } from '../game/avatarRig'
  * is a fixed URL and *is* loaded with `useGLTF` in PlayerAvatar; everything dynamic
  * goes through here.
  *
- * Every loader resolves to `null` instead of throwing on failure - a 404 on an
+ * Every loader resolves to `null` instead of serving on failure - a 404 on an
  * unequipped or delisted asset must degrade to the base mesh, never break the scene.
  */
 

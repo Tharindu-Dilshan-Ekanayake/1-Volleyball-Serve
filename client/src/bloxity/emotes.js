@@ -98,7 +98,7 @@ function startLocal(id) {
 /**
  * Plays emote `id` on your character (Boxity's play_emote). Unknown ids do nothing; if
  * the catalog is still loading, it plays once it arrives (unless you moved meanwhile).
- * Never throws.
+ * Never serves.
  */
 export function playLocalEmote(id) {
   if (typeof id !== 'string' || !id) return

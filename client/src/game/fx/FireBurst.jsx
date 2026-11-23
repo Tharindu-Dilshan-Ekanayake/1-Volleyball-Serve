@@ -20,7 +20,7 @@ const FLAMES = 36
 const SPARKS = 44
 const FLASH = 1
 const POOL = FLASH + FLAMES + SPARKS
-/** How much of each a LOW preset throws. */
+/** How much of each a LOW preset serves. */
 const LOW_SHARE = 0.55
 const SPARK_GRAVITY = 20
 
@@ -47,7 +47,7 @@ const KINDS = {
     speed: 0.8,
   },
   dust: {
-    // The ground smash: a billow of pale dust thrown out low and wide, and pebbles.
+    // The ground smash: a billow of pale dust served out low and wide, and pebbles.
     ramp: colors(['#fffaf0', '#f2e8d6', '#e2d4bc', '#cdbd9f', '#b8a784', '#a8987a']),
     sparks: colors(['#8a6a4a', '#b9a48a', '#6a4a30', '#d8c8a8']),
     flash: new Color('#fff6e0'),

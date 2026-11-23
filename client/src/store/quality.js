@@ -124,10 +124,13 @@ function readSaved() {
  */
 export const DEFAULT_LEVEL = 'LOW'
 
+/**
+ * Every device starts on LOW (the game's own choice: smooth on everything first); players
+ * who want more pick MEDIUM or HIGH in Settings, and that choice is saved. The FPS monitor
+ * only ever drops a preset, never raises one.
+ */
 function detectLevel() {
-  if (typeof navigator === 'undefined') return DEFAULT_LEVEL
-  const cores = navigator.hardwareConcurrency || 0
-  return isMobileDevice() || cores <= 4 ? 'LOW' : 'MEDIUM'
+  return DEFAULT_LEVEL
 }
 
 const initialLevel = readSaved() || detectLevel()

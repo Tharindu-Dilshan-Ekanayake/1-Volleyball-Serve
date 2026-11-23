@@ -5,7 +5,7 @@ import { Color, Matrix4, Quaternion, Vector3 } from 'three'
 import { ROLL_RECOVERY } from '@shared/balance'
 import { BATTER_YAW, padAt, PAD_YAWS } from '@shared/world'
 
-import { swordBase } from '../swords'
+import { ballBase } from '../volleyballs'
 
 import { remotePlayers } from '../../net/remotePlayers'
 import { getQuality } from '../../store/quality'
@@ -18,7 +18,7 @@ import { hideNameplatesFrom, NAMEPLATE_POOL_SIZE, placeNameplate } from './namep
 /** Remote players are drawn this far in the past, so 10 Hz updates interpolate. */
 const INTERP_DELAY_MS = 110
 const MAX_REMOTES = 8
-/** Six blocks of body and one of sword. */
+/** Six blocks of body and one of ball. */
 const PARTS = 7
 const S = 0.36
 
@@ -56,7 +56,7 @@ const _up = new Vector3(0, 1, 0)
 const _target = new Vector3()
 const _dir = new Vector3()
 const _prev = new Vector3()
-/** The sword across a figure's back (grip over the right shoulder), held ready, and thrown. */
+/** The ball across a figure's back (grip over the right shoulder), held ready, and served. */
 const BAT_BACK = new Matrix4().compose(new Vector3(0.05, 1.15, -0.32), new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), 0.75), new Vector3(0.24, 1.7, 0.06))
 const BAT_UP = new Matrix4().compose(new Vector3(-0.35, 1.9, -0.25), new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -0.9), new Vector3(0.2, 1.4, 0.05))
 const BAT_SWUNG = new Matrix4().compose(new Vector3(0.45, 1.3, 0.5), new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), 1.2), new Vector3(0.2, 1.4, 0.05))
@@ -114,7 +114,7 @@ function writeFigure(body, instance, r, base, swing, armSwing, armStretch = 1, b
     instance += 1
   }
   body.setMatrixAt(instance, _m.copy(base).multiply(bat))
-  body.setColorAt(instance, _batColor.copy(swordBase(r.tireId || 'bicycle')))
+  body.setColorAt(instance, _batColor.copy(ballBase(r.tireId || 'bicycle')))
   return instance + 1
 }
 

@@ -61,7 +61,7 @@ function TutorialBanner({ step }) {
   const atPlate = useGame((s) => s.zone.atPlate)
   let text = current.text
   if (current.health) text += ` (${formatNumber(Math.min(health, current.health))}/${formatNumber(current.health)})`
-  if (current.event === 'roll' && atPlate) text = 'Anywhere on the stage: HOLD THROW to wind up - let go in the gold!'
+  if (current.event === 'roll' && atPlate) text = 'Anywhere on the serve line: HOLD SERVE to load up - let go in the gold!'
   return (
     <div
       className="flex items-center"
@@ -116,11 +116,11 @@ function GoalBanner() {
     const wins = Math.max(0, profile.wins - pending)
     const ball = nextBall({ ownedBalls: profile.ownedBalls || ['plain'] })
     if (ball && wins >= ball.cost && (!next || wins < next.cost)) {
-      text = `You can buy ${ball.name}! Visit the Enchant Altar`
+      text = `You can buy ${ball.name}! Visit the Aura Shrine`
       panel = 'balls'
       ready = text
     } else if (next) {
-      text = wins >= next.cost ? `You can buy the ${next.name}! Visit the Sword Counter` : `Next sword: ${next.name}`
+      text = wins >= next.cost ? `You can buy the ${next.name}! Visit the Ball Counter` : `Next ball: ${next.name}`
       if (wins >= next.cost) ready = text
       progress = Math.min(1, wins / Math.max(1, next.cost))
       if (wins < next.cost) text += ` (${formatNumber(wins)}/${formatNumber(next.cost)} Wins)`

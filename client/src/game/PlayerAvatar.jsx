@@ -20,7 +20,7 @@ import { useBloxity } from '../bloxity/BloxityContext'
 import { getEmoteClip, updateLocalEmote } from '../bloxity/emotes'
 import { shareLook } from '../net/connection'
 import { getGame } from '../store/game'
-import { createSwordMesh, disposeSwordMesh } from './swords'
+import { createBallMesh, disposeBallMesh } from './volleyballs'
 import {
   animateRig,
   applyPart,
@@ -81,7 +81,7 @@ function fallbackMotion(delta) {
  *   than the game's metric scale, so the model is measured and rescaled. `handRef` is
  *   an object beside the avatar that gets moved onto the right palm every frame, for
  *   anything held. `onStep` reports loading progress. `batId`, if given, is asked every
- *   frame which sword (shared/balance.js TIRES id) this player carries: it's drawn where
+ *   frame which ball (shared/balance.js TIRES id) this player carries: it's drawn where
  *   the pose puts it (playerPose `bat`) - across their back, or in their hands.
  */
 export const BloxityAvatar = forwardRef(function BloxityAvatar(
@@ -281,10 +281,10 @@ export const BloxityAvatar = forwardRef(function BloxityAvatar(
   }, [proportions])
   /** This avatar's emote playback (blend weight, clip time). */
   const emotePlayer = useMemo(() => createEmotePlayer(), [])
-  /** The sword this game avatar carries (`batId`): one mesh, placed from the pose. */
+  /** The ball this game avatar carries (`batId`): one mesh, placed from the pose. */
   const wantsBat = Boolean(batId)
-  const bat = useMemo(() => (wantsBat ? createSwordMesh() : null), [wantsBat])
-  useEffect(() => () => bat && disposeSwordMesh(bat), [bat])
+  const bat = useMemo(() => (wantsBat ? createBallMesh() : null), [wantsBat])
+  useEffect(() => () => bat && disposeBallMesh(bat), [bat])
   const batRef = useRef(null)
 
   useFrame((_state, delta) => {
@@ -301,7 +301,7 @@ export const BloxityAvatar = forwardRef(function BloxityAvatar(
         const placed = pose?.bat
         held.visible = Boolean(placed) && placed.mode !== 'none'
         if (held.visible) {
-          held.setSword(batId())
+          held.setBall(batId())
           held.position.copy(placed.pos)
           held.quaternion.copy(placed.quat)
           held.scale.setScalar(placed.scale)
@@ -356,7 +356,7 @@ export const PlayerAvatar = forwardRef(function PlayerAvatar(props, ref) {
   )
 })
 
-/** The sword you've equipped, for your avatar to carry. */
+/** The ball you've equipped, for your avatar to carry. */
 const yourBat = () => getGame().profile.equippedTire
 
 /** The SDK's characterAccessoryMatrix(character, bone), or null on an SDK without it. */

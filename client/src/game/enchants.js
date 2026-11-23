@@ -1,22 +1,22 @@
 import { Color } from 'three'
 
 import { swordTrailLook } from './swordTrails'
-import { swordTrail } from './swords'
+import { ballTrail } from './volleyballs'
 
 /**
- * How every enchantment at the Enchant Altar looks (shared/balance.js BALLS - the
+ * How every aura at the Enchant Altar looks (shared/balance.js BALLS - the
  * template's balls: names and stats). Colours are sRGB hex.
  *
  *   a, b     the panel swatch's two colours
- *   aura     the glow wrapped round the flying sword (null: none)
- *   head     the trail's colour at the sword; `tail` at its tip (null: the sword's own glow)
+ *   aura     the glow wrapped round the flying ball (null: none)
+ *   head     the trail's colour at the ball; `tail` at its tip (null: the ball's own glow)
  *   rainbow  the trail runs through every colour
  *   fx       what streams off it in the air: 'fire' (flames and embers), 'frost',
  *            'spark' (electric), 'gold' (glitter), 'smoke' (meteor), 'stars', 'void',
  *            'wind' (swirling streaks) - or nothing
  *
- * A bare blade (No Enchant) trails in the sword's own glow colour (swords.js), so every
- * sword already leaves its own streak; each enchantment then puts its aura over it.
+ * A bare blade (No Enchant) trails in the ball's own glow colour (balls.js), so every
+ * ball already leaves its own streak; each aura then puts its aura over it.
  */
 export const ENCHANT_STYLES = {
   plain: { a: '#d6dce6', b: '#9aa4b4', aura: null, head: null, tail: null },
@@ -50,17 +50,17 @@ const PARSED = Object.fromEntries(
   ]),
 )
 
-/** Enchantment `id`'s style as hex (for the UI). */
+/** Aura `id`'s style as hex (for the UI). */
 export const enchantStyle = (id) => ENCHANT_STYLES[id] || FALLBACK
 
-/** Enchantment `id`'s aura colour round the flying sword, or null for a bare blade. */
+/** Aura `id`'s aura colour round the flying ball, or null for a bare blade. */
 export const enchantAura = (id) => (PARSED[id] || PARSED.plain).aura
 
-/** What the trail of sword `tireId` with enchantment `ballId` looks like. Reused: copy what you keep. */
+/** What the trail of ball `tireId` with aura `ballId` looks like. Reused: copy what you keep. */
 const _look = { head: new Color(), tail: new Color(), fx: null, rainbow: false }
 export function trailLook(ballId, tireId) {
   const e = PARSED[ballId] || PARSED.plain
-  const own = swordTrail(tireId)
+  const own = ballTrail(tireId)
   _look.head.copy(e.head ?? own)
   // A bare blade's streak fades from its glow towards white-hot at the tip.
   _look.tail.copy(e.tail ?? _look.tail.copy(own).lerp(WHITE, 0.55))
@@ -70,7 +70,7 @@ export function trailLook(ballId, tireId) {
 }
 
 /**
- * The colour the speed lines take for a throw of sword `tireId`: its own trail's (its
- * enchantment shows in its aura). `ballId` is kept for the callers.
+ * The colour the speed lines take for a serve of ball `tireId`: its own trail's (its
+ * aura shows in its aura). `ballId` is kept for the callers.
  */
 export const throwTint = (ballId, tireId) => swordTrailLook(tireId).head

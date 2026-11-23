@@ -8,8 +8,8 @@ import { banner, crossedSwords, localBox, wallTorch } from './heraldry'
 
 /**
  * The castle round the courtyard: toy-stone curtain walls just outside the plaza on the
- * south, east and west, and along the north only out beyond the valley's mouth - the
- * throw stage and the road between are left wide open, nothing over them - each with a
+ * south, east and west, and along the north only out beyond the court's mouth - the
+ * serve stage and the road between are left wide open, nothing over them - each with a
  * darker plinth, a string course, a wall-walk coping and merlons along the outer parapet.
  * Square towers stand at the corners and along the walls (arrow slits, a crenellated top,
  * a pointed roof in the academy's blue or red, a gold finial and a pennant), and the spawn
@@ -17,10 +17,10 @@ import { banner, crossedSwords, localBox, wallTorch } from './heraldry'
  * stands behind you as you arrive, between the leaderboards. The academy's banners hang
  * down the inner faces between the towers, with wall torches between them. Out on the
  * hills stand four tall watchtowers, and on the south hills the great banner board with
- * the game's name (a world label, lobbyLabels.js) under a crest of crossed swords.
+ * the game's name (a world label, lobbyLabels.js) under a crest of crossed balls.
  *
  * Built in the colours of the world's venue (sceneStyle VENUES `castle`): pale stone,
- * blue and gold at Sunblade Academy, basalt and fire at Dragonfire Peaks.
+ * blue and gold at Sunblade Academy, basalt and fire at Christmas Village.
  *
  * Boxes go into the world's block set and the roofs into its props: no draw calls of their
  * own, nothing to do per frame. Nothing stands inside the plaza (the walls and towers are
@@ -33,13 +33,13 @@ const WALL = {
   south: PLAZA.maxZ + 3,
   east: PLAZA.maxX + 3.5,
   west: PLAZA.minX - 3.5,
-  // Along the north, out beyond the valley's mouth only, its plinth clear of the plaza.
+  // Along the north, out beyond the court's mouth only, its plinth clear of the plaza.
   north: PLAZA.minZ - 0.9,
   height: 6,
   thick: 1.1,
   plinth: 0.9,
 }
-/** The north walls stop here either side of the valley's mouth (the stage and road stay open). */
+/** The north walls stop here either side of the court's mouth (the stage and road stay open). */
 export const MOUTH_X = 24.5
 /** Towers: their size, height, and where each one stands (never inside the plaza: nothing there has a collider). */
 const TOWER = { size: 4.6, height: 10.5 }
@@ -64,7 +64,7 @@ const TOWERS = [
   [WALL.west, -12],
   [WALL.west, 14],
   [WALL.west, 40],
-  // The north walls' ends at the valley's mouth, and one between each and the corner.
+  // The north walls' ends at the court's mouth, and one between each and the corner.
   [-MOUTH_X, NORTH_TOWERS],
   [MOUTH_X, NORTH_TOWERS],
   [-36, NORTH_TOWERS],
@@ -180,7 +180,7 @@ function buildTower(blocks, props, x, z, c, i, { height = TOWER.height, size = T
 /**
  * The spawn gate on the south wall's inner face, between its two towers: great studded
  * wooden doors with iron bands in a stone arch, a gold-lit keystone, the crest of crossed
- * swords over it and a banner either side.
+ * balls over it and a banner either side.
  */
 function buildGate(blocks, c, detail) {
   const z = WALL.south - WALL.thick / 2
@@ -246,7 +246,7 @@ export const SCOREBOARD = { x: 0, z: PLAZA.maxZ + 14, y: 23.6, width: 30, height
 /**
  * The great board: two stone pylons, a stone frame with a gold-lit edge round the board's
  * dark face (the game's name is a world label on it), a row of lanterns along its top and
- * the academy's crest - a pair of giant crossed swords - standing over it.
+ * the academy's crest - a pair of giant crossed balls - standing over it.
  */
 export function addScoreboard(blocks, v) {
   const c = v.castle
@@ -284,7 +284,7 @@ export function buildCastle(blocks, props, { density = 1, world = 0 } = {}) {
   }
   TOWERS.forEach(([x, z], i) => buildTower(blocks, props, x, z, c, i, { detail }))
   buildGate(blocks, c, detail)
-  // Torches on the north end towers' inner faces, lighting the valley's mouth.
+  // Torches on the north end towers' inner faces, lighting the court's mouth.
   if (detail) {
     for (const side of [-1, 1]) {
       for (const dx of [-1.2, 1.2]) wallTorch(blocks, side * MOUTH_X + dx, 3.6, NORTH_TOWERS + TOWER.size / 2 + 0.02, 0, c)

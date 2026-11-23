@@ -24,7 +24,7 @@ import { standLabelSpec, standState } from '../labels/lobbyLabels'
 import { updateWorldLabel } from '../labels/registry'
 import { sharedMaterials, STYLE } from '../materials'
 import { venueOf } from '../sceneStyle'
-import { createSwordShowcase, disposeSwordShowcase, getSwordGeometry, swordTrail } from '../swords'
+import { createBallShowcase, disposeBallShowcase, getBallGeometry, ballTrail } from '../volleyballs'
 import {
   CORNICE,
   COUNTER_SIGN,
@@ -43,15 +43,15 @@ import {
 } from './swordWall'
 
 /**
- * How big each sword hangs: scaled towards TARGET metres tall (so the early, short swords
+ * How big each ball hangs: scaled towards TARGET metres tall (so the early, short balls
  * still read from across the courtyard), never under MIN nor over MAX times its size, and
  * never taller than TALLEST - which fits its niche: its middle SWORD_UP over the niche's
  * floor, its foot clear of the plate below, its tip under the ledge above.
  */
-const SWORD_FIT = { target: 2.7, min: 1.15, max: 1.75, tallest: 3.3 }
+const SWORD_FIT = { target: 2.1, min: 4, max: 7.5, tallest: 3.2 }
 
 function swordHeight(id) {
-  const geometry = getSwordGeometry(id)
+  const geometry = getBallGeometry(id)
   if (!geometry.boundingBox) geometry.computeBoundingBox()
   return geometry.boundingBox.max.y - geometry.boundingBox.min.y
 }
@@ -87,14 +87,14 @@ const FRAME_STRIPS = 4
 const frameIndex = (stand, k) => TIRE_STANDS.length + stand.index * FRAME_STRIPS + k
 
 /**
- * The Sword Wall (shared/world SWORD_WALL, SHOP its footprint), all in one block set - one
+ * The Ball Wall (shared/world SWORD_WALL, SHOP its footprint), all in one block set - one
  * draw call. Front (west) to back (swordWall.js): a stone body SWORD_WALL_TOP tall; pillars
  * between the columns, a glowing gem on each at every tier; a ledge under each tier above
  * the first and a cornice over the last, gold-lined; merlons and two end turrets along the
- * top (the SWORD SHOP crown sign is the world's - structures.js buildShop). In each niche a
- * back panel and a glowing frame (recoloured by state - see nicheLooks), and under the sword
+ * top (the BALL SHOP crown sign is the world's - structures.js buildShop). In each niche a
+ * back panel and a glowing frame (recoloured by state - see nicheLooks), and under the ball
  * its name plate: a dark block with gold edges, its lettering a flat world label
- * (lobbyLabels). Then the SWORD COUNTER's dais: stone, a gold rune ring and crossed swords
+ * (lobbyLabels). Then the BALL COUNTER's dais: stone, a gold rune ring and crossed balls
  * inlaid on top, and a low sign board along its east edge.
  */
 function buildWall(c, shop) {
@@ -126,7 +126,7 @@ function buildWall(c, shop) {
   set.addOn((WALL_FACE - 0.1 + NICHE_BACK) / 2, 0, midZ, NICHE_BACK - WALL_FACE + 0.1, SWORD_TIER_BASE, length + END_PILLAR, c.dark, STYLE.STUDS)
   set.add(WALL_FACE - 0.12, SWORD_TIER_BASE - 0.06, midZ, 0.05, 0.08, length + END_PILLAR, c.trim, STYLE.GLOW)
 
-  // Pillars, a gem on each at every tier's sword height.
+  // Pillars, a gem on each at every tier's ball height.
   const pillarTop = SWORD_WALL_TOP - CORNICE
   for (let k = 0; k <= SWORD_COLUMNS; k += 1) {
     const z = minZ + k * SWORD_COLUMN_PITCH
@@ -174,9 +174,9 @@ function buildWall(c, shop) {
 }
 
 /**
- * The SWORD COUNTER (shared/world SWORD_COUNTER, counterRect): a stone dais exactly its
+ * The BALL COUNTER (shared/world SWORD_COUNTER, counterRect): a stone dais exactly its
  * walkable height, a dark inlay on top with a ring of glowing gold runes and crossed
- * swords in it, gold-lined edges, and a low sign board along the east (wall) edge.
+ * balls in it, gold-lined edges, and a low sign board along the east (wall) edge.
  * Nothing on it stands over 1.2 m: from the courtyard it never hides a name plate.
  */
 function buildCounter(set, c, shop) {
@@ -196,7 +196,7 @@ function buildCounter(set, c, shop) {
     const a = (k / RUNES) * Math.PI * 2
     set.add(x + Math.cos(a) * r, top + 0.012, z + Math.sin(a) * r, 0.62, 0.025, k % 2 ? 0.12 : 0.18, c.trim, STYLE.GLOW, -a - Math.PI / 2)
   }
-  // Crossed swords in the ring, and a gem where they cross.
+  // Crossed balls in the ring, and a gem where they cross.
   // (One a hair over the other: no shared plane where they cross.)
   set.add(x, top + 0.014, z, 2.6, 0.025, 0.14, '#ffffff', STYLE.GLOW, Math.PI / 4)
   set.add(x, top + 0.02, z, 2.6, 0.025, 0.14, '#ffffff', STYLE.GLOW, -Math.PI / 4)
@@ -210,13 +210,13 @@ function buildCounter(set, c, shop) {
 }
 
 /**
- * The Sword Wall's middle, and how near the camera must be to draw its swords and halos:
+ * The Ball Wall's middle, and how near the camera must be to draw its balls and halos:
  * LOW, then the rest - from anywhere in the courtyard; they're dropped once the camera's
- * off down the road after a throw (and frustum-culled whenever they're out of view).
+ * off down the road after a serve (and frustum-culled whenever they're out of view).
  */
 const WALL_MID = { x: SWORD_WALL.x, z: (SWORD_WALL.minZ + SWORD_WALL.maxZ) / 2 }
 const SHOWCASE_RANGE = [95, 140]
-/** The halos sit just in front of each niche's back panel, behind its sword. */
+/** The halos sit just in front of each niche's back panel, behind its ball. */
 const HALO_X = PANEL_FRONT - 0.12
 
 const _m = new Matrix4()
@@ -224,12 +224,12 @@ const _p = new Vector3()
 const _q = new Quaternion()
 const _s = new Vector3()
 
-// --- Sparkles round the rarest swords -----------------------------------------------------
+// --- Sparkles round the rarest balls -----------------------------------------------------
 
 /**
- * Twinkles of light drifting up round the Mythic, Secret and Legend swords (RARITIES
- * order 5 up: the wall's last twenty niches), each in its sword's own colour - twice as
- * many round a Legend sword. One pool of camera-facing stars, one additive draw call,
+ * Twinkles of light drifting up round the Mythic, Secret and Legend balls (RARITIES
+ * order 5 up: the wall's last twenty niches), each in its ball's own colour - twice as
+ * many round a Legend ball. One pool of camera-facing stars, one additive draw call,
  * only on presets with particles and only near the wall; nothing allocated per frame.
  */
 const SPARKLES = 72
@@ -296,7 +296,7 @@ function sparkleEmitters() {
     list.push(stand.index)
     if (order >= 7) list.push(stand.index)
   }
-  const tints = TIRES.map((tire) => swordTrail(tire.id).clone().lerp(WHITE, 0.35))
+  const tints = TIRES.map((tire) => ballTrail(tire.id).clone().lerp(WHITE, 0.35))
   return { list, tints }
 }
 
@@ -343,7 +343,7 @@ function updateSparkles(mesh, pool, emitters, on, delta) {
     const i = f.next
     f.next = (f.next + 1) % SPARKLES
     const stand = TIRE_STANDS[list[Math.floor(Math.random() * list.length)]]
-    // Round the sword in its niche, in front of the back panel.
+    // Round the ball in its niche, in front of the back panel.
     f.x[i] = stand.x + (Math.random() - 0.35) * 0.9
     f.y[i] = stand.y + (Math.random() - 0.5) * 3.0
     f.z[i] = stand.z + (Math.random() - 0.5) * 2.6
@@ -378,16 +378,16 @@ function updateSparkles(mesh, pool, emitters, on, delta) {
 }
 
 /**
- * The SWORD WALL: every sword (swords.js) hung upright in its niche (shared/world
+ * The BALL WALL: every ball (balls.js) hung upright in its niche (shared/world
  * TIRE_STANDS), point up, turning slowly like a trophy on a turntable and bobbing, a soft
- * halo glowing behind it, its name plate under it - and the SWORD COUNTER at the wall's
+ * halo glowing behind it, its name plate under it - and the BALL COUNTER at the wall's
  * foot. Frames, panels, halos and plates recolour and rewrite as you buy and equip: gold
- * round the one you hold, bright green round the next to buy, your swords in their
+ * round the one you hold, bright green round the next to buy, your balls in their
  * rarity's colour, the ones past that dim. Three draw calls: the wall and counter, the
- * swords (all thirty-six turned in one mesh's vertex shader), the halos.
+ * balls (all thirty-six turned in one mesh's vertex shader), the halos.
  */
 export function TireShop() {
-  // As a string: the profile is a fresh copy after every update (a throw, a slash...).
+  // As a string: the profile is a fresh copy after every update (a serve, a spike...).
   const ownedKey = useGame((s) => s.profile.ownedTires.join(','))
   const equipped = useGame((s) => s.profile.equippedTire)
   const world = useGame((s) => s.profile.world || 0)
@@ -401,13 +401,13 @@ export function TireShop() {
   const assets = useMemo(() => {
     const v = venueOf(world)
     const wall = buildWall(v.castle, v.shop)
-    // Every sword, in one draw call, each at its own fitted size.
+    // Every ball, in one draw call, each at its own fitted size.
     const scales = TIRE_STANDS.map((stand) => shownScale(TIRES[stand.index].id))
-    const swords = createSwordShowcase(
+    const swords = createBallShowcase(
       TIRE_STANDS.map((stand) => ({ id: TIRES[stand.index].id, x: stand.x, y: stand.y, z: stand.z, phase: stand.index, scale: scales[stand.index] })),
       SWORD_FIT.max,
     )
-    // A soft glow behind each sword, the size of the sword (and never past its niche): set once.
+    // A soft glow behind each ball, the size of the ball (and never past its niche): set once.
     const halos = createGlowInstances(TIRE_STANDS.length, 0.5)
     for (const stand of TIRE_STANDS) {
       const size = Math.min(NICHE_WIDTH - 0.3, swordHeight(TIRES[stand.index].id) * scales[stand.index] + 0.6)
@@ -423,7 +423,7 @@ export function TireShop() {
     () => () => {
       disposeBlocks(assets.wall)
       disposeGlow(assets.halos)
-      disposeSwordShowcase(assets.swords)
+      disposeBallShowcase(assets.swords)
       assets.sparkles.geometry.dispose()
       assets.sparkles.material.dispose()
       assets.sparkles.dispose()
@@ -454,7 +454,7 @@ export function TireShop() {
     const halos = halosRef.current
     const swords = swordsRef.current
     if (!halos || !swords) return
-    // Distance culling: the swords and their halos only within SHOWCASE_RANGE of the wall -
+    // Distance culling: the balls and their halos only within SHOWCASE_RANGE of the wall -
     // at that distance they're a few pixels tall anyway.
     const cam = state.camera.position
     const quality = useQuality.getState()

@@ -18,7 +18,7 @@ export function linkPrograms(gl) {
  * Runs `fn` (a compile / compileAsync call) with every hidden object under `root` shown,
  * then hides them again. three's compile() gathers only what's visible, so whatever waits
  * hidden until it's needed (a burst, a splash, a ghost) was otherwise compiled the first
- * time it appeared - in the middle of a throw. compile() gathers synchronously, before any
+ * time it appeared - in the middle of a serve. compile() gathers synchronously, before any
  * frame, so nothing is ever drawn shown.
  *
  * @template T

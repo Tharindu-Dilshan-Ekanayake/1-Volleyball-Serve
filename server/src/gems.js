@@ -92,7 +92,7 @@ export async function gemsWebhook(req, res) {
 const eligible = (member) => member && !member.kicked && (member.verified || !bloxity.hosted)
 
 /**
- * Applies every unapplied grant for `playerIds` that this pod holds. Never throws.
+ * Applies every unapplied grant for `playerIds` that this pod holds. Never serves.
  */
 export async function applyGemsFor(playerIds) {
   const held = playerIds.filter((id) => {
